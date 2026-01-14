@@ -9,7 +9,7 @@ export default function HomePage() {
   return (
     <>
       <section className="grid grid-cols-1 md:grid-cols-2">
-        <div className="relative h-[60vh] md:h-screen bg-secondary/50 flex items-end p-8 md:p-12">
+        <div className="relative h-[60vh] md:h-[70vh] bg-secondary/50 flex items-end p-8 md:p-12">
            <Image
               src="https://images.unsplash.com/photo-1594589278946-0b5c1f3a5a7a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjb2ZmZWUlMjBiYWdzfGVufDB8fHx8MTc2ODc1NjUwMHww&ixlib=rb-4.1.0&q=80&w=1080"
               alt="Coffee bags"
@@ -30,7 +30,7 @@ export default function HomePage() {
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         </div>
-         <div className="relative h-[60vh] md:h-screen bg-secondary/50 flex items-end p-8 md:p-12">
+         <div className="relative h-[60vh] md:h-[70vh] bg-secondary/50 flex items-end p-8 md:p-12">
            <Image
               src="https://images.unsplash.com/photo-1579781403233-10d24f1e319b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjb2ZmZWUlMjBjdXBzfGVufDB8fHx8MTc2ODc1NjUwMHww&ixlib=rb-4.1.0&q=80&w=1080"
               alt="Coffee cups"

@@ -1,3 +1,52 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "product-1",
+      "description": "A stylish reusable water bottle",
+      "imageUrl": "https://images.unsplash.com/photo-1616118132534-381148898bb4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx3YXRlciUyMGJvdHRsZXxlbnwwfHx8fDE3NjgzNTg3MzF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "water bottle"
+    },
+    {
+      "id": "product-2",
+      "description": "A set of bamboo toothbrushes",
+      "imageUrl": "https://images.unsplash.com/photo-1553691158-91a7f9183156?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxiYW1ib28lMjB0b290aGJydXNofGVufDB8fHx8MTc2ODQzMjI1MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "bamboo toothbrush"
+    },
+    {
+      "id": "product-3",
+      "description": "A canvas tote bag with a leaf design",
+      "imageUrl": "https://images.unsplash.com/photo-1578237493287-8d4d2b03591a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx0b3RlJTIwYmFnfGVufDB8fHx8MTc2ODQzMjI1MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tote bag"
+    },
+    {
+      "id": "product-4",
+      "description": "A set of stainless steel straws",
+      "imageUrl": "https://images.unsplash.com/photo-1615723093586-1ad38d59056b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxzdGVlbCUyMHN0cmF3c3xlbnwwfHx8fDE3Njg0MzIyNTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "steel straws"
+    },
+    {
+      "id": "product-5",
+      "description": "A solar-powered phone charger",
+      "imageUrl": "https://images.unsplash.com/photo-1692052480358-235419613e4d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxzb2xhciUyMGNoYXJnZXJ8ZW58MHx8fHwxNzY4MzcyODM4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "solar charger"
+    },
+    {
+      "id": "product-6",
+      "description": "A set of beeswax food wraps",
+      "imageUrl": "https://images.unsplash.com/photo-1628254744918-986e2fbfbdf0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxiZWVzd2F4JTIwd3JhcHN8ZW58MHx8fHwxNzY4NDMyMjUwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "beeswax wraps"
+    },
+    {
+      "id": "product-7",
+      "description": "A compost bin for kitchen scraps",
+      "imageUrl": "https://images.unsplash.com/photo-1621496654772-c66c48290259?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjb21wb3N0JTIwYmlufGVufDB8fHx8MTc2ODQzMjI1MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "compost bin"
+    },
+    {
+      "id": "product-8",
+      "description": "A set of wool dryer balls",
+      "imageUrl": "https://images.unsplash.com/photo-1626372037370-41bc64f8c2bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8ZHJ5ZXIlMjBiYWxsc3xlbnwwfHx8fDE3Njg0MzIyNTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "dryer balls"
+    }
+  ]
 }

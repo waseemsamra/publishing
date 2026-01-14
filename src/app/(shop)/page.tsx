@@ -7,7 +7,7 @@ import { ArrowRight } from 'lucide-react';
 
 export default function HomePage() {
   return (
-    <>
+    <div className="container">
       <section className="grid grid-cols-1 md:grid-cols-2 md:gap-px bg-white">
         <div className="relative h-[60vh] md:h-[49vh] bg-secondary/50 flex items-end p-8 md:p-12">
            <Image
@@ -18,7 +18,7 @@ export default function HomePage() {
               data-ai-hint="coffee bags"
             />
             <div className="relative z-10 text-white w-full">
-              <h1 className="font-headline text-5xl md:text-4xl font-bold">Coffee Bags</h1>
+              <h1 className="font-headline text-4xl md:text-3xl font-bold">Coffee Bags</h1>
               <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                   <Link href="#" className="text-sm hover:underline">Low MOQ Bags</Link>
                   <Link href="#" className="text-sm hover:underline">Premium Bags</Link>
@@ -39,7 +39,7 @@ export default function HomePage() {
               data-ai-hint="coffee cups"
             />
              <div className="relative z-10 text-white w-full">
-              <h1 className="font-headline text-5xl md:text-4xl font-bold">Cups</h1>
+              <h1 className="font-headline text-4xl md:text-3xl font-bold">Cups</h1>
               <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                   <Link href="#" className="text-sm hover:underline">Hot Cups</Link>
                   <Link href="#" className="text-sm hover:underline">Clear Cups</Link>
@@ -53,6 +53,6 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

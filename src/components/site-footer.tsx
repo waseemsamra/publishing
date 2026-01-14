@@ -6,14 +6,14 @@ export function SiteFooter() {
   return (
     <footer className="border-t">
       <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
+          <div className="flex flex-col gap-4 items-center md:items-start">
             <Logo />
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground max-w-xs">
               Your one-stop shop for sustainable and eco-friendly products.
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 col-span-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 col-span-1 md:col-span-3 gap-8">
             <div>
               <h4 className="font-headline font-semibold mb-4">Shop</h4>
               <ul className="space-y-2">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import React, { useActionState } from 'react';
 import { getSustainabilityReport } from './actions';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';

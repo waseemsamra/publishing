@@ -12,8 +12,10 @@ export function SiteHeader() {
   const { cartCount } = useCart();
 
   const navLinks = [
-    { href: '/', label: 'Products' },
-    { href: '/sustainability-report', label: 'Industries', className: 'text-accent' },
+    { href: '#', label: 'Products' },
+    { href: '#', label: 'Industries' },
+    { href: '#', label: 'Resources' },
+    { href: '#', label: 'About' },
   ];
 
   return (
@@ -23,9 +25,9 @@ export function SiteHeader() {
         <nav className="hidden md:flex gap-6 ml-10">
           {navLinks.map((link) => (
             <Link
-              key={link.href}
+              key={link.label}
               href={link.href}
-              className={`text-sm font-medium transition-colors hover:text-primary ${link.className || 'text-foreground'}`}
+              className={`text-sm font-medium transition-colors hover:text-primary text-foreground`}
             >
               {link.label}
             </Link>

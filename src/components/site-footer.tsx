@@ -2,7 +2,7 @@
 
 import { Logo } from "./logo";
 import Link from 'next/link';
-import { Instagram, Facebook,Linkedin } from 'lucide-react';
+import { Instagram, Facebook, Linkedin } from 'lucide-react';
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
@@ -24,43 +24,46 @@ export function SiteFooter() {
     <footer className="border-t bg-background text-foreground">
       <div className="container py-12">
         <div className="bg-secondary/50 p-8 rounded-lg mb-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
-                <div>
-                  <h4 className="font-headline font-semibold mb-4">Company</h4>
-                  <ul className="space-y-2">
-                    <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">noissue</Link></li>
-                    <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">noissue+</Link></li>
-                    <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">The blog</Link></li>
-                    <li><Link href="/sustainability-report" className="text-sm text-muted-foreground hover:text-primary">Sustainability</Link></li>
-                    <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Help center</Link></li>
-                    <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Contact</Link></li>
-                  </ul>
-                </div>
-                 <div>
-                  <h4 className="font-headline font-semibold mb-4">Account</h4>
-                  <ul className="space-y-2">
-                    <li><Link href="/account" className="text-sm text-muted-foreground hover:text-primary">My orders</Link></li>
-                    <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">My quotes</Link></li>
-                    <li><Link href="/account" className="text-sm text-muted-foreground hover:text-primary">My profile</Link></li>
-                    <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Track order</Link></li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-headline font-semibold mb-4">Shop</h4>
-                  <ul className="space-y-2">
-                    <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">All products</Link></li>
-                    <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Samples</Link></li>
-                  </ul>
-                </div>
-                <div className="mt-8 sm:mt-0">
-                  <h4 className="font-headline font-semibold mb-4">Partners</h4>
-                  <ul className="space-y-2">
-                    <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Supplier application</Link></li>
-                  </ul>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <div className="col-span-1 lg:col-span-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
+                    <div>
+                      <h4 className="font-headline font-semibold mb-4">Company</h4>
+                      <ul className="space-y-2">
+                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">noissue</Link></li>
+                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">noissue+</Link></li>
+                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">The blog</Link></li>
+                        <li><Link href="/sustainability-report" className="text-sm text-muted-foreground hover:text-primary">Sustainability</Link></li>
+                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Help center</Link></li>
+                         <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Contact</Link></li>
+                      </ul>
+                    </div>
+                     <div>
+                      <h4 className="font-headline font-semibold mb-4">Account</h4>
+                      <ul className="space-y-2">
+                        <li><Link href="/account" className="text-sm text-muted-foreground hover:text-primary">My orders</Link></li>
+                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">My quotes</Link></li>
+                        <li><Link href="/account" className="text-sm text-muted-foreground hover:text-primary">My profile</Link></li>
+                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Track order</Link></li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-headline font-semibold mb-4">Shop</h4>
+                      <ul className="space-y-2">
+                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">All products</Link></li>
+                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Samples</Link></li>
+                      </ul>
+                    </div>
+                    <div className="mt-8 sm:mt-0 col-span-2 sm:col-span-1">
+                      <h4 className="font-headline font-semibold mb-4">Partners</h4>
+                      <ul className="space-y-2">
+                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Supplier application</Link></li>
+                      </ul>
+                    </div>
                 </div>
               </div>
-              <div>
+
+              <div className="col-span-1 md:col-span-2 lg:col-span-2">
                 <h4 className="font-headline font-semibold mb-2">Join us! Special offers, tips, tricks and more</h4>
                  <div className="flex w-full max-w-sm items-center space-x-2">
                     <Input type="email" placeholder="hello@thisismyemail.com" className="bg-white" />

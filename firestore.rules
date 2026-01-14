@@ -1,0 +1,220 @@
+/**
+ * This Firestore Security Ruleset defines the access control policy for the EcoCart Marketplace application.
+ *
+ * Core Philosophy:
+ * The security model is based on strict user ownership. All user-generated content (accounts, orders, addresses) is
+ * stored in a private data tree unique to that user, ensuring that only the authenticated owner can access their data.
+ * Global, non-sensitive data like the product and category catalogs are publicly readable to all users.
+ *
+ * Data Structure:
+ * All private user data is hierarchically organized under the `/users/{userId}` path. This structure naturally isolates
+ * user data and simplifies the implementation of ownership-based security. Publicly accessible catalog data, such as
+ * products and categories, is stored in top-level collections (`/products`, `/categories`).
+ *
+ * Key Security Decisions:
+ * - User Isolation: A user can only ever interact with documents within their own `/users/{userId}` path.
+ * - No User Listing: The top-level `/users` collection is not listable, preventing enumeration of all application users.
+ * - Read-Only Catalogs: Product and category information is public for reading and browsing but cannot be modified by
+ *   client applications. All writes to these collections must be performed by a trusted backend server with admin privileges.
+ * - Ownership Enforcement: All write operations on user-specific data are strictly validated to ensure the acting user
+ *   is the document owner.
+ *
+ * Denormalization for Authorization:
+ * The data structure is designed to be self-sufficient for authorization. The user's ID (`userId`) is present in the document
+ * path for all private data, eliminating the need for slow and costly `get()` calls in security rules. For example, securing
+ * `/users/{userId}/orders/{orderId}` relies directly on the `{userId}` from the path, not on a field within the order document.
+ *
+ * Structural Segregation:
+ * The ruleset leverages structural segregation by keeping private user data (`/users/{userId}`) entirely separate from
+ * public catalog data (`/products`, `/categories`). This is more secure and performant than using a single collection
+ * with a flag (e.g., `isPublic`), especially for list operations.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper Functions
+    // =================================
+
+    /**
+     * Checks if a user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the currently authenticated user's UID matches the provided userId.
+     * This is the primary function for enforcing document ownership.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks if a document exists and if the authenticated user is the owner.
+     * CRITICAL: Used for all update and delete operations to prevent modifying non-existent data.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+    
+    /**
+     * Validates that the user document being created has an 'id' field matching the document's path ID.
+     * This establishes a durable and consistent ownership link within the data itself.
+     */
+    function isUserAccountValidForCreate(userId) {
+        return request.resource.data.id == userId;
+    }
+
+    /**
+     * Validates that the 'id' field of a user document cannot be changed after creation.
+     * This prevents re-assigning the user document's core identifier.
+     */
+    function isUserAccountValidForUpdate() {
+        return request.resource.data.id == resource.data.id;
+    }
+    
+    /**
+     * Validates that the order being created has a 'userId' field matching the document's path ID.
+     * Enforces relational integrity between the order and its parent user document.
+     */
+    function isOrderValidForCreate(userId) {
+        return request.resource.data.userId == userId;
+    }
+
+    /**
+     * Validates that the 'userId' field of an order cannot be changed after creation.
+     * Prevents an order from being moved from one user to another.
+     */
+    function isOrderValidForUpdate() {
+        return request.resource.data.userId == resource.data.userId;
+    }
+    
+    /**
+     * Validates that the order item being created has an 'orderId' field matching its parent path ID.
+     * Enforces relational integrity between the order item and its parent order document.
+     */
+    function isOrderItemValidForCreate(orderId) {
+        return request.resource.data.orderId == orderId;
+    }
+
+    /**
+     * Validates that the 'orderId' field of an order item cannot be changed after creation.
+     * Prevents an order item from being moved from one order to another.
+     */
+    function isOrderItemValidForUpdate() {
+        return request.resource.data.orderId == resource.data.orderId;
+    }
+
+
+    // User Data Rules
+    // =================================
+
+    /**
+     * @description Controls access to a user's own account document.
+     * @path /users/{userId}
+     * @allow A signed-in user (auth.uid='user_abc') creating their own document at `/users/user_abc` (create).
+     * @deny A signed-in user (auth.uid='user_xyz') trying to read the document at `/users/user_abc` (get).
+     * @principle Restricts access to a user's own data tree and prevents user enumeration.
+     */
+    match /users/{userId} {
+      // READ: A user can only get their own document. Listing all users is forbidden.
+      allow get: if isOwner(userId);
+      allow list: if false;
+
+      // WRITE: A user can create their own document, and update or delete it thereafter.
+      allow create: if isOwner(userId) && isUserAccountValidForCreate(userId);
+      allow update: if isExistingOwner(userId) && isUserAccountValidForUpdate();
+      allow delete: if isExistingOwner(userId);
+      
+      /**
+       * @description Controls access to a user's addresses.
+       * @path /users/{userId}/addresses/{addressId}
+       * @allow User 'user_abc' can list all their documents under `/users/user_abc/addresses` (list).
+       * @deny User 'user_xyz' cannot create an address at `/users/user_abc/addresses/addr_123` (create).
+       * @principle Inherits ownership from the parent user document.
+       */
+      match /addresses/{addressId} {
+        // READ: Owner can read their own addresses.
+        allow get, list: if isOwner(userId);
+        
+        // WRITE: Owner can manage their own addresses.
+        allow create: if isOwner(userId);
+        allow update: if isExistingOwner(userId);
+        allow delete: if isExistingOwner(userId);
+      }
+      
+      /**
+       * @description Controls access to a user's orders.
+       * @path /users/{userId}/orders/{orderId}
+       * @allow User 'user_abc' can get their own order at `/users/user_abc/orders/order_123` (get).
+       * @deny User 'user_xyz' cannot list orders at `/users/user_abc/orders` (list).
+       * @principle Inherits ownership and validates relational integrity on writes.
+       */
+      match /orders/{orderId} {
+        // READ: Owner can read their own orders.
+        allow get, list: if isOwner(userId);
+        
+        // WRITE: Owner can create, update, and delete their own orders.
+        allow create: if isOwner(userId) && isOrderValidForCreate(userId);
+        allow update: if isExistingOwner(userId) && isOrderValidForUpdate();
+        allow delete: if isExistingOwner(userId);
+        
+        /**
+         * @description Controls access to items within a specific order.
+         * @path /users/{userId}/orders/{orderId}/orderItems/{orderItemId}
+         * @allow User 'user_abc' can update an item at `/users/user_abc/orders/order_123/orderItems/item_xyz` (update).
+         * @deny User 'user_xyz' cannot delete an item at `/users/user_abc/orders/order_123/orderItems/item_xyz` (delete).
+         * @principle Inherits ownership from the parent user and order documents.
+         */
+        match /orderItems/{orderItemId} {
+          // READ: Owner can read their own order items.
+          allow get, list: if isOwner(userId);
+          
+          // WRITE: Owner can manage their own order items.
+          allow create: if isOwner(userId) && isOrderItemValidForCreate(orderId);
+          allow update: if isExistingOwner(userId) && isOrderItemValidForUpdate();
+          allow delete: if isExistingOwner(userId);
+        }
+      }
+    }
+
+    // Public Catalog Rules
+    // =================================
+
+    /**
+     * @description Controls access to the public product catalog.
+     * @path /products/{productId}
+     * @allow Any user, signed-in or not, can read product data (get, list).
+     * @deny Any signed-in user trying to add a new product (create).
+     * @principle Data is public read-only for clients. Writes must be handled by a trusted server environment.
+     */
+    match /products/{productId} {
+      // READ: Products are public and can be read by anyone.
+      allow get, list: if true;
+
+      // WRITE: No client-side writes are allowed. Must be done via a backend with admin privileges.
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Controls access to the public product categories.
+     * @path /categories/{categoryId}
+     * @allow Any user, signed-in or not, can list all categories (list).
+     * @deny Any user attempting to modify a category document (update).
+     * @principle Data is public read-only for clients. Writes must be handled by a trusted server environment.
+     */
+    match /categories/{categoryId} {
+      // READ: Categories are public and can be read by anyone.
+      allow get, list: if true;
+
+      // WRITE: No client-side writes are allowed. Must be done via a backend with admin privileges.
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}

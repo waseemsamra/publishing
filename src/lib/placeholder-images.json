@@ -47,6 +47,18 @@
       "description": "A set of wool dryer balls",
       "imageUrl": "https://images.unsplash.com/photo-1626372037370-41bc64f8c2bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8ZHJ5ZXIlMjBiYWxsc3xlbnwwfHx8fDE3Njg0MzIyNTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "dryer balls"
+    },
+    {
+      "id": "hero-coffee-bags",
+      "description": "A collection of branded coffee bags",
+      "imageUrl": "https://images.unsplash.com/photo-1594589278946-0b5c1f3a5a7a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjb2ZmZWUlMjBiYWdzfGVufDB8fHx8MTc2ODc1NjUwMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "coffee bags"
+    },
+    {
+      "id": "hero-coffee-cups",
+      "description": "A person holding different types of coffee cups",
+      "imageUrl": "https://images.unsplash.com/photo-1579781403233-10d24f1e319b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjb2ZmZWUlMjBjdXBzfGVufDB8fHx8MTc2ODc1NjUwMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "coffee cups"
     }
   ]
 }

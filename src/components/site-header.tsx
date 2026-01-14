@@ -2,15 +2,36 @@
 
 import Link from 'next/link';
 import { ShoppingBag, Search, ChevronDown } from 'lucide-react';
-
+import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/cart-context';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
 import { Input } from '@/components/ui/input';
 
-export function SiteHeader() {
+function CartButton() {
   const { cartCount } = useCart();
+  const [isClient, setIsClient] = useState(false);
 
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  return (
+    <Button asChild variant="ghost" size="icon" className="relative">
+      <Link href="/cart">
+        <ShoppingBag className="h-6 w-6" />
+        {isClient && cartCount > 0 && (
+          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold">
+            {cartCount}
+          </span>
+        )}
+        <span className="sr-only">Shopping Cart</span>
+      </Link>
+    </Button>
+  );
+}
+
+export function SiteHeader() {
   const navLinks = [
     { href: '#', label: 'Products' },
     { href: '#', label: 'Industries', active: true },
@@ -75,17 +96,7 @@ export function SiteHeader() {
           <Button asChild variant="outline">
             <Link href="/login">Login / Signup</Link>
           </Button>
-          <Button asChild variant="ghost" size="icon" className="relative">
-            <Link href="/cart">
-              <ShoppingBag className="h-6 w-6" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold">
-                  {cartCount}
-                </span>
-              )}
-              <span className="sr-only">Shopping Cart</span>
-            </Link>
-          </Button>
+          <CartButton />
         </div>
       </div>
     </header>

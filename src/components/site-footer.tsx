@@ -6,8 +6,8 @@ export function SiteFooter() {
   return (
     <footer className="border-t">
       <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
-          <div className="flex flex-col gap-4 items-center md:items-start">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="flex flex-col gap-4 items-start">
             <Logo />
             <p className="text-sm text-muted-foreground max-w-xs">
               Your one-stop shop for sustainable and eco-friendly products.

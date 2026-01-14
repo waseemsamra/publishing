@@ -4,21 +4,25 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function HomePage() {
+  const coffeeBagsImage = PlaceHolderImages.find(p => p.id === 'hero-coffee-bags');
+  const coffeeCupsImage = PlaceHolderImages.find(p => p.id === 'hero-coffee-cups');
+
   return (
-    <div className="container">
+    <>
       <section className="grid grid-cols-1 md:grid-cols-2 md:gap-px bg-white">
-        <div className="relative h-[60vh] md:h-[49vh] bg-secondary/50 flex items-end p-8 md:p-12">
-           <Image
-              src="https://images.unsplash.com/photo-1594589278946-0b5c1f3a5a7a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjb2ZmZWUlMjBiYWdzfGVufDB8fHx8MTc2ODc1NjUwMHww&ixlib=rb-4.1.0&q=80&w=1080"
-              alt="Coffee bags"
+        <div className="relative h-[49vh] bg-secondary/50 flex items-end p-8 md:p-12">
+           {coffeeBagsImage && <Image
+              src={coffeeBagsImage.imageUrl}
+              alt={coffeeBagsImage.description}
               fill
               className="object-cover"
-              data-ai-hint="coffee bags"
-            />
+              data-ai-hint={coffeeBagsImage.imageHint}
+            />}
             <div className="relative z-10 text-white w-full">
-              <h1 className="font-headline text-4xl md:text-3xl font-bold">Coffee Bags</h1>
+              <h1 className="font-headline text-3xl md:text-2xl font-bold">Coffee Bags</h1>
               <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                   <Link href="#" className="text-sm hover:underline">Low MOQ Bags</Link>
                   <Link href="#" className="text-sm hover:underline">Premium Bags</Link>
@@ -30,16 +34,16 @@ export default function HomePage() {
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         </div>
-         <div className="relative h-[60vh] md:h-[49vh] bg-secondary/50 flex items-end p-8 md:p-12">
-           <Image
-              src="https://images.unsplash.com/photo-1579781403233-10d24f1e319b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjb2ZmZWUlMjBjdXBzfGVufDB8fHx8MTc2ODc1NjUwMHww&ixlib=rb-4.1.0&q=80&w=1080"
-              alt="Coffee cups"
+         <div className="relative h-[49vh] bg-secondary/50 flex items-end p-8 md:p-12">
+           {coffeeCupsImage && <Image
+              src={coffeeCupsImage.imageUrl}
+              alt={coffeeCupsImage.description}
               fill
               className="object-cover"
-              data-ai-hint="coffee cups"
-            />
+              data-ai-hint={coffeeCupsImage.imageHint}
+            />}
              <div className="relative z-10 text-white w-full">
-              <h1 className="font-headline text-4xl md:text-3xl font-bold">Cups</h1>
+              <h1 className="font-headline text-3xl md:text-2xl font-bold">Cups</h1>
               <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                   <Link href="#" className="text-sm hover:underline">Hot Cups</Link>
                   <Link href="#" className="text-sm hover:underline">Clear Cups</Link>
@@ -53,6 +57,6 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         </div>
       </section>
-    </div>
+    </>
   );
 }

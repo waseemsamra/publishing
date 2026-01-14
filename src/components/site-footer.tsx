@@ -22,8 +22,8 @@ const PinterestIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export function SiteFooter() {
   return (
     <footer className="border-t bg-background text-foreground">
-      <div className="container py-12">
-        <div className="bg-secondary/50 p-8 rounded-lg mb-12">
+      <div className="container">
+        <div className="bg-secondary/50 p-8 rounded-lg my-12">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
             <div className="col-span-1 lg:col-span-2">
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
@@ -74,7 +74,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 py-6">
           <div className="flex items-center gap-4">
              <Logo />
              <div className="flex items-center gap-4">

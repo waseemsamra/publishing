@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   SidebarProvider,
   Sidebar,
@@ -13,8 +13,19 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { LayoutGrid, Package, Users, ShoppingCart, Settings } from 'lucide-react';
+import {
+  LayoutGrid,
+  Package,
+  Users,
+  ShoppingCart,
+  Settings,
+  LogOut,
+} from 'lucide-react';
 import { Logo } from '@/components/logo';
+import { useAuthContext } from '@/context/auth-context';
+import { Button } from '@/components/ui/button';
+import { getAuth } from 'firebase/auth';
+import { useEffect } from 'react';
 
 const menuItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutGrid },
@@ -30,6 +41,27 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { user, loading } = useAuthContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/admin/login');
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
+
+  const handleLogout = async () => {
+    await getAuth().signOut();
+    router.push('/admin/login');
+  };
 
   return (
     <SidebarProvider>
@@ -37,7 +69,7 @@ export default function AdminLayout({
         <SidebarHeader>
           <div className="flex items-center justify-between">
             <div className="p-2">
-                <Logo />
+              <Logo />
             </div>
             <SidebarTrigger className="hidden md:flex" />
           </div>
@@ -59,11 +91,17 @@ export default function AdminLayout({
             ))}
           </SidebarMenu>
         </SidebarContent>
+        <div className="p-4">
+          <Button onClick={handleLogout} className="w-full">
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+          </Button>
+        </div>
       </Sidebar>
       <SidebarInset>
         <header className="flex h-14 items-center gap-4 border-b bg-background px-4 md:hidden">
-            <SidebarTrigger />
-            <Logo />
+          <SidebarTrigger />
+          <Logo />
         </header>
         <main className="flex-1 p-4 sm:p-6 bg-secondary/40">{children}</main>
       </SidebarInset>

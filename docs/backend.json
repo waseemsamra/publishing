@@ -36,6 +36,17 @@
           "items": {
             "type": "string"
           }
+        },
+        "roles": {
+          "type": "array",
+          "description": "Roles assigned to the user.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "customer"
+            ]
+          }
         }
       },
       "required": [
@@ -300,7 +311,7 @@
         }
       },
       {
-        "path": "/users/{userId}/orders/{orderId}",
+        "path": "/orders/{orderId}",
         "definition": {
           "entityName": "Order",
           "schema": {
@@ -309,61 +320,13 @@
           "description": "Stores order information for a specific user. This path enforces ownership-based security, allowing only the authenticated user to access their own orders.",
           "params": [
             {
-              "name": "userId",
-              "description": "The unique identifier of the user account."
-            },
-            {
               "name": "orderId",
               "description": "The unique identifier of the order."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/orders/{orderId}/orderItems/{orderItemId}",
-        "definition": {
-          "entityName": "OrderItem",
-          "schema": {
-            "$ref": "#/backend/entities/OrderItem"
-          },
-          "description": "Stores order item information for a specific order. This path inherits ownership from the parent order, ensuring only the authenticated user can access their own order items.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user account."
-            },
-            {
-              "name": "orderId",
-              "description": "The unique identifier of the order."
-            },
-            {
-              "name": "orderItemId",
-              "description": "The unique identifier of the order item."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/addresses/{addressId}",
-        "definition": {
-          "entityName": "Address",
-          "schema": {
-            "$ref": "#/backend/entities/Address"
-          },
-          "description": "Stores address information for a specific user. This path enforces ownership-based security, allowing only the authenticated user to access their own addresses.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user account."
-            },
-            {
-              "name": "addressId",
-              "description": "The unique identifier of the address."
             }
           ]
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the EcoCart Marketplace application. User data is segregated into `/users/{userId}` collections, enabling straightforward ownership-based security rules. Product and Category data are stored in root-level collections (`/products`, `/categories`) with no access restrictions, facilitating easy listing and filtering. Orders and OrderItems are nested under `/users/{userId}` to maintain a clear ownership hierarchy. Address are also nested under `/users/{userId}` for the same reasons. This structure eliminates the need for `get()` calls in security rules, as all necessary authorization context is available within the document or through path-based ownership. This approach ensures atomic operations and simplifies debugging. Segregation of data based on access requirements (e.g., public products vs. private user data) supports secure list operations. This design enables straightforward implementation of security rules based solely on `request.auth.uid` and the document path, promoting maintainability and security."
+    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the EcoCart Marketplace application. User data is segregated into `/users/{userId}` collections, enabling straightforward ownership-based security rules. Product and Category data are stored in root-level collections (`/products`, `/categories`) with no access restrictions, facilitating easy listing and filtering. Orders are in their own collection to be viewed by admins. This structure eliminates the need for `get()` calls in security rules, as all necessary authorization context is available within the document or through path-based ownership. This approach ensures atomic operations and simplifies debugging. Segregation of data based on access requirements (e.g., public products vs. private user data) supports secure list operations. This design enables straightforward implementation of security rules based solely on `request.auth.uid` and the document path, promoting maintainability and security."
   }
 }

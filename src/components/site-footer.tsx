@@ -77,11 +77,13 @@ export function SiteFooter() {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-4">
              <Logo />
-             <Link href="#" aria-label="Instagram"><Instagram className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-             <Link href="#" aria-label="Facebook"><Facebook className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-             <Link href="#" aria-label="TikTok"><TikTokIcon className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-             <Link href="#" aria-label="Pinterest"><PinterestIcon className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-             <Link href="#" aria-label="LinkedIn"><Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+             <div className="flex items-center gap-4">
+                <Link href="#" aria-label="Instagram"><Instagram className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+                <Link href="#" aria-label="Facebook"><Facebook className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+                <Link href="#" aria-label="TikTok"><TikTokIcon className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+                <Link href="#" aria-label="Pinterest"><PinterestIcon className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+                <Link href="#" aria-label="LinkedIn"><Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+             </div>
           </div>
           <div className="text-sm text-muted-foreground flex gap-4">
             <span>&copy; noissue {new Date().getFullYear()}</span>

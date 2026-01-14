@@ -18,7 +18,7 @@ export default function HomePage() {
               data-ai-hint="coffee bags"
             />
             <div className="relative z-10 text-white w-full">
-              <h1 className="font-headline text-5xl md:text-5xl font-bold">Coffee Bags</h1>
+              <h1 className="font-headline text-5xl md:text-4xl font-bold">Coffee Bags</h1>
               <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                   <Link href="#" className="text-sm hover:underline">Low MOQ Bags</Link>
                   <Link href="#" className="text-sm hover:underline">Premium Bags</Link>
@@ -39,7 +39,7 @@ export default function HomePage() {
               data-ai-hint="coffee cups"
             />
              <div className="relative z-10 text-white w-full">
-              <h1 className="font-headline text-5xl md:text-5xl font-bold">Cups</h1>
+              <h1 className="font-headline text-5xl md:text-4xl font-bold">Cups</h1>
               <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                   <Link href="#" className="text-sm hover:underline">Hot Cups</Link>
                   <Link href="#" className="text-sm hover:underline">Clear Cups</Link>
@@ -51,18 +51,6 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-        </div>
-      </section>
-
-      <section className="container py-16">
-        <div className="text-center mb-12">
-          <h2 className="font-headline text-3xl font-bold">Featured Products</h2>
-          <p className="text-muted-foreground mt-2">Hand-picked items to help you live more sustainably.</p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
         </div>
       </section>
     </>

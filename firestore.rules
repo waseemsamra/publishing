@@ -106,12 +106,11 @@ service cloud.firestore {
      * @principle Restricts access to a user's own data tree, with a temporary exception for role management.
      */
     match /users/{userId} {
-      // Temporarily allow any signed-in user to list and update users to bootstrap the first admin.
-      // This should be locked down after setup.
-      allow list, update: if isSignedIn();
-      
       allow get: if isOwner(userId) || isAdmin();
-      allow create: if isOwner(userId) && isIdMatchingDocId(userId);
+      // Temporarily allow any signed-in user to list and create users to bootstrap the first admin.
+      // This should be locked down after setup.
+      allow list, create: if isSignedIn();
+      allow update: if isAdmin() || isOwner(userId);
       allow delete: if isAdmin();
     }
 

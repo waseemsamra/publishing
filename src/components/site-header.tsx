@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { ShoppingBag, Search, ChevronDown } from 'lucide-react';
+import { ShoppingBag, Search, ChevronDown, User } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/cart-context';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/context/auth-context';
 
 function CartButton() {
   const { cartCount } = useCart();
@@ -30,6 +31,37 @@ function CartButton() {
     </Button>
   );
 }
+
+function AuthButton() {
+  const { user, loading } = useAuth();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient || loading) {
+    return <Button variant="outline" className="w-[120px]">...</Button>;
+  }
+
+  if (user) {
+    return (
+      <Button asChild variant="outline">
+        <Link href="/account">
+          <User className="mr-2 h-4 w-4" />
+          Account
+        </Link>
+      </Button>
+    );
+  }
+
+  return (
+    <Button asChild variant="outline">
+      <Link href="/login">Login / Signup</Link>
+    </Button>
+  );
+}
+
 
 export function SiteHeader() {
   const navLinks = [
@@ -100,9 +132,7 @@ export function SiteHeader() {
               <ChevronDown className="h-4 w-4 ml-1" />
             </Button>
           </div>
-          <Button asChild variant="outline">
-            <Link href="/login">Login / Signup</Link>
-          </Button>
+          <AuthButton />
           <CartButton />
         </div>
       </div>

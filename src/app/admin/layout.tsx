@@ -47,65 +47,68 @@ export default function AdminLayout({
   const { user, isUserLoading: authLoading } = useUser();
   const { firestore } = useFirebase();
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [verificationStatus, setVerificationStatus] = useState<
+    'loading' | 'admin' | 'non-admin'
+  >('loading');
 
-  const isAuthPage = pathname === '/admin/login' || pathname === '/admin/signup';
+  const isAuthPage =
+    pathname === '/admin/login' || pathname === '/admin/signup';
 
   const userDocRef = useMemoFirebase(
     () => (user ? doc(firestore, 'users', user.uid) : null),
     [user, firestore]
   );
-  
+
   const { data: userData, isLoading: userDocLoading } = useDoc(userDocRef);
 
   useEffect(() => {
-    // If we are on an auth page, do nothing.
     if (isAuthPage) {
+      setVerificationStatus('non-admin'); // Or a specific state for auth pages
       return;
     }
 
-    // If auth is still loading, wait.
     if (authLoading) {
+      setVerificationStatus('loading');
       return;
     }
 
-    // If there is no user, redirect to login.
     if (!user) {
       router.push('/admin/login');
       return;
     }
-
-    // If user exists, but their document is still loading, wait.
+    
+    // User exists, now we need to wait for their document
     if (userDocLoading) {
+      setVerificationStatus('loading');
       return;
     }
-
-    // Now we have the user and their document (or know it doesn't exist).
+    
+    // We have the auth status and the user doc loading is complete
     if (userData) {
       const roles = (userData as any).roles || [];
       if (roles.includes('admin')) {
-        setIsAdmin(true); // User is an admin, allow access.
+        setVerificationStatus('admin');
       } else {
-        setIsAdmin(false); // User is not an admin.
-        router.push('/'); // Redirect non-admins to the homepage.
+        setVerificationStatus('non-admin');
       }
     } else {
-      // User is logged in, but has no user document in Firestore.
-      setIsAdmin(false);
-      router.push('/'); // Redirect to homepage.
+      // User is authenticated but has no document or roles
+      setVerificationStatus('non-admin');
     }
-  }, [user, authLoading, userData, userDocLoading, router, isAuthPage, pathname]);
+  }, [user, authLoading, userData, userDocLoading, router, isAuthPage]);
 
+
+  useEffect(() => {
+      if (verificationStatus === 'non-admin' && !isAuthPage) {
+          router.push('/');
+      }
+  }, [verificationStatus, router, isAuthPage]);
 
   if (isAuthPage) {
     return <>{children}</>;
   }
-  
-  // Display a loading screen while we verify auth and admin status.
-  // This covers initial auth check and user document fetch.
-  const isLoading = authLoading || userDocLoading || isAdmin === null;
 
-  if (isLoading) {
+  if (verificationStatus === 'loading') {
     return (
       <div className="flex h-screen items-center justify-center">
         Verifying access...
@@ -113,10 +116,9 @@ export default function AdminLayout({
     );
   }
   
-  // If verification is complete but user is not an admin, don't render anything
-  // as the redirect will be in progress.
-  if (!isAdmin) {
-      return null;
+  if (verificationStatus !== 'admin') {
+    // Render nothing while the redirect is in progress.
+    return null;
   }
 
   const handleLogout = async () => {

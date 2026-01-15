@@ -119,6 +119,36 @@
       "description": "A custom shipping box.",
       "imageUrl": "https://images.unsplash.com/photo-1577702312706-e23ff063064f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzaGlwcGluZyUyMGJveHxlbnwwfHx8fDE3Njg0MzgxODR8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "shipping box"
+    },
+    {
+      "id": "trending-tapes",
+      "description": "A roll of decorative tape on a yellow background",
+      "imageUrl": "https://images.unsplash.com/photo-1631117541217-703649c0634a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjdXN0b20lMjB0YXBlfGVufDB8fHx8MTc2OTQ1MDY3NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "custom tape"
+    },
+    {
+      "id": "trending-coffee-bags",
+      "description": "Blue coffee bags with white text",
+      "imageUrl": "https://images.unsplash.com/photo-1643185390431-7b04879683d3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwYWNrYWdpbmclMjBjb2ZmZWV8ZW58MHx8fHwxNzY5NDUwNzA0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "coffee packaging"
+    },
+    {
+      "id": "trending-product-boxes",
+      "description": "Unfolded white product boxes on a wooden surface",
+      "imageUrl": "https://images.unsplash.com/photo-1618063614809-7f4c6e3d2f2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx1bmZvbGRlZCUyMGJveHxlbnwwfHx8fDE3Njk0NTA3MzN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "unfolded box"
+    },
+    {
+      "id": "trending-totes",
+      "description": "A white tote bag with a green logo",
+      "imageUrl": "https://images.unsplash.com/photo-1562546106-b9cb3a52f725?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx0b3RlJTIwYmFnfGVufDB8fHx8MTc2OTQ1MDc2MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tote bag"
+    },
+    {
+      "id": "alliance-background",
+      "description": "A logo stamped on a brown cardboard box",
+      "imageUrl": "https://images.unsplash.com/photo-1617994392158-0d194246d655?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwYWNrYWdpbmclMjBsb2dvfGVufDB8fHx8MTc2OTQ1MDc5NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "packaging logo"
     }
   ]
 }

@@ -98,7 +98,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const handleLogout = async () => {
     try {
       await logout();
-      router.push('/admin/login');
+      router.push('/');
     } catch (error) {
       console.error('Logout error:', error);
     }

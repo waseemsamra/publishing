@@ -1,3 +1,4 @@
+
 import { products } from '@/lib/data';
 import { ProductCard } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { ArrowRight } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { LowMinimumMustHaves } from '@/components/low-minimum-must-haves';
 import { BrandStories } from '@/components/brand-stories';
+import { PackagingAlliance } from '@/components/packaging-alliance';
 
 const TrendingNowCard = ({ imageId, title }: { imageId: string, title: string }) => {
   const image = PlaceHolderImages.find(p => p.id === imageId);
@@ -94,7 +96,11 @@ export default function HomePage() {
         </div>
       </section>
 
+      <PackagingAlliance />
+
       <BrandStories />
     </>
   );
 }
+
+    

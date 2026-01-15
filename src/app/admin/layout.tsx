@@ -29,6 +29,7 @@ import { doc } from 'firebase/firestore';
 import { useDoc } from '@/firebase/firestore/use-doc';
 import { useFirebase, useUser } from '@/firebase';
 import { useMemoFirebase } from '@/firebase/provider';
+import { AuthRedirect } from '@/components/auth-redirect';
 
 const menuItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutGrid },
@@ -62,28 +63,32 @@ export default function AdminLayout({
   const { data: userData, isLoading: userDocLoading } = useDoc(userDocRef);
 
   useEffect(() => {
+    // On auth pages, no verification is needed.
     if (isAuthPage) {
-      setVerificationStatus('non-admin'); // Or a specific state for auth pages
+      setVerificationStatus('non-admin');
       return;
     }
 
+    // While auth state is loading, we are loading.
     if (authLoading) {
       setVerificationStatus('loading');
       return;
     }
 
+    // If auth is done and there's no user, redirect to login.
     if (!user) {
       router.push('/admin/login');
       return;
     }
-    
-    // User exists, now we need to wait for their document
+
+    // If we have a user but are waiting for their Firestore document, keep loading.
     if (userDocLoading) {
       setVerificationStatus('loading');
       return;
     }
-    
-    // We have the auth status and the user doc loading is complete
+
+    // At this point, auth and Firestore doc loading are complete.
+    // We can now safely check the roles.
     if (userData) {
       const roles = (userData as any).roles || [];
       if (roles.includes('admin')) {
@@ -92,22 +97,23 @@ export default function AdminLayout({
         setVerificationStatus('non-admin');
       }
     } else {
-      // User is authenticated but has no document or roles
+      // User is authenticated but has no Firestore document or roles.
       setVerificationStatus('non-admin');
     }
   }, [user, authLoading, userData, userDocLoading, router, isAuthPage]);
 
 
-  useEffect(() => {
-      if (verificationStatus === 'non-admin' && !isAuthPage) {
-          router.push('/');
-      }
-  }, [verificationStatus, router, isAuthPage]);
+  const handleLogout = async () => {
+    await getAuth().signOut();
+    router.push('/admin/login');
+  };
 
+  // If it's an auth page (login/signup), just render the children.
   if (isAuthPage) {
     return <>{children}</>;
   }
 
+  // While verifying, show a loading screen.
   if (verificationStatus === 'loading') {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -116,16 +122,12 @@ export default function AdminLayout({
     );
   }
   
+  // If not an admin, render the redirect component.
   if (verificationStatus !== 'admin') {
-    // Render nothing while the redirect is in progress.
-    return null;
+    return <AuthRedirect to="/" />;
   }
 
-  const handleLogout = async () => {
-    await getAuth().signOut();
-    router.push('/admin/login');
-  };
-
+  // If we've reached here, the user is a verified admin.
   return (
     <SidebarProvider>
       <Sidebar>

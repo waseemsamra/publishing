@@ -21,7 +21,7 @@ import {
 } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/firebase';
+import { useFirebase } from '@/firebase';
 
 const GoogleIcon = () => (
   <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -58,9 +58,17 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast();
-  const auth = useAuth();
+  const { auth, areServicesAvailable } = useFirebase();
 
   const handleSocialSignIn = async (provider: AuthProvider) => {
+    if (!areServicesAvailable || !auth) {
+        toast({
+            variant: "destructive",
+            title: "Firebase not available",
+            description: "The authentication service is not ready. Please try again later.",
+        });
+        return;
+    }
     try {
       await signInWithPopup(auth, provider);
       router.push('/admin/dashboard');
@@ -75,6 +83,14 @@ export default function AdminLoginPage() {
   };
 
   const handleEmailSignIn = async () => {
+    if (!areServicesAvailable || !auth) {
+        toast({
+            variant: "destructive",
+            title: "Firebase not available",
+            description: "The authentication service is not ready. Please try again later.",
+        });
+        return;
+    }
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/admin/dashboard');

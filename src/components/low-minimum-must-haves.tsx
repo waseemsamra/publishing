@@ -15,13 +15,13 @@ import type { MustHaveProduct } from '@/lib/types';
 function MustHaveProductCard({ product }: { product: MustHaveProduct }) {
   return (
     <div className="flex flex-col">
-      <div className="relative overflow-hidden rounded-xl">
+      <div className="relative overflow-hidden rounded-xl aspect-square">
         <Image
           src={product.image.imageUrl}
           alt={product.image.description}
           width={400}
           height={400}
-          className="aspect-square w-full object-cover"
+          className="w-full object-cover"
           data-ai-hint={product.image.imageHint}
         />
         {product.badge && (
@@ -47,31 +47,31 @@ function MustHaveProductCard({ product }: { product: MustHaveProduct }) {
 export function LowMinimumMustHaves() {
   return (
     <section className="py-12 md:py-20 overflow-hidden">
-      <Carousel
-        opts={{
-          align: 'start',
-        }}
-        className="w-full"
-      >
-        <div className="container">
+      <div className="container">
+        <Carousel
+          opts={{
+            align: 'start',
+          }}
+          className="w-full"
+        >
           <div className="flex justify-between items-center mb-8">
             <h2 className="font-headline text-3xl font-bold md:text-4xl">
               Low Minimum Must-Haves
             </h2>
             <CarouselNext className="hidden md:inline-flex relative -top-4 -right-4" />
           </div>
-        </div>
-        <CarouselContent className="ml-0 pl-[var(--container-padding)]">
-          {mustHaveProducts.map((product) => (
-            <CarouselItem
-              key={product.id}
-              className="px-2 basis-3/4 sm:basis-1/3 md:basis-1/4 lg:basis-1/5"
-            >
-              <MustHaveProductCard product={product} />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
+          <CarouselContent className="ml-0 pl-4">
+            {mustHaveProducts.map((product) => (
+              <CarouselItem
+                key={product.id}
+                className="px-2 basis-3/4 sm:basis-1/3 md:basis-1/4 lg:basis-1/5"
+              >
+                <MustHaveProductCard product={product} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </div>
     </section>
   );
 }

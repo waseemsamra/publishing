@@ -61,7 +61,7 @@ export function LowMinimumMustHaves() {
           </h2>
           <CarouselNext className="hidden md:inline-flex" />
         </div>
-        <CarouselContent className="pl-4 sm:pl-6 lg:pl-8 -ml-4">
+        <CarouselContent className="pl-[var(--container-padding)]">
           {mustHaveProducts.map((product) => (
             <CarouselItem
               key={product.id}

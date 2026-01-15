@@ -80,7 +80,7 @@ export function SiteHeader() {
             </div>
         </div>
 
-        <div className="flex items-center justify-end space-x-2">
+        <div className="flex items-center justify-end space-x-2 flex-shrink-0">
           <div className="hidden md:flex items-center text-sm font-medium">
             <Button variant="ghost" size="sm" className="ml-1">
               <svg

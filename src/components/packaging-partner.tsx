@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { mustHaveProducts } from '@/lib/data';
 import type { MustHaveProduct } from '@/lib/types';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 function PackagingProductCard({ product }: { product: MustHaveProduct }) {
   return (
@@ -45,6 +46,9 @@ function PackagingProductCard({ product }: { product: MustHaveProduct }) {
 }
 
 export function PackagingPartner() {
+  const tabs = ['New In', 'Most Popular', 'Ready to Ship'];
+  const [activeTab, setActiveTab] = React.useState(tabs[0]);
+
   return (
     <section className="py-12 md:py-20 overflow-hidden">
         <div className="container">
@@ -53,9 +57,22 @@ export function PackagingPartner() {
                     Packaging partner to world-leading brands
                 </h2>
                 <div className="flex items-center gap-2 mt-4">
-                    <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full">New In</Button>
-                    <Button size="sm" variant="outline" className="rounded-full bg-secondary/50 border-transparent">Most Popular</Button>
-                    <Button size="sm" variant="outline" className="rounded-full bg-secondary/50 border-transparent">Ready to Ship</Button>
+                    {tabs.map((tab) => (
+                       <Button
+                        key={tab}
+                        size="sm"
+                        onClick={() => setActiveTab(tab)}
+                        className={cn(
+                            "rounded-full",
+                            activeTab === tab
+                                ? "bg-accent text-accent-foreground hover:bg-accent/90"
+                                : "bg-secondary/50 border-transparent text-foreground"
+                        )}
+                        variant={activeTab === tab ? "default" : "outline"}
+                       >
+                           {tab}
+                       </Button>
+                    ))}
                 </div>
             </div>
         </div>

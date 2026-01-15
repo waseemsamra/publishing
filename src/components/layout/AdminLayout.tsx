@@ -20,6 +20,7 @@ import {
   BarChart3,
   Package,
   ShoppingCart,
+  UserCog,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,6 +44,7 @@ const navItems = [
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/admin/content', label: 'Content', icon: FileText },
   { href: '/admin/calendar', label: 'Calendar', icon: Calendar },
+  { href: '/admin/grant-admin', label: 'Grant Admin', icon: UserCog },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 

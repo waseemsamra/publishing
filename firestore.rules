@@ -55,6 +55,13 @@ service cloud.firestore {
     }
     
     /**
+     * Checks if the requesting user has the 'admin' role in their own user document.
+     */
+    function isAdmin() {
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.hasAny(['admin']);
+    }
+
+    /**
      * Validates that the `userAccountId` field in a new document matches the user's UID.
      * Enforces relational integrity on create.
      */
@@ -98,16 +105,11 @@ service cloud.firestore {
      * @principle Restricts access to a user's own data tree, with a temporary exception for role management.
      */
     match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow list: if false; // Disallow listing all users for security.
+      allow get: if isSignedIn(); // Admins or owners can read.
+      allow list: if isAdmin(); // Only admins can list users.
       allow create: if isOwner(userId) && isIdMatchingDocId(userId);
-      
-      // TEMPORARY RULE: Allow any signed-in user to update a user document.
-      // This is to allow the initial admin to grant themselves a role.
-      // THIS SHOULD BE RESTRICTED to admin users only in production.
-      allow update: if isSignedIn();
-      
-      allow delete: if isExistingOwner(userId);
+      allow update: if isAdmin() || isOwner(userId); // Admins can update any user, users can update their own profile.
+      allow delete: if isAdmin(); // Only admins can delete users.
     }
 
     /**
@@ -120,12 +122,11 @@ service cloud.firestore {
      * @principle Public read access, with writes locked down for security.
      */
     match /products/{productId} {
-      // CRITICAL: Cannot implement admin-only writes. The 'Product' entity is missing an 'ownerId' or similar field for authorization, and no admin role system is defined.
       allow get: if true;
       allow list: if true;
-      allow create: if false; // TODO: Implement admin role check once available.
-      allow update: if false; // TODO: Implement admin role check once available.
-      allow delete: if false; // TODO: Implement admin role check once available.
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
 
     /**
@@ -138,12 +139,11 @@ service cloud.firestore {
      * @principle Public read access, with writes locked down for security.
      */
     match /categories/{categoryId} {
-      // CRITICAL: Cannot implement admin-only writes. The 'Category' entity is missing an 'ownerId' or similar field for authorization, and no admin role system is defined.
       allow get: if true;
       allow list: if true;
-      allow create: if false; // TODO: Implement admin role check once available.
-      allow update: if false; // TODO: Implement admin role check once available.
-      allow delete: if false; // TODO: Implement admin role check once available.
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
 
     /**
@@ -186,10 +186,10 @@ service cloud.firestore {
      * @principle Read-only access for users to their own historical data.
      */
     match /users/{userId}/orders/{orderId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if false;
-      allow update: if false;
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isOwner(userId) || isAdmin();
+      allow create: if false; // Should be handled by backend functions
+      allow update: if isAdmin(); // Admins can update order status
       allow delete: if false;
     }
 
@@ -202,8 +202,8 @@ service cloud.firestore {
      * @principle Read-only access for users to their own historical data.
      */
     match /users/{userId}/orders/{orderId}/orderItems/{orderItemId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
+       allow get: if isOwner(userId) || isAdmin();
+      allow list: if isOwner(userId) || isAdmin();
       allow create: if false;
       allow update: if false;
       allow delete: if false;

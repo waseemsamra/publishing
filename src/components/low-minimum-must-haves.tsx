@@ -20,8 +20,8 @@ function MustHaveProductCard({ product }: { product: MustHaveProduct }) {
           src={product.image.imageUrl}
           alt={product.image.description}
           width={400}
-          height={400}
-          className="aspect-[4/5] w-full object-cover"
+          height={533}
+          className="aspect-[3/4] w-full object-cover"
           data-ai-hint={product.image.imageHint}
         />
         {product.badge && (
@@ -48,31 +48,33 @@ export function LowMinimumMustHaves() {
   return (
     <section className="py-12 md:py-20 overflow-hidden">
       <div className="container">
-        <Carousel
-          opts={{
-            align: 'start',
-            containScroll: 'keepSnaps',
-          }}
-          className="w-full"
-        >
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="font-headline text-3xl md:text-4xl font-bold">
-              Low Minimum Must-Haves
-            </h2>
-            <CarouselNext className="relative -top-4 -right-4 hidden md:inline-flex" />
-          </div>
-          <CarouselContent className="-ml-4">
-            {mustHaveProducts.map((product) => (
-              <CarouselItem
-                key={product.id}
-                className="pl-4 basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
-              >
-                <MustHaveProductCard product={product} />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="font-headline text-3xl md:text-4xl font-bold">
+            Low Minimum Must-Haves
+          </h2>
+        </div>
       </div>
+      <Carousel
+        opts={{
+          align: 'start',
+          containScroll: 'keepSnaps',
+        }}
+        className="w-full"
+      >
+        <CarouselContent className="-ml-4 pl-8">
+          {mustHaveProducts.map((product) => (
+            <CarouselItem
+              key={product.id}
+              className="pl-4 basis-3/4 sm:basis-1/2 md:basis-1/3"
+            >
+              <MustHaveProductCard product={product} />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <div className="container">
+           <CarouselNext className="relative -top-8 -right-4 hidden md:inline-flex" />
+        </div>
+      </Carousel>
     </section>
   );
 }

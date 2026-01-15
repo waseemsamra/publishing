@@ -51,20 +51,20 @@ export function LowMinimumMustHaves() {
           opts={{
             align: 'start',
           }}
-          className="w-full container"
+          className="w-full"
         >
-          <div className="flex justify-between items-center mb-8">
+          <div className="container flex justify-between items-center mb-8">
             <h2 className="font-headline text-3xl font-bold md:text-4xl">
               Low Minimum Must-Haves
             </h2>
             <CarouselNext className="hidden md:inline-flex" />
           </div>
   
-          <CarouselContent className="ml-0 mr-[-1rem] sm:mr-[-1.5rem] lg:mr-[-2rem] pl-0">
+          <CarouselContent className="ml-0 pl-[var(--container-padding)]">
             {mustHaveProducts.map((product) => (
               <CarouselItem
                 key={product.id}
-                className="px-2 basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-[24%]"
+                className="px-2 basis-3/4 sm:basis-1/2 md:basis-1/3"
               >
                 <MustHaveProductCard product={product} />
               </CarouselItem>

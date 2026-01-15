@@ -33,12 +33,16 @@ export default function AdminSignUpPage() {
 
       if (user) {
         const userDocRef = doc(db, 'users', user.uid);
+        // This is a temporary measure for initial setup.
+        // In a real application, the first admin would be created via a script or console.
+        const roles = email === 'waseemsamra@gmail.com' ? ['admin', 'customer'] : ['customer'];
+        
         const userData = {
             id: user.uid,
             email: user.email,
             firstName: name.split(' ')[0] || '',
             lastName: name.split(' ').slice(1).join(' ') || '',
-            roles: ['admin', 'customer'],
+            roles: roles,
         };
         await setDoc(userDocRef, userData, { merge: true });
       }

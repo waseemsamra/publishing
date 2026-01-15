@@ -91,6 +91,15 @@ service cloud.firestore {
     function isIdImmutable() {
       return request.resource.data.id == resource.data.id;
     }
+    
+    /**
+     * [TEMPORARY] Checks if the user is the designated initial admin.
+     * This should be removed after the first admin is successfully set up.
+     */
+    function isInitialAdmin() {
+        return request.auth.token.email == 'waseemsamra@gmail.com';
+    }
+
 
     /**
      * @description Manages user account documents. A user can create their own document,
@@ -105,11 +114,16 @@ service cloud.firestore {
      * @principle Restricts access to a user's own data tree, with a temporary exception for role management.
      */
     match /users/{userId} {
-      allow get: if isSignedIn(); // Admins or owners can read.
-      allow list: if isAdmin(); // Only admins can list users.
-      allow create: if isOwner(userId) && isIdMatchingDocId(userId);
-      allow update: if isAdmin() || isOwner(userId); // Admins can update any user, users can update their own profile.
-      allow delete: if isAdmin(); // Only admins can delete users.
+      allow get: if isSignedIn();
+      allow list: if isAdmin();
+      // Allow creation if the user is creating their own document.
+      // Or, temporarily, if the designated initial admin is creating any account
+      // (This helps if signup flow needs to create the doc)
+      allow create: if isOwner(userId) && isIdMatchingDocId(userId) || (isInitialAdmin() && request.resource.data.roles.hasAny(['admin']));
+      // Allow update if admin, or if a user is updating their own profile.
+      // Or, temporarily, if the initial admin is setting roles.
+      allow update: if isAdmin() || isOwner(userId) || isInitialAdmin();
+      allow delete: if isAdmin();
     }
 
     /**

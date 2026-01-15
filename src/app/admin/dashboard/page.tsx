@@ -10,21 +10,21 @@ import {
 import { DollarSign, Package, Users, ShoppingCart } from 'lucide-react';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useMemoFirebase } from '@/firebase/provider';
-import { useFirestore } from '@/firebase/firestore/use-auth';
+import { useFirestore } from '@/firebase';
 import { collection } from 'firebase/firestore';
 
 export default function DashboardPage() {
   const firestore = useFirestore();
   const productsQuery = useMemoFirebase(
-    () => collection(firestore, 'products'),
+    () => (firestore ? collection(firestore, 'products') : null),
     [firestore]
   );
   const ordersQuery = useMemoFirebase(
-    () => collection(firestore, 'orders'),
+    () => (firestore ? collection(firestore, 'orders') : null),
     [firestore]
   );
   const usersQuery = useMemoFirebase(
-    () => collection(firestore, 'users'),
+    () => (firestore ? collection(firestore, 'users') : null),
     [firestore]
   );
 
@@ -33,7 +33,7 @@ export default function DashboardPage() {
   const { data: users } = useCollection(usersQuery);
 
   const totalRevenue =
-    orders?.reduce((acc, order) => acc + order.totalAmount, 0) || 0;
+    orders?.reduce((acc, order) => acc + (order.totalAmount || 0), 0) || 0;
 
   const stats = [
     {

@@ -50,11 +50,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           
           if (userDoc.exists()) {
             const userData = userDoc.data();
+            const roles = userData?.roles || [];
+            const primaryRole = roles.includes('admin') ? 'admin' : roles[0] || 'customer';
+
             setUser({
               ...firebaseUser,
               uid: firebaseUser.uid,
               email: firebaseUser.email,
-              role: userData?.roles?.includes('admin') ? 'admin' : 'customer',
+              role: primaryRole,
               displayName: userData?.firstName || firebaseUser.email?.split('@')[0] || 'User',
               photoURL: userData?.photoURL || firebaseUser.photoURL,
             });

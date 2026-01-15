@@ -91,12 +91,21 @@ service cloud.firestore {
     function isIdImmutable() {
       return request.resource.data.id == resource.data.id;
     }
+    
+    /**
+     * [TEMPORARY] Checks if the user is the designated initial admin.
+     * This should be removed after the first admin is successfully set up.
+     */
+    function isInitialAdmin() {
+        return isSignedIn() && request.auth.token.email == 'waseemsamra@gmail.com';
+    }
+
 
     /**
      * @description Manages user account documents. A user can create their own document,
      * and can only read or write to their own document thereafter. Listing users is forbidden.
-     * [TEMPORARY] Any authenticated user can update another user's document to grant admin roles.
-     * This should be reverted after initial setup.
+     * For a temporary period, any authenticated user can update another user's document
+     * to grant admin roles. This should be reverted after initial setup.
      * @path /users/{userId}
      * @allow (create) A new user with UID 'user123' creating their own document at /users/user123.
      * @allow (get) An authenticated user with UID 'user123' reading their own document at /users/user123.
@@ -106,11 +115,11 @@ service cloud.firestore {
      */
     match /users/{userId} {
       allow get: if isSignedIn();
-      allow list: if isAdmin();
-      allow create: if isOwner(userId) && isIdMatchingDocId(userId);
-      // [TEMPORARY] Allow any signed-in user to update roles.
-      // This should be changed back to `isAdmin() || isOwner(userId)` after setup.
-      allow update: if isSignedIn(); 
+      // Temporarily allow any signed-in user to list users so grant-admin page can query by email.
+      allow list: if isSignedIn();
+      allow create: if isOwner(userId) && isIdMatchingDocId(userId) || (isInitialAdmin() && request.resource.data.roles.hasAny(['admin']));
+      // Temporarily allow initial admin to update any user doc to grant roles.
+      allow update: if isInitialAdmin() || isAdmin() || isOwner(userId);
       allow delete: if isAdmin();
     }
 
@@ -238,7 +247,7 @@ service cloud.firestore {
       allow list: if isOwner(userId);
       allow create: if isOwner(userId);
       allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
+      allow delete: if isOwner(userId);
     }
   }
 }

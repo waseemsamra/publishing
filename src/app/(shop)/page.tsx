@@ -84,7 +84,7 @@ export default function HomePage() {
       
       <LowMinimumMustHaves />
 
-      <section className="py-12 md:py-20">
+      <section className="pt-12 md:pt-20">
         <div className="container">
             <h2 className="font-headline text-4xl font-bold mb-8">Trending now</h2>
         </div>
@@ -102,5 +102,3 @@ export default function HomePage() {
     </>
   );
 }
-
-    

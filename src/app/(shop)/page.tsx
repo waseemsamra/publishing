@@ -12,6 +12,7 @@ import { BrandStories } from '@/components/brand-stories';
 import { PackagingAlliance } from '@/components/packaging-alliance';
 import { PackagingPartner } from '@/components/packaging-partner';
 import { PackagingForBrands } from '@/components/packaging-for-brands';
+import { SignupBanner } from '@/components/signup-banner';
 
 const TrendingNowCard = ({ imageId, title }: { imageId: string, title: string }) => {
   const image = PlaceHolderImages.find(p => p.id === imageId);
@@ -106,6 +107,8 @@ export default function HomePage() {
       <BrandStories />
 
       <PackagingForBrands />
+
+      <SignupBanner />
     </>
   );
 }

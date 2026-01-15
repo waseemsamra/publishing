@@ -98,7 +98,6 @@ const TrendingNowCard = ({ imageId, title }: { imageId: string, title: string })
 export default function HomePage() {
   const coffeeBagsImage = PlaceHolderImages.find(p => p.id === 'hero-coffee-bags');
   const coffeeCupsImage = PlaceHolderImages.find(p => p.id === 'hero-coffee-cups');
-  const allianceImage = PlaceHolderImages.find(p => p.id === 'alliance-background');
 
   return (
     <>
@@ -149,6 +148,18 @@ export default function HomePage() {
       
       <LowMinimumMustHaves />
 
+      <section className="py-12 md:py-20">
+        <div className="container">
+          <h2 className="font-headline text-4xl font-bold mb-8">Trending now</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border">
+            <TrendingNowCard imageId="trending-tapes" title="Tapes" />
+            <TrendingNowCard imageId="trending-coffee-bags" title="Coffee Bags" />
+            <TrendingNowCard imageId="trending-product-boxes" title="Product Boxes" />
+            <TrendingNowCard imageId="trending-totes" title="Totes" />
+          </div>
+        </div>
+      </section>
+      
       <PackagingPartner />
 
       <section className="bg-background">

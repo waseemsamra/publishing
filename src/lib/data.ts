@@ -1,5 +1,5 @@
 import { PlaceHolderImages } from './placeholder-images';
-import type { Product, User, Order } from './types';
+import type { Product, User, Order, MustHaveProduct } from './types';
 
 const imageMap = PlaceHolderImages.reduce(
   (acc, img) => {
@@ -91,6 +91,60 @@ export const products: Product[] = [
     image: imageMap['product-8'],
   },
 ];
+
+export const mustHaveProducts: MustHaveProduct[] = [
+    {
+        id: 'mh-1',
+        name: 'Custom Coffee Bags',
+        price: 'from £0.75 per unit',
+        minUnits: 'Min. 500 units',
+        delivery: 'Delivery: 4 - 5 weeks',
+        badge: 'New',
+        image: imageMap['must-have-1'],
+    },
+    {
+        id: 'mh-2',
+        name: 'Custom Poly Mailers',
+        price: 'from £0.17 per unit',
+        minUnits: 'Min. 25 units',
+        delivery: 'Delivery: 4 - 5 weeks',
+        image: imageMap['must-have-2'],
+    },
+    {
+        id: 'mh-3',
+        name: 'Custom Recyclable Coffee Cups',
+        price: 'from £0.09 per unit',
+        minUnits: 'Min. 1000 units',
+        delivery: 'Delivery: 2 - 3 weeks',
+        badge: 'PE',
+        image: imageMap['must-have-3'],
+    },
+    {
+        id: 'mh-4',
+        name: 'Custom Multi Colored Tissue Paper',
+        price: 'from £0.05 per unit',
+        minUnits: 'Min. 250 units',
+        delivery: 'Delivery: 2 weeks',
+        image: imageMap['must-have-4'],
+    },
+    {
+        id: 'mh-5',
+        name: 'Custom Stickers',
+        price: 'from £0.02 per unit',
+        minUnits: 'Min. 1000 units',
+        delivery: 'Delivery: 1 - 2 weeks',
+        image: imageMap['must-have-5'],
+    },
+    {
+        id: 'mh-6',
+        name: 'Custom Food Grade Paper',
+        price: 'from £0.12 per unit',
+        minUnits: 'Min. 500 units',
+        delivery: 'Delivery: 3 - 4 weeks',
+        image: imageMap['must-have-1'],
+    }
+];
+
 
 export const users: User[] = [
     { id: 'usr_1', name: 'Alice Johnson', email: 'alice@example.com', joinedDate: '2023-01-15' },

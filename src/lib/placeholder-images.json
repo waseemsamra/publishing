@@ -59,6 +59,36 @@
       "description": "A person holding different types of coffee cups",
       "imageUrl": "https://images.unsplash.com/photo-1579781403233-10d24f1e319b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjb2ZmZWUlMjBjdXBzfGVufDB8fHx8MTc2ODc1NjUwMHww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "coffee cups"
+    },
+    {
+      "id": "must-have-1",
+      "description": "A pink bag of Grateful Dead Morning Brew coffee.",
+      "imageUrl": "https://images.unsplash.com/photo-1651761483492-7d2e26dd3455?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb2ZmZWUlMjBiYWd8ZW58MHx8fHwxNzY4MzM1NzUwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "coffee bag"
+    },
+    {
+      "id": "must-have-2",
+      "description": "Blue and teal custom poly mailers with a logo.",
+      "imageUrl": "https://images.unsplash.com/photo-1701518035740-a33935aeb3ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwb2x5JTIwbWFpbGVyc3xlbnwwfHx8fDE3Njg0Mzc2Mjd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "poly mailers"
+    },
+    {
+      "id": "must-have-3",
+      "description": "A hand holding a custom recyclable coffee cup.",
+      "imageUrl": "https://images.unsplash.com/photo-1598908314732-07113901949e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb2ZmZWUlMjBjdXB8ZW58MHx8fHwxNzY4NDI1MzU4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "coffee cup"
+    },
+    {
+      "id": "must-have-4",
+      "description": "Hands holding custom multi-colored tissue paper with a checkered pattern.",
+      "imageUrl": "https://images.unsplash.com/photo-1663729219757-c619e3aeb72f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx0aXNzdWUlMjBwYXBlcnxlbnwwfHx8fDE3Njg0Mjk4Mzd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tissue paper"
+    },
+    {
+      "id": "must-have-5",
+      "description": "A roll of custom branded stickers.",
+      "imageUrl": "https://images.unsplash.com/photo-1572950947476-26a6e4111e80?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzdGlja2Vyc3xlbnwwfHx8fDE3Njg0Mzc2MjZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "stickers"
     }
   ]
 }

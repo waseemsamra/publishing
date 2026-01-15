@@ -1,4 +1,5 @@
 
+
 import { products } from '@/lib/data';
 import { ProductCard } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { LowMinimumMustHaves } from '@/components/low-minimum-must-haves';
 
 const HBSurgerLogo = () => (
   <svg
@@ -122,6 +124,9 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         </div>
       </section>
+      
+      <LowMinimumMustHaves />
+
       <section className="bg-background">
         <div className="container py-12">
           <div className="flex justify-around items-center gap-8">

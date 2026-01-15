@@ -11,6 +11,16 @@ export interface Product {
   image: ImagePlaceholder;
 }
 
+export interface MustHaveProduct {
+    id: string;
+    name: string;
+    price: string;
+    minUnits: string;
+    delivery: string;
+    badge?: string;
+    image: ImagePlaceholder;
+}
+
 export interface CartItem extends Product {
   quantity: number;
 }

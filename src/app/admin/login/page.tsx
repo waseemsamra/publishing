@@ -13,16 +13,15 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  getAuth,
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   FacebookAuthProvider,
   signInWithPopup,
-  AuthProvider,
+  type AuthProvider,
 } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/firebase';
 
 const GoogleIcon = () => (
   <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -59,9 +58,9 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast();
+  const auth = useAuth();
 
   const handleSocialSignIn = async (provider: AuthProvider) => {
-    const auth = getAuth();
     try {
       await signInWithPopup(auth, provider);
       router.push('/admin/dashboard');
@@ -76,16 +75,14 @@ export default function AdminLoginPage() {
   };
 
   const handleEmailSignIn = async () => {
-    const auth = getAuth();
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/admin/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
-        description:
-          'There was a problem with your request. Please check your credentials and try again.',
+        description: error.message || 'There was a problem with your request. Please check your credentials and try again.',
       });
       console.error('Failed to sign in:', error);
     }

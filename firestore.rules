@@ -250,7 +250,7 @@ service cloud.firestore {
       allow list: if isOwner(userId);
       allow create: if isOwner(userId);
       allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
+      allow delete: if isOwner(userId);
     }
   }
 }

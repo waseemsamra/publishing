@@ -12,8 +12,8 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, doc } from 'firebase/firestore';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
@@ -25,10 +25,18 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast();
-  const { firestore } = useFirebase();
+  const { auth, firestore } = useFirebase();
 
   const handleSignUp = async () => {
-    const auth = getAuth();
+    if (!auth || !firestore) {
+        toast({
+            variant: 'destructive',
+            title: 'Uh oh! Something went wrong.',
+            description: 'Firebase is not initialized correctly.',
+        });
+        return;
+    }
+    
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -37,7 +45,7 @@ export default function SignUpPage() {
       );
       const user = userCredential.user;
 
-      if (user && firestore) {
+      if (user) {
         const userDocRef = doc(firestore, 'users', user.uid);
         const userData = {
           id: user.uid,

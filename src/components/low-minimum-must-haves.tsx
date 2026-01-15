@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -47,12 +48,6 @@ function MustHaveProductCard({ product }: { product: MustHaveProduct }) {
 export function LowMinimumMustHaves() {
   return (
     <section className="py-12 md:py-20">
-      <div className="container mb-8 flex items-center justify-between">
-        <h2 className="font-headline text-3xl font-bold md:text-4xl">
-          Low Minimum Must-Haves
-        </h2>
-        <CarouselNext className="-mr-4 hidden md:inline-flex" />
-      </div>
       <Carousel
         opts={{
           align: 'start',
@@ -60,11 +55,17 @@ export function LowMinimumMustHaves() {
         }}
         className="w-full"
       >
-        <CarouselContent className="pl-4 sm:pl-6 lg:pl-8">
+        <div className="container mb-8 flex items-center justify-between">
+          <h2 className="font-headline text-3xl font-bold md:text-4xl">
+            Low Minimum Must-Haves
+          </h2>
+          <CarouselNext className="hidden md:inline-flex" />
+        </div>
+        <CarouselContent className="pl-4 sm:pl-6 lg:pl-8 -ml-4">
           {mustHaveProducts.map((product) => (
             <CarouselItem
               key={product.id}
-              className="basis-3/4 pr-4 sm:basis-1/2 md:basis-1/3 lg:basis-[24%]"
+              className="pr-4 basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-[24%]"
             >
               <MustHaveProductCard product={product} />
             </CarouselItem>

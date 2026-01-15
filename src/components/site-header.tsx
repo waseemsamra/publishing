@@ -51,7 +51,7 @@ export function SiteHeader() {
           </nav>
         </div>
       </div>
-      <div className="container flex h-20 items-center justify-between">
+      <div className="container flex h-20 items-center">
         <div className="flex items-center gap-6">
           <Logo />
           <nav className="hidden items-center gap-6 md:flex">

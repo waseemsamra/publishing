@@ -24,6 +24,14 @@ export default function LoginPage() {
   const { login } = useAuth();
 
   const handleSignIn = async () => {
+    if (!email.trim() || !password.trim()) {
+      toast({
+        variant: 'destructive',
+        title: 'Login Failed',
+        description: 'Please enter both your email and password.',
+      });
+      return;
+    }
     try {
       await login(email, password);
       router.push('/account');

@@ -19,6 +19,7 @@ export interface MustHaveProduct {
     delivery: string;
     badge?: string;
     image: ImagePlaceholder;
+    tags?: ('new-in' | 'most-popular' | 'ready-to-ship')[];
 }
 
 export interface CartItem extends Product {

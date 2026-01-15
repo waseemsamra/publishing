@@ -101,6 +101,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
         delivery: 'Delivery: 4 - 5 weeks',
         badge: 'New',
         image: imageMap['must-have-1'],
+        tags: ['new-in', 'most-popular'],
     },
     {
         id: 'mh-2',
@@ -109,6 +110,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
         minUnits: 'Min. 25 units',
         delivery: 'Delivery: 4 - 5 weeks',
         image: imageMap['must-have-2'],
+        tags: ['most-popular', 'ready-to-ship'],
     },
     {
         id: 'mh-3',
@@ -118,6 +120,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
         delivery: 'Delivery: 2 - 3 weeks',
         badge: 'PE',
         image: imageMap['must-have-3'],
+        tags: ['most-popular'],
     },
     {
         id: 'mh-4',
@@ -126,6 +129,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
         minUnits: 'Min. 250 units',
         delivery: 'Delivery: 2 weeks',
         image: imageMap['must-have-4'],
+        tags: ['ready-to-ship'],
     },
     {
         id: 'mh-5',
@@ -134,6 +138,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
         minUnits: 'Min. 1000 units',
         delivery: 'Delivery: 1 - 2 weeks',
         image: imageMap['must-have-5'],
+        tags: ['ready-to-ship', 'most-popular'],
     },
     {
         id: 'mh-6',
@@ -142,6 +147,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
         minUnits: 'Min. 500 units',
         delivery: 'Delivery: 3 - 4 weeks',
         image: imageMap['must-have-6'],
+        tags: ['new-in'],
     },
     {
         id: 'mh-7',
@@ -150,6 +156,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
         minUnits: 'Min. 36 units',
         delivery: 'Delivery: 2 weeks',
         image: imageMap['must-have-7'],
+        tags: ['ready-to-ship'],
     },
     {
         id: 'mh-8',
@@ -158,6 +165,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
         minUnits: 'Min. 250 units',
         delivery: 'Delivery: 4 - 5 weeks',
         image: imageMap['must-have-8'],
+        tags: ['new-in', 'most-popular'],
     },
     {
         id: 'mh-9',
@@ -166,6 +174,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
         minUnits: 'Min. 100 units',
         delivery: 'Delivery: 3 - 4 weeks',
         image: imageMap['must-have-9'],
+        tags: ['new-in'],
     },
     {
         id: 'mh-10',
@@ -174,6 +183,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
         minUnits: 'Min. 50 units',
         delivery: 'Delivery: 2 - 3 weeks',
         image: imageMap['must-have-10'],
+        tags: ['ready-to-ship'],
     }
 ];
 

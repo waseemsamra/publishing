@@ -46,8 +46,19 @@ function PackagingProductCard({ product }: { product: MustHaveProduct }) {
 }
 
 export function PackagingPartner() {
-  const tabs = ['New In', 'Most Popular', 'Ready to Ship'];
-  const [activeTab, setActiveTab] = React.useState(tabs[0]);
+  const tabs = ['New In', 'Most Popular', 'Ready to Ship'] as const;
+  const tabSlugs = {
+    'New In': 'new-in',
+    'Most Popular': 'most-popular',
+    'Ready to Ship': 'ready-to-ship',
+  } as const;
+
+  const [activeTab, setActiveTab] = React.useState<typeof tabs[number]>(tabs[0]);
+
+  const filteredProducts = React.useMemo(() => {
+    const slug = tabSlugs[activeTab];
+    return mustHaveProducts.filter(p => p.tags?.includes(slug));
+  }, [activeTab]);
 
   return (
     <section className="py-12 md:py-20 overflow-hidden">
@@ -83,7 +94,7 @@ export function PackagingPartner() {
         className="w-full"
       >
         <CarouselContent className="pl-[var(--container-padding)]">
-          {mustHaveProducts.map((product) => (
+          {filteredProducts.map((product) => (
             <CarouselItem
               key={product.id}
               className="px-2 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-[23.5%]"

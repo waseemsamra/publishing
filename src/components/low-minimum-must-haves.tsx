@@ -15,7 +15,7 @@ import type { MustHaveProduct } from '@/lib/types';
 function MustHaveProductCard({ product }: { product: MustHaveProduct }) {
   return (
     <div className="flex flex-col h-full">
-      <div className="relative overflow-hidden rounded-xl aspect-square">
+      <div className="relative overflow-hidden aspect-square rounded-xl">
         <Image
           src={product.image.imageUrl}
           alt={product.image.description}
@@ -46,19 +46,20 @@ function MustHaveProductCard({ product }: { product: MustHaveProduct }) {
 export function LowMinimumMustHaves() {
   return (
     <section className="py-12 md:py-20 overflow-hidden">
-      <div className="container">
-        <div className="flex justify-between items-center mb-8">
-            <h2 className="font-headline text-3xl font-bold md:text-4xl">
-                Low Minimum Must-Haves
-            </h2>
-        </div>
-      </div>
       <Carousel
         opts={{
           align: 'start',
         }}
         className="w-full"
       >
+        <div className="container">
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="font-headline text-3xl font-bold md:text-4xl">
+                    Low Minimum Must-Haves
+                </h2>
+                <CarouselNext className="hidden md:inline-flex" />
+            </div>
+        </div>
         <CarouselContent className="pl-[var(--container-padding)]">
           {mustHaveProducts.map((product) => (
             <CarouselItem
@@ -69,9 +70,6 @@ export function LowMinimumMustHaves() {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <div className="container">
-            <CarouselNext className="hidden md:inline-flex absolute right-8 top-[-5.5rem]" />
-        </div>
       </Carousel>
     </section>
   );

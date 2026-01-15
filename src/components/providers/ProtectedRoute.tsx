@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { Loader2 } from 'lucide-react';
@@ -10,24 +10,32 @@ interface ProtectedRouteProps {
   requiredRole?: string;
 }
 
-export default function ProtectedRoute({ 
-  children, 
-  requiredRole = 'admin' 
+export default function ProtectedRoute({
+  children,
+  requiredRole = 'admin',
 }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    if (!loading) {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!loading && isClient) {
       if (!user) {
+        // Redirect to login if not authenticated
         router.push('/login');
       } else if (user.role !== requiredRole) {
+        // Redirect to unauthorized if wrong role
         router.push('/unauthorized');
       }
     }
-  }, [user, loading, router, requiredRole]);
+  }, [user, loading, router, requiredRole, isClient]);
 
-  if (loading) {
+  // Show loading state
+  if (loading || !isClient) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -38,6 +46,8 @@ export default function ProtectedRoute({
     );
   }
 
+  // If user doesn't exist or wrong role, don't render children
+  // (they'll be redirected by useEffect)
   if (!user || user.role !== requiredRole) {
     return null;
   }

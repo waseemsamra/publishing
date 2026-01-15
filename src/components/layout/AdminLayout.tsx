@@ -44,11 +44,13 @@ const navItems = [
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/admin/content', label: 'Content', icon: FileText },
   { href: '/admin/calendar', label: 'Calendar', icon: Calendar },
-  { href: '/admin/grant-admin', label: 'Grant Admin', icon: UserCog },
+  { href: '/admin/grant-admin', label: 'Grant Admin', icon: UserCog, isPublic: true }, // Allow public access
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 
-function SidebarContent({ pathname, onLinkClick }: { pathname: string, onLinkClick: () => void }) {
+function SidebarContent({ pathname, onLinkClick, isAdmin }: { pathname: string, onLinkClick: () => void, isAdmin: boolean }) {
+  const visibleNavItems = navItems.filter(item => isAdmin || item.isPublic);
+
   return (
     <div className="flex h-full flex-col">
        <div className="p-4 border-b">
@@ -61,7 +63,7 @@ function SidebarContent({ pathname, onLinkClick }: { pathname: string, onLinkCli
           </Link>
       </div>
       <nav className="flex-1 space-y-1 p-2">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
           return (
@@ -113,12 +115,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   
   const closeSidebar = () => setSidebarOpen(false);
 
+  const isAdmin = user?.role === 'admin';
 
   return (
         <div className="min-h-screen bg-muted/40">
         {/* Desktop Sidebar */}
         <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col md:border-r bg-background">
-          <SidebarContent pathname={pathname} onLinkClick={closeSidebar} />
+          <SidebarContent pathname={pathname} onLinkClick={closeSidebar} isAdmin={isAdmin} />
         </aside>
 
         <div className="md:pl-64 flex flex-col">
@@ -133,7 +136,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="w-64 p-0">
-                      <SidebarContent pathname={pathname} onLinkClick={closeSidebar} />
+                      <SidebarContent pathname={pathname} onLinkClick={closeSidebar} isAdmin={isAdmin} />
                     </SheetContent>
                 </Sheet>
                 

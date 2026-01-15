@@ -23,11 +23,14 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/context/auth-context';
+import AdminLayout from '@/components/layout/AdminLayout';
 
-export default function GrantAdminPage() {
+function GrantAdminContent() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleGrantAdmin = async () => {
     if (!email) {
@@ -67,6 +70,7 @@ export default function GrantAdminPage() {
       });
       setEmail('');
     } catch (error: any) {
+      console.error('Error granting admin role:', error);
       toast({
         variant: 'destructive',
         title: 'Error granting admin role',
@@ -85,7 +89,7 @@ export default function GrantAdminPage() {
           <CardTitle>Grant Admin Privileges</CardTitle>
           <CardDescription>
             Enter the email of an existing user to add the 'admin' role to their
-            account.
+            account. This is a temporary measure for initial setup.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -116,4 +120,13 @@ export default function GrantAdminPage() {
       </Card>
     </div>
   );
+}
+
+
+export default function GrantAdminPage() {
+    return (
+        <AdminLayout>
+            <GrantAdminContent />
+        </AdminLayout>
+    )
 }

@@ -33,26 +33,24 @@ export default function AdminSignUpPage() {
 
       if (user) {
         const userDocRef = doc(db, 'users', user.uid);
-        // This is a temporary measure for initial setup.
-        // In a real application, the first admin would be created via a script or console.
-        const roles = email === 'waseemsamra@gmail.com' ? ['admin', 'customer'] : ['customer'];
-        
+        // New users are always created with the 'customer' role.
+        // Admin rights must be granted explicitly via the 'Grant Admin' page.
         const userData = {
             id: user.uid,
             email: user.email,
             firstName: name.split(' ')[0] || '',
             lastName: name.split(' ').slice(1).join(' ') || '',
-            roles: roles,
+            roles: ['customer'],
         };
         await setDoc(userDocRef, userData, { merge: true });
       }
 
       toast({
         title: 'Account Created',
-        description: "You've successfully signed up.",
+        description: "You've successfully signed up. You can now sign in.",
       });
-      router.push('/admin/dashboard');
-    } catch (error: any) {
+      router.push('/admin/login');
+    } catch (error: any)
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
@@ -70,7 +68,7 @@ export default function AdminSignUpPage() {
             Create an Admin Account
           </CardTitle>
           <CardDescription>
-            Fill in the details below to create your admin account.
+            Fill in the details below to create your account.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

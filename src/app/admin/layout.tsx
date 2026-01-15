@@ -59,32 +59,50 @@ export default function AdminLayout({
   const { data: userData, isLoading: userDocLoading } = useDoc(userDocRef);
 
   useEffect(() => {
-    if (!authLoading && !user && !isAuthPage) {
+    // If we are on an auth page, do nothing.
+    if (isAuthPage) {
+      return;
+    }
+
+    // If auth is still loading, wait.
+    if (authLoading) {
+      return;
+    }
+
+    // If there is no user, redirect to login.
+    if (!user) {
       router.push('/admin/login');
       return;
     }
 
-    if (user && !userDocLoading) {
-      if (userData) {
-        const roles = (userData as any).roles || [];
-        if (roles.includes('admin')) {
-          setIsAdmin(true);
-        } else {
-          setIsAdmin(false);
-          router.push('/'); // Not an admin, redirect to homepage
-        }
-      } else if (!isAuthPage) {
-        // User doc doesn't exist, but they are logged in. Not an admin.
-        setIsAdmin(false);
-        router.push('/');
-      }
+    // If user exists, but their document is still loading, wait.
+    if (userDocLoading) {
+      return;
     }
-  }, [user, authLoading, userData, userDocLoading, router, isAuthPage]);
+
+    // Now we have the user and their document (or know it doesn't exist).
+    if (userData) {
+      const roles = (userData as any).roles || [];
+      if (roles.includes('admin')) {
+        setIsAdmin(true); // User is an admin, allow access.
+      } else {
+        setIsAdmin(false); // User is not an admin.
+        router.push('/'); // Redirect non-admins to the homepage.
+      }
+    } else {
+      // User is logged in, but has no user document in Firestore.
+      setIsAdmin(false);
+      router.push('/'); // Redirect to homepage.
+    }
+  }, [user, authLoading, userData, userDocLoading, router, isAuthPage, pathname]);
+
 
   if (isAuthPage) {
     return <>{children}</>;
   }
-
+  
+  // Display a loading screen while we verify auth and admin status.
+  // This covers initial auth check and user document fetch.
   const isLoading = authLoading || userDocLoading || isAdmin === null;
 
   if (isLoading) {
@@ -95,11 +113,11 @@ export default function AdminLayout({
     );
   }
   
+  // If verification is complete but user is not an admin, don't render anything
+  // as the redirect will be in progress.
   if (!isAdmin) {
-      // This part might not be strictly necessary due to the redirect, but it's a good safeguard.
       return null;
   }
-
 
   const handleLogout = async () => {
     await getAuth().signOut();

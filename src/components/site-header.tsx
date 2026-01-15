@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -40,10 +39,10 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-20 items-center">
-        <div className="flex items-center">
+      <div className="container flex h-20 items-center justify-between">
+        <div className="flex items-center gap-10">
           <Logo />
-          <nav className="hidden md:flex gap-6 ml-10">
+          <nav className="hidden md:flex gap-6">
             {navLinks.map(link => (
               <Link
                 key={link.label}
@@ -58,7 +57,7 @@ export function SiteHeader() {
           </nav>
         </div>
 
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        <div className="flex items-center justify-end space-x-4">
           <div className="relative w-full max-w-sm hidden sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input

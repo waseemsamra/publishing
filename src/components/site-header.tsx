@@ -39,26 +39,27 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-20 items-center justify-between">
-        <div className="flex items-center gap-10">
+      <div className="container flex h-20 items-center">
+        <div className="flex items-center">
           <Logo />
-          <nav className="hidden md:flex gap-6">
-            {navLinks.map(link => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  link.active ? 'text-accent' : 'text-foreground'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
         </div>
 
+        <nav className="hidden md:flex flex-1 justify-center items-center gap-6">
+          {navLinks.map(link => (
+            <Link
+              key={link.label}
+              href={link.href}
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                link.active ? 'text-accent' : 'text-foreground'
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
         <div className="flex items-center justify-end space-x-4">
-          <div className="relative w-full max-w-sm hidden sm:block">
+          <div className="relative w-full max-w-xs hidden sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"

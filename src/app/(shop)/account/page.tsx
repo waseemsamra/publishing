@@ -51,9 +51,9 @@ export default function AccountPage() {
               <CardDescription>Manage your personal details.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-               <p><strong>Name:</strong> {user.displayName || 'Alex Doe'}</p>
+               <p><strong>Name:</strong> {user.displayName || 'N/A'}</p>
                <p><strong>Email:</strong> {user.email}</p>
-               <p><strong>Member Since:</strong> {user.metadata.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString() : 'January 1, 2024'}</p>
+               <p><strong>Member Since:</strong> {user.metadata.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString() : 'N/A'}</p>
                <Button>Edit Profile</Button>
             </CardContent>
           </Card>

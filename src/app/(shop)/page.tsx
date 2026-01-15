@@ -9,6 +9,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { LowMinimumMustHaves } from '@/components/low-minimum-must-haves';
 import { BrandStories } from '@/components/brand-stories';
 import { PackagingAlliance } from '@/components/packaging-alliance';
+import { PackagingPartner } from '@/components/packaging-partner';
 
 const TrendingNowCard = ({ imageId, title }: { imageId: string, title: string }) => {
   const image = PlaceHolderImages.find(p => p.id === imageId);
@@ -84,8 +85,8 @@ export default function HomePage() {
       
       <LowMinimumMustHaves />
 
-      <section className="pt-12 md:pt-20">
-        <div className="container">
+      <section>
+        <div className="container pt-12 md:pt-20">
             <h2 className="font-headline text-4xl font-bold mb-8">Trending now</h2>
         </div>
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border">
@@ -97,6 +98,8 @@ export default function HomePage() {
       </section>
 
       <PackagingAlliance />
+
+      <PackagingPartner />
 
       <BrandStories />
     </>

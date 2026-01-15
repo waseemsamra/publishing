@@ -97,9 +97,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <PackagingPartner />
-
       <PackagingAlliance />
+
+      <PackagingPartner />
 
       <BrandStories />
     </>

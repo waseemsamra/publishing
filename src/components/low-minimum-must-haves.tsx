@@ -47,12 +47,10 @@ function MustHaveProductCard({ product }: { product: MustHaveProduct }) {
 export function LowMinimumMustHaves() {
   return (
     <section className="py-12 md:py-20">
-      <div className="container">
-        <div className="mb-8 flex items-center justify-between">
-          <h2 className="font-headline text-3xl font-bold md:text-4xl">
-            Low Minimum Must-Haves
-          </h2>
-        </div>
+      <div className="container mb-8 flex items-center justify-between">
+        <h2 className="font-headline text-3xl font-bold md:text-4xl">
+          Low Minimum Must-Haves
+        </h2>
       </div>
       <Carousel
         opts={{
@@ -61,11 +59,11 @@ export function LowMinimumMustHaves() {
         }}
         className="w-full"
       >
-        <CarouselContent className="ml-0 pl-[calc((100vw-var(--container-width))/2)] pr-4">
+        <CarouselContent className="-ml-1 pl-[calc((100vw-var(--container-width))/2+1rem)] pr-4">
           {mustHaveProducts.map((product) => (
             <CarouselItem
               key={product.id}
-              className="basis-3/4 pr-4 sm:basis-1/2 md:basis-1/3 lg:basis-[23.5%]"
+              className="basis-3/4 pr-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
             >
               <MustHaveProductCard product={product} />
             </CarouselItem>

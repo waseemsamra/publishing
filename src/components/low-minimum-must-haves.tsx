@@ -53,12 +53,15 @@ export function LowMinimumMustHaves() {
         }}
         className="w-full"
       >
-        <div className="container mb-8 flex items-baseline justify-between">
+        <div className="container mb-8 relative">
           <h2 className="font-headline text-3xl font-bold md:text-4xl">
             Low Minimum Must-Haves
           </h2>
-          <CarouselNext className="hidden md:inline-flex" />
+          <div className="absolute right-8 top-1/2 -translate-y-1/2 hidden md:block">
+            <CarouselNext />
+          </div>
         </div>
+
         <CarouselContent className="ml-0 pl-[var(--container-padding)]">
           {mustHaveProducts.map((product) => (
             <CarouselItem

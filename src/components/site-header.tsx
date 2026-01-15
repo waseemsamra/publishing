@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -40,34 +39,48 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-20 items-center justify-between">
-        <div className="flex items-center justify-start">
+      <div className="bg-secondary/50">
+        <div className="container flex h-10 items-center justify-between text-xs">
+          <p className="font-medium">
+            Custom Paper Bowls - <span className="text-muted-foreground">Serve in style! Now available</span>
+          </p>
+          <nav className="hidden md:flex items-center gap-6">
+            <Link href="#" className="hover:underline">Tapkit by noissue</Link>
+            <Link href="#" className="hover:underline">Help Center</Link>
+            <Link href="#" className="hover:underline">Contact Us</Link>
+          </nav>
+        </div>
+      </div>
+      <div className="container flex h-20 items-center">
+        <div className="flex items-center gap-6">
           <Logo />
+          <nav className="hidden items-center gap-6 md:flex">
+            {navLinks.map(link => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  link.active ? 'text-accent' : 'text-foreground'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
         </div>
 
-        <nav className="hidden flex-1 items-center justify-center gap-6 md:flex">
-          {navLinks.map(link => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                link.active ? 'text-accent' : 'text-foreground/60'
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        <div className="flex flex-1 items-center justify-center px-8">
+            <div className="relative w-full max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                type="search"
+                placeholder="Search for mailers"
+                className="pl-9"
+                />
+            </div>
+        </div>
 
         <div className="flex items-center justify-end space-x-2">
-          <div className="relative w-full max-w-xs hidden sm:block">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search for bowls"
-              className="pl-9"
-            />
-          </div>
           <div className="hidden md:flex items-center text-sm font-medium">
             <Button variant="ghost" size="sm" className="ml-1">
               <svg
@@ -85,7 +98,7 @@ export function SiteHeader() {
             </Button>
           </div>
           <Button asChild variant="outline">
-            <Link href="/login">Login</Link>
+            <Link href="/login">Login / Signup</Link>
           </Button>
           <CartButton />
         </div>

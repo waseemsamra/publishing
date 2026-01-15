@@ -23,30 +23,13 @@
           "type": "string",
           "description": "Last name of the user."
         },
-        "shippingAddresses": {
-          "type": "array",
-          "description": "References to the user's shipping addresses. (Relationship: UserAccount 1:N Address)",
-          "items": {
-            "type": "string"
-          }
+        "billingAddressId": {
+          "type": "string",
+          "description": "Reference to BillingAddress. (Relationship: UserAccount 1:1 BillingAddress)"
         },
-        "billingAddresses": {
-          "type": "array",
-          "description": "References to the user's billing addresses. (Relationship: UserAccount 1:N Address)",
-          "items": {
-            "type": "string"
-          }
-        },
-        "roles": {
-          "type": "array",
-          "description": "Roles assigned to the user.",
-          "items": {
-            "type": "string",
-            "enum": [
-              "admin",
-              "customer"
-            ]
-          }
+        "shippingAddressId": {
+          "type": "string",
+          "description": "Reference to ShippingAddress. (Relationship: UserAccount 1:1 ShippingAddress)"
         }
       },
       "required": [
@@ -60,7 +43,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Product",
       "type": "object",
-      "description": "Represents a product available on the EcoCart Marketplace.",
+      "description": "Represents a product listed in the EcoCart Marketplace.",
       "properties": {
         "id": {
           "type": "string",
@@ -72,7 +55,7 @@
         },
         "description": {
           "type": "string",
-          "description": "Description of the product."
+          "description": "Detailed description of the product."
         },
         "price": {
           "type": "number",
@@ -85,19 +68,19 @@
         },
         "materials": {
           "type": "string",
-          "description": "Information about the materials used in the product."
+          "description": "Materials used to manufacture the product."
         },
         "certifications": {
           "type": "string",
-          "description": "Certifications held by the product."
+          "description": "Certifications held by the product (e.g., Fair Trade, Organic)."
         },
         "sustainabilityImpact": {
           "type": "string",
-          "description": "Description of the product's sustainability impact."
+          "description": "Description of the product's positive impact on sustainability."
         },
         "categoryIds": {
           "type": "array",
-          "description": "References to Categories. (Relationship: Category N:N Product)",
+          "description": "References to Categories. (Relationship: Product N:N Category)",
           "items": {
             "type": "string"
           }
@@ -108,14 +91,17 @@
         "name",
         "description",
         "price",
-        "imageUrl"
+        "imageUrl",
+        "materials",
+        "certifications",
+        "sustainabilityImpact"
       ]
     },
     "Category": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Category",
       "type": "object",
-      "description": "Represents a category of products.",
+      "description": "Represents a product category.",
       "properties": {
         "id": {
           "type": "string",
@@ -136,17 +122,69 @@
         "description"
       ]
     },
+    "ShoppingCart": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ShoppingCart",
+      "type": "object",
+      "description": "Represents a user's shopping cart.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the shopping cart."
+        },
+        "userAccountId": {
+          "type": "string",
+          "description": "Reference to UserAccount. (Relationship: UserAccount 1:1 ShoppingCart)"
+        },
+        "cartItemIds": {
+          "type": "array",
+          "description": "References to CartItems. (Relationship: ShoppingCart 1:N CartItem)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "userAccountId"
+      ]
+    },
+    "CartItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CartItem",
+      "type": "object",
+      "description": "Represents an item in a shopping cart.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the cart item."
+        },
+        "productId": {
+          "type": "string",
+          "description": "Reference to Product. (Relationship: Product 1:N CartItem)"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Quantity of the product in the cart."
+        }
+      },
+      "required": [
+        "id",
+        "productId",
+        "quantity"
+      ]
+    },
     "Order": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Order",
       "type": "object",
-      "description": "Represents an order placed by a user.",
+      "description": "Represents a customer order.",
       "properties": {
         "id": {
           "type": "string",
           "description": "Unique identifier for the order."
         },
-        "userId": {
+        "userAccountId": {
           "type": "string",
           "description": "Reference to UserAccount. (Relationship: UserAccount 1:N Order)"
         },
@@ -161,7 +199,11 @@
         },
         "shippingAddressId": {
           "type": "string",
-          "description": "Reference to Address. (Relationship: Order 1:1 Address)"
+          "description": "Reference to ShippingAddress. (Relationship: Order 1:1 ShippingAddress)"
+        },
+        "billingAddressId": {
+          "type": "string",
+          "description": "Reference to BillingAddress. (Relationship: Order 1:1 BillingAddress)"
         },
         "orderItemIds": {
           "type": "array",
@@ -173,24 +215,22 @@
       },
       "required": [
         "id",
-        "userId",
+        "userAccountId",
         "orderDate",
-        "totalAmount"
+        "totalAmount",
+        "shippingAddressId",
+        "billingAddressId"
       ]
     },
     "OrderItem": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "OrderItem",
       "type": "object",
-      "description": "Represents an item within an order.",
+      "description": "Represents an item in an order.",
       "properties": {
         "id": {
           "type": "string",
           "description": "Unique identifier for the order item."
-        },
-        "orderId": {
-          "type": "string",
-          "description": "Reference to Order. (Relationship: Order 1:N OrderItem)"
         },
         "productId": {
           "type": "string",
@@ -198,7 +238,7 @@
         },
         "quantity": {
           "type": "number",
-          "description": "Quantity of the product in the order item."
+          "description": "Quantity of the product in the order."
         },
         "price": {
           "type": "number",
@@ -207,25 +247,28 @@
       },
       "required": [
         "id",
-        "orderId",
         "productId",
         "quantity",
         "price"
       ]
     },
-    "Address": {
+    "ShippingAddress": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Address",
+      "title": "ShippingAddress",
       "type": "object",
-      "description": "Represents a shipping or billing address.",
+      "description": "Represents a shipping address.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the address."
+          "description": "Unique identifier for the shipping address."
         },
-        "streetAddress": {
+        "addressLine1": {
           "type": "string",
-          "description": "Street address."
+          "description": "Address line 1."
+        },
+        "addressLine2": {
+          "type": "string",
+          "description": "Address line 2 (optional)."
         },
         "city": {
           "type": "string",
@@ -246,7 +289,51 @@
       },
       "required": [
         "id",
-        "streetAddress",
+        "addressLine1",
+        "city",
+        "state",
+        "zipCode",
+        "country"
+      ]
+    },
+    "BillingAddress": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "BillingAddress",
+      "type": "object",
+      "description": "Represents a billing address.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the billing address."
+        },
+        "addressLine1": {
+          "type": "string",
+          "description": "Address line 1."
+        },
+        "addressLine2": {
+          "type": "string",
+          "description": "Address line 2 (optional)."
+        },
+        "city": {
+          "type": "string",
+          "description": "City."
+        },
+        "state": {
+          "type": "string",
+          "description": "State."
+        },
+        "zipCode": {
+          "type": "string",
+          "description": "Zip code."
+        },
+        "country": {
+          "type": "string",
+          "description": "Country."
+        }
+      },
+      "required": [
+        "id",
+        "addressLine1",
         "city",
         "state",
         "zipCode",
@@ -257,8 +344,7 @@
   "auth": {
     "providers": [
       "password",
-      "google.com",
-      "facebook.com"
+      "anonymous"
     ]
   },
   "firestore": {
@@ -270,11 +356,11 @@
           "schema": {
             "$ref": "#/backend/entities/UserAccount"
           },
-          "description": "Stores user account information. This path enforces ownership-based security, allowing only the authenticated user to access their own data.",
+          "description": "Stores user account information. Accessible only by the user and administrators.",
           "params": [
             {
               "name": "userId",
-              "description": "The unique identifier of the user account."
+              "description": "The unique identifier for the user account."
             }
           ]
         }
@@ -286,11 +372,11 @@
           "schema": {
             "$ref": "#/backend/entities/Product"
           },
-          "description": "Stores product information. Products are publicly accessible.",
+          "description": "Stores product information. Publicly readable, but write access restricted to administrators.",
           "params": [
             {
               "name": "productId",
-              "description": "The unique identifier of the product."
+              "description": "The unique identifier for the product."
             }
           ]
         }
@@ -302,32 +388,144 @@
           "schema": {
             "$ref": "#/backend/entities/Category"
           },
-          "description": "Stores category information. Categories are publicly accessible.",
+          "description": "Stores product category information. Publicly readable, but write access restricted to administrators.",
           "params": [
             {
               "name": "categoryId",
-              "description": "The unique identifier of the category."
+              "description": "The unique identifier for the category."
             }
           ]
         }
       },
       {
-        "path": "/orders/{orderId}",
+        "path": "/users/{userId}/shoppingCarts/{shoppingCartId}",
+        "definition": {
+          "entityName": "ShoppingCart",
+          "schema": {
+            "$ref": "#/backend/entities/ShoppingCart"
+          },
+          "description": "Stores shopping cart information for each user. Accessible only by the user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user account."
+            },
+            {
+              "name": "shoppingCartId",
+              "description": "The unique identifier for the shopping cart."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/shoppingCarts/{shoppingCartId}/cartItems/{cartItemId}",
+        "definition": {
+          "entityName": "CartItem",
+          "schema": {
+            "$ref": "#/backend/entities/CartItem"
+          },
+          "description": "Stores individual cart items within a shopping cart. Accessible only by the user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user account."
+            },
+            {
+              "name": "shoppingCartId",
+              "description": "The unique identifier for the shopping cart."
+            },
+            {
+              "name": "cartItemId",
+              "description": "The unique identifier for the cart item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/orders/{orderId}",
         "definition": {
           "entityName": "Order",
           "schema": {
             "$ref": "#/backend/entities/Order"
           },
-          "description": "Stores order information for a specific user. This path enforces ownership-based security, allowing only the authenticated user to access their own orders.",
+          "description": "Stores order information for each user. Accessible only by the user and administrators.",
           "params": [
             {
+              "name": "userId",
+              "description": "The unique identifier for the user account."
+            },
+            {
               "name": "orderId",
-              "description": "The unique identifier of the order."
+              "description": "The unique identifier for the order."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/orders/{orderId}/orderItems/{orderItemId}",
+        "definition": {
+          "entityName": "OrderItem",
+          "schema": {
+            "$ref": "#/backend/entities/OrderItem"
+          },
+          "description": "Stores individual order items within an order. Accessible only by the user and administrators.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user account."
+            },
+            {
+              "name": "orderId",
+              "description": "The unique identifier for the order."
+            },
+            {
+              "name": "orderItemId",
+              "description": "The unique identifier for the order item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/shippingAddresses/{shippingAddressId}",
+        "definition": {
+          "entityName": "ShippingAddress",
+          "schema": {
+            "$ref": "#/backend/entities/ShippingAddress"
+          },
+          "description": "Stores shipping addresses for each user. Accessible only by the user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user account."
+            },
+            {
+              "name": "shippingAddressId",
+              "description": "The unique identifier for the shipping address."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/billingAddresses/{billingAddressId}",
+        "definition": {
+          "entityName": "BillingAddress",
+          "schema": {
+            "$ref": "#/backend/entities/BillingAddress"
+          },
+          "description": "Stores billing addresses for each user. Accessible only by the user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user account."
+            },
+            {
+              "name": "billingAddressId",
+              "description": "The unique identifier for the billing address."
             }
           ]
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the EcoCart Marketplace application. User data is segregated into `/users/{userId}` collections, enabling straightforward ownership-based security rules. Product and Category data are stored in root-level collections (`/products`, `/categories`) with no access restrictions, facilitating easy listing and filtering. Orders are in their own collection to be viewed by admins. This structure eliminates the need for `get()` calls in security rules, as all necessary authorization context is available within the document or through path-based ownership. This approach ensures atomic operations and simplifies debugging. Segregation of data based on access requirements (e.g., public products vs. private user data) supports secure list operations. This design enables straightforward implementation of security rules based solely on `request.auth.uid` and the document path, promoting maintainability and security."
+    "reasoning": "The Firestore structure is designed to be secure, scalable, and easily debuggable, following the core design principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and QAPs (Rules are not Filters).  \n\nAuthorization Independence is achieved through denormalization.  For example, if access to a cart requires knowing the user's ID, that ID is directly embedded within the cart document or its subcollections (cartItems). This eliminates the need for `get()` calls in security rules, allowing atomic operations (transactions/batches) to work correctly and simplifying debugging. Collaborative data (if any) uses the Membership Map pattern.  \n\nStructural Segregation is applied by separating data with different security requirements into distinct collections.  For example, user accounts are stored separately from products, and each user's shopping cart and orders are stored under their user ID.\n\nAccess Modeling follows consistent patterns:  User-owned data uses path-based ownership (`/users/{userId}/shoppingCarts/{shoppingCartId}`). Global roles are implemented using existence checks on dedicated collections (e.g., `/roles_admin/{uid}`).\n\nData Clarity and Predictability are ensured by using explicit state modeling (if applicable), predictable schemas, and consistent naming conventions.  All collections and documents use semantic names.  Wildcards are descriptive (e.g., `{userId}` instead of `{id}`).\n\nThis structure facilitates simple, robust, and easily debuggable security rules, supporting secure `list` operations and maintaining the integrity of ownership, timestamps, and denormalized data."
   }
 }

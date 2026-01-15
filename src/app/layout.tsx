@@ -28,13 +28,15 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="font-body antialiased overflow-x-hidden">
-        <AuthContextProvider>
-          <CartProvider>
-            {children}
-            <Toaster />
-          </CartProvider>
-        </AuthContextProvider>
+      <body className="font-body antialiased">
+        <div className="overflow-x-hidden">
+          <AuthContextProvider>
+            <CartProvider>
+              {children}
+              <Toaster />
+            </CartProvider>
+          </AuthContextProvider>
+        </div>
       </body>
     </html>
   );

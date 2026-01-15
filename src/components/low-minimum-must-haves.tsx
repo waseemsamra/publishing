@@ -11,16 +11,17 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { mustHaveProducts } from '@/lib/data';
 import type { MustHaveProduct } from '@/lib/types';
+import Link from 'next/link';
 
 function MustHaveProductCard({ product }: { product: MustHaveProduct }) {
   return (
-    <div className="flex flex-col h-full">
+    <Link href="#" className="flex flex-col h-full group">
       <div className="relative overflow-hidden aspect-square rounded-xl">
         <Image
           src={product.image.imageUrl}
           alt={product.image.description}
           fill
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           data-ai-hint={product.image.imageHint}
         />
         {product.badge && (
@@ -36,31 +37,30 @@ function MustHaveProductCard({ product }: { product: MustHaveProduct }) {
         <p className="text-xs text-muted-foreground">
           {product.minUnits} - {product.delivery}
         </p>
-        <h3 className="font-headline font-semibold mt-1">{product.name}</h3>
+        <h3 className="font-headline font-semibold mt-1 group-hover:text-primary">{product.name}</h3>
         <p className="text-sm text-muted-foreground mt-1">{product.price}</p>
       </div>
-    </div>
+    </Link>
   );
 }
 
 export function LowMinimumMustHaves() {
   return (
     <section className="py-12 md:py-20 overflow-hidden">
+       <div className="container">
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="font-headline text-3xl font-bold md:text-4xl">
+                    Low Minimum Must-Haves
+                </h2>
+            </div>
+        </div>
       <Carousel
         opts={{
           align: 'start',
         }}
         className="w-full"
       >
-        <div className="container">
-            <div className="flex justify-between items-center mb-8">
-                <h2 className="font-headline text-3xl font-bold md:text-4xl">
-                    Low Minimum Must-Haves
-                </h2>
-                <CarouselNext className="hidden md:inline-flex" />
-            </div>
-        </div>
-        <CarouselContent className="pl-[var(--container-padding)]">
+        <CarouselContent className="pl-[calc((100%-1280px)/2+1rem)]">
           {mustHaveProducts.map((product) => (
             <CarouselItem
               key={product.id}
@@ -70,6 +70,9 @@ export function LowMinimumMustHaves() {
             </CarouselItem>
           ))}
         </CarouselContent>
+        <div className="hidden md:block">
+            <CarouselNext className="absolute top-0 right-[calc((100%-1280px)/2)]" />
+        </div>
       </Carousel>
     </section>
   );

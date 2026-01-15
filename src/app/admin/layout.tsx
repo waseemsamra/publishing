@@ -23,12 +23,7 @@ import {
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
-import { getAuth } from 'firebase/auth';
-import { useEffect, useState } from 'react';
-import { doc } from 'firebase/firestore';
-import { useDoc } from '@/firebase/firestore/use-doc';
-import { useFirebase, useUser } from '@/firebase';
-import { useMemoFirebase } from '@/firebase/provider';
+import { useAuth } from '@/context/auth-context';
 import { AuthRedirect } from '@/components/auth-redirect';
 
 const menuItems = [
@@ -45,76 +40,28 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { user, isUserLoading: authLoading } = useUser();
-  const { firestore } = useFirebase();
   const router = useRouter();
-  const [verificationStatus, setVerificationStatus] = useState<
-    'loading' | 'admin' | 'non-admin'
-  >('loading');
+  const { user, logout, loading } = useAuth();
 
   const isAuthPage =
     pathname === '/admin/login' || pathname === '/admin/signup';
 
-  const userDocRef = useMemoFirebase(
-    () => (user ? doc(firestore, 'users', user.uid) : null),
-    [user, firestore]
-  );
-
-  const { data: userData, isLoading: userDocLoading } = useDoc(userDocRef);
-
-  useEffect(() => {
-    // On auth pages, no verification is needed.
-    if (isAuthPage) {
-      setVerificationStatus('non-admin');
-      return;
-    }
-
-    // While auth state is loading, we are loading.
-    if (authLoading) {
-      setVerificationStatus('loading');
-      return;
-    }
-
-    // If auth is done and there's no user, redirect to login.
-    if (!user) {
-      router.push('/admin/login');
-      return;
-    }
-
-    // If we have a user but are waiting for their Firestore document, keep loading.
-    if (userDocLoading) {
-      setVerificationStatus('loading');
-      return;
-    }
-
-    // At this point, auth and Firestore doc loading are complete.
-    // We can now safely check the roles.
-    if (userData) {
-      const roles = (userData as any).roles || [];
-      if (roles.includes('admin')) {
-        setVerificationStatus('admin');
-      } else {
-        setVerificationStatus('non-admin');
-      }
-    } else {
-      // User is authenticated but has no Firestore document or roles.
-      setVerificationStatus('non-admin');
-    }
-  }, [user, authLoading, userData, userDocLoading, router, isAuthPage]);
-
-
   const handleLogout = async () => {
-    await getAuth().signOut();
+    await logout();
     router.push('/admin/login');
   };
 
-  // If it's an auth page (login/signup), just render the children.
+  // If it's an auth page (login/signup), just render the children without the layout.
+  // Also, if the user is already logged in, redirect them to the dashboard.
   if (isAuthPage) {
+    if (!loading && user) {
+        return <AuthRedirect to="/admin/dashboard" />;
+    }
     return <>{children}</>;
   }
 
-  // While verifying, show a loading screen.
-  if (verificationStatus === 'loading') {
+  // While checking auth state, show a loading screen.
+  if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
         Verifying access...
@@ -122,9 +69,9 @@ export default function AdminLayout({
     );
   }
   
-  // If not an admin, render the redirect component.
-  if (verificationStatus !== 'admin') {
-    return <AuthRedirect to="/" />;
+  // If not an admin after loading, redirect.
+  if (!user || user.role !== 'admin') {
+    return <AuthRedirect to="/admin/login" />;
   }
 
   // If we've reached here, the user is a verified admin.

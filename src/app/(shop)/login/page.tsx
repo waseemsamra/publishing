@@ -12,30 +12,20 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { useFirebase } from '@/firebase';
+import { useAuth } from '@/context/auth-context';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast();
-  const { auth, areServicesAvailable } = useFirebase();
+  const { login } = useAuth();
 
   const handleSignIn = async () => {
-    if (!areServicesAvailable || !auth) {
-      toast({
-        variant: 'destructive',
-        title: 'Firebase not available',
-        description:
-          'The authentication service is not ready. Please try again later.',
-      });
-      return;
-    }
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await login(email, password);
       router.push('/');
     } catch (error: any) {
       toast({

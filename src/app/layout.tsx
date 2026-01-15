@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { CartProvider } from '@/context/cart-context';
-import { FirebaseProvider } from '@/firebase';
+import { AuthProvider } from '@/context/auth-context';
 
 export const metadata: Metadata = {
   title: 'EcoCart Marketplace',
@@ -29,12 +29,12 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <FirebaseProvider>
+        <AuthProvider>
           <CartProvider>
             {children}
             <Toaster />
           </CartProvider>
-        </FirebaseProvider>
+        </AuthProvider>
       </body>
     </html>
   );

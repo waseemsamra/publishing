@@ -12,12 +12,11 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-import { useFirebase } from '@/firebase';
+import { useAuth } from '@/context/auth-context';
+import { db } from '@/lib/firebase';
 
 export default function SignUpPage() {
   const [name, setName] = useState('');
@@ -25,28 +24,15 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast();
-  const { auth, firestore } = useFirebase();
+  const { signup } = useAuth();
 
   const handleSignUp = async () => {
-    if (!auth || !firestore) {
-        toast({
-            variant: 'destructive',
-            title: 'Uh oh! Something went wrong.',
-            description: 'Firebase is not initialized correctly.',
-        });
-        return;
-    }
-    
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const userCredential = await signup(email, password);
       const user = userCredential.user;
 
       if (user) {
-        const userDocRef = doc(firestore, 'users', user.uid);
+        const userDocRef = doc(db, 'users', user.uid);
         const userData = {
           id: user.uid,
           email: user.email,
@@ -54,7 +40,7 @@ export default function SignUpPage() {
           lastName: name.split(' ').slice(1).join(' ') || '',
           roles: ['customer'],
         };
-        setDocumentNonBlocking(userDocRef, userData, { merge: true });
+        await setDoc(userDocRef, userData, { merge: true });
       }
 
       toast({

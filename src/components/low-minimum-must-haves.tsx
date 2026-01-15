@@ -51,7 +51,6 @@ export function LowMinimumMustHaves() {
       <Carousel
         opts={{
           align: 'start',
-          containScroll: false,
         }}
         className="w-full"
       >

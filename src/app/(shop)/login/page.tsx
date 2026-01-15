@@ -36,12 +36,19 @@ export default function LoginPage() {
       await login(email, password);
       router.push('/account');
     } catch (error: any) {
+      let description =
+        'There was a problem with your request. Please try again.';
+      if (error.code === 'auth/invalid-credential') {
+        description =
+          'Invalid credentials. Please check your email and password.';
+      } else if (error.message) {
+        description = error.message;
+      }
+
       toast({
         variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description:
-          error.message ||
-          'There was a problem with your request. Please check your credentials and try again.',
+        title: 'Login Failed',
+        description: description,
       });
       console.error('Failed to sign in:', error);
     }

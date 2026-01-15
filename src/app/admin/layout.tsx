@@ -22,13 +22,12 @@ import {
   LogOut,
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
-import { useAuthContext } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
 import { getAuth } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import { doc } from 'firebase/firestore';
 import { useDoc } from '@/firebase/firestore/use-doc';
-import { useFirebase } from '@/firebase';
+import { useFirebase, useUser } from '@/firebase';
 import { useMemoFirebase } from '@/firebase/provider';
 
 const menuItems = [
@@ -45,7 +44,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { user, loading: authLoading } = useAuthContext();
+  const { user, isUserLoading: authLoading } = useUser();
   const { firestore } = useFirebase();
   const router = useRouter();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
@@ -73,8 +72,9 @@ export default function AdminLayout({
             setIsAdmin(false);
             router.push('/'); // Not an admin, redirect to homepage
         }
-    } else if (user && !userDocLoading && !userData) {
-        // User is logged in but no user document found
+    } else if (user && !userDocLoading && !userData && !isAuthPage) {
+        // User is logged in but no user document found (or it's loading)
+        // and we are not on an auth page, assume not admin and redirect.
         setIsAdmin(false);
         router.push('/');
     }

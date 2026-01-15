@@ -44,11 +44,17 @@ export default function AdminLayout({
   const { user, loading } = useAuthContext();
   const router = useRouter();
 
+  const isAuthPage = pathname === '/admin/login' || pathname === '/admin/signup';
+
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !user && !isAuthPage) {
       router.push('/admin/login');
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, isAuthPage]);
+
+  if (isAuthPage) {
+    return <>{children}</>;
+  }
 
   if (loading || !user) {
     return (

@@ -20,8 +20,8 @@ function MustHaveProductCard({ product }: { product: MustHaveProduct }) {
           src={product.image.imageUrl}
           alt={product.image.description}
           width={400}
-          height={533}
-          className="aspect-[3/4] w-full object-cover"
+          height={500}
+          className="aspect-[4/5] w-full object-cover"
           data-ai-hint={product.image.imageHint}
         />
         {product.badge && (
@@ -53,7 +53,7 @@ export function LowMinimumMustHaves() {
         }}
         className="w-full"
       >
-        <div className="container mb-8 flex items-center justify-between">
+        <div className="container mb-8 flex items-baseline justify-between">
           <h2 className="font-headline text-3xl font-bold md:text-4xl">
             Low Minimum Must-Haves
           </h2>

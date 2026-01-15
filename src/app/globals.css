@@ -81,4 +81,13 @@
   body {
     @apply bg-background text-foreground;
   }
+  html, body {
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  .container {
+    @apply w-full mx-auto px-4 sm:px-6 lg:px-8;
+  }
 }

@@ -42,7 +42,7 @@ export function SiteHeader() {
       <div className="bg-secondary/50">
         <div className="container flex h-10 items-center justify-between text-xs">
           <p className="font-medium">
-            Custom Coffee &amp; Matcha Tins - <span className="text-muted-foreground">just launched!</span>
+            Custom Paper Bowls - <span className="text-muted-foreground">Serve in style! Now available</span>
           </p>
           <nav className="hidden md:flex items-center gap-6">
             <Link href="#" className="hover:underline">Tapkit by noissue</Link>
@@ -51,7 +51,7 @@ export function SiteHeader() {
           </nav>
         </div>
       </div>
-      <div className="container flex h-20 items-center">
+      <div className="container flex h-20 items-center justify-between">
         {/* Left Section */}
         <div className="flex items-center gap-6">
           <Logo />
@@ -76,7 +76,7 @@ export function SiteHeader() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                 type="search"
-                placeholder="Search for bowls"
+                placeholder="Search for mailers"
                 className="pl-9"
                 />
             </div>

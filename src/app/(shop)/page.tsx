@@ -1,4 +1,5 @@
 
+
 import { products } from '@/lib/data';
 import { ProductCard } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,7 @@ import { LowMinimumMustHaves } from '@/components/low-minimum-must-haves';
 import { BrandStories } from '@/components/brand-stories';
 import { PackagingAlliance } from '@/components/packaging-alliance';
 import { PackagingPartner } from '@/components/packaging-partner';
+import { PackagingForBrands } from '@/components/packaging-for-brands';
 
 const TrendingNowCard = ({ imageId, title }: { imageId: string, title: string }) => {
   const image = PlaceHolderImages.find(p => p.id === imageId);
@@ -102,6 +104,8 @@ export default function HomePage() {
       <PackagingPartner />
 
       <BrandStories />
+
+      <PackagingForBrands />
     </>
   );
 }

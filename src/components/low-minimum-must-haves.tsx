@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import {
   Carousel,
   CarouselContent,
@@ -48,33 +47,33 @@ function MustHaveProductCard({ product }: { product: MustHaveProduct }) {
 export function LowMinimumMustHaves() {
   return (
     <section className="py-12 md:py-20 overflow-hidden">
-      <Carousel
-        opts={{
-          align: 'start',
-          containScroll: 'keepSnaps',
-        }}
-        className="w-full"
-      >
-        <div className="container">
-            <div className="flex items-center justify-between mb-8">
+      <div className="container">
+        <Carousel
+          opts={{
+            align: 'start',
+            containScroll: 'keepSnaps',
+          }}
+          className="w-full"
+        >
+          <div className="flex items-center justify-between mb-8">
             <h2 className="font-headline text-3xl md:text-4xl font-bold">
-                Low Minimum Must-Haves
+              Low Minimum Must-Haves
             </h2>
             <CarouselNext className="relative -top-4 -right-4" />
-            </div>
-        </div>
+          </div>
 
-        <CarouselContent className="-ml-4 pl-4 sm:pl-6 lg:pl-8">
-          {mustHaveProducts.map((product) => (
-            <CarouselItem
-              key={product.id}
-              className="basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 pl-4"
-            >
-              <MustHaveProductCard product={product} />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
+          <CarouselContent className="-ml-4">
+            {mustHaveProducts.map((product) => (
+              <CarouselItem
+                key={product.id}
+                className="basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 pl-4"
+              >
+                <MustHaveProductCard product={product} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </div>
     </section>
   );
 }

@@ -26,7 +26,7 @@ export default function LoginPage() {
   const handleSignIn = async () => {
     try {
       await login(email, password);
-      router.push('/');
+      router.push('/account');
     } catch (error: any) {
       toast({
         variant: 'destructive',

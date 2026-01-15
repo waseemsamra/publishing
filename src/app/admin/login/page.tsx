@@ -26,7 +26,7 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      router.push('/admin');
+      router.push('/admin/dashboard');
     } catch (error: any) {
       setError(error.message || 'Failed to login');
     } finally {

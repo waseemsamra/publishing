@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -154,6 +155,12 @@ export default function AdminLoginPage() {
           <Button onClick={handleEmailSignIn} className="w-full">
             Sign in
           </Button>
+          <div className="text-center text-sm">
+            Don&apos;t have an account?{' '}
+            <Link href="/admin/signup" className="underline">
+              Sign up
+            </Link>
+          </div>
         </CardFooter>
       </Card>
     </div>

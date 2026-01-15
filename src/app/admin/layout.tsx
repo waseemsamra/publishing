@@ -25,7 +25,11 @@ import { Logo } from '@/components/logo';
 import { useAuthContext } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
 import { getAuth } from 'firebase/auth';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { doc } from 'firebase/firestore';
+import { useDoc } from '@/firebase/firestore/use-doc';
+import { useFirebase } from '@/firebase';
+import { useMemoFirebase } from '@/firebase/provider';
 
 const menuItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutGrid },
@@ -41,28 +45,59 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { user, loading } = useAuthContext();
+  const { user, loading: authLoading } = useAuthContext();
+  const { firestore } = useFirebase();
   const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   const isAuthPage = pathname === '/admin/login' || pathname === '/admin/signup';
 
+  const userDocRef = useMemoFirebase(
+    () => (user ? doc(firestore, 'users', user.uid) : null),
+    [user, firestore]
+  );
+  
+  const { data: userData, isLoading: userDocLoading } = useDoc(userDocRef);
+
   useEffect(() => {
-    if (!loading && !user && !isAuthPage) {
+    if (!authLoading && !user && !isAuthPage) {
       router.push('/admin/login');
+      return;
     }
-  }, [user, loading, router, isAuthPage]);
+
+    if (user && !userDocLoading && userData) {
+        const roles = (userData as any).roles || [];
+        if (roles.includes('admin')) {
+            setIsAdmin(true);
+        } else {
+            setIsAdmin(false);
+            router.push('/'); // Not an admin, redirect to homepage
+        }
+    } else if (user && !userDocLoading && !userData) {
+        // User is logged in but no user document found
+        setIsAdmin(false);
+        router.push('/');
+    }
+
+  }, [user, authLoading, userData, userDocLoading, router, isAuthPage]);
 
   if (isAuthPage) {
     return <>{children}</>;
   }
 
-  if (loading || !user) {
+  if (authLoading || userDocLoading || isAdmin === null) {
     return (
       <div className="flex h-screen items-center justify-center">
-        Loading...
+        Verifying access...
       </div>
     );
   }
+  
+  if (!isAdmin) {
+      // This part might not be strictly necessary due to the redirect, but it's a good safeguard.
+      return null;
+  }
+
 
   const handleLogout = async () => {
     await getAuth().signOut();

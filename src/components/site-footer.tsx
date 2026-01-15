@@ -22,74 +22,76 @@ const PinterestIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export function SiteFooter() {
   return (
     <footer className="border-t bg-background text-foreground">
-      <div className="container">
-        <div className="bg-secondary/50 p-8 rounded-lg my-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            <div className="col-span-1 lg:col-span-2">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
-                    <div>
-                      <h4 className="font-headline font-semibold mb-4">Company</h4>
-                      <ul className="space-y-2">
-                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">noissue</Link></li>
-                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">noissue+</Link></li>
-                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">The blog</Link></li>
-                        <li><Link href="/sustainability-report" className="text-sm text-muted-foreground hover:text-primary">Sustainability</Link></li>
-                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Help center</Link></li>
-                         <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Contact</Link></li>
-                      </ul>
-                    </div>
-                     <div>
-                      <h4 className="font-headline font-semibold mb-4">Account</h4>
-                      <ul className="space-y-2">
-                        <li><Link href="/account" className="text-sm text-muted-foreground hover:text-primary">My orders</Link></li>
-                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">My quotes</Link></li>
-                        <li><Link href="/account" className="text-sm text-muted-foreground hover:text-primary">My profile</Link></li>
-                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Track order</Link></li>
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-headline font-semibold mb-4">Shop</h4>
-                      <ul className="space-y-2">
-                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">All products</Link></li>
-                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Samples</Link></li>
-                      </ul>
-                    </div>
-                    <div className="mt-8 sm:mt-0 col-span-2 sm:col-span-1">
-                      <h4 className="font-headline font-semibold mb-4">Partners</h4>
-                      <ul className="space-y-2">
-                        <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Supplier application</Link></li>
-                      </ul>
-                    </div>
+      <div className="w-full bg-secondary/50">
+        <div className="container py-12">
+          <div className="p-8 rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+              <div className="col-span-1 lg:col-span-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
+                      <div>
+                        <h4 className="font-headline font-semibold mb-4">Company</h4>
+                        <ul className="space-y-2">
+                          <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">noissue</Link></li>
+                          <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">noissue+</Link></li>
+                          <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">The blog</Link></li>
+                          <li><Link href="/sustainability-report" className="text-sm text-muted-foreground hover:text-primary">Sustainability</Link></li>
+                          <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Help center</Link></li>
+                           <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Contact</Link></li>
+                        </ul>
+                      </div>
+                       <div>
+                        <h4 className="font-headline font-semibold mb-4">Account</h4>
+                        <ul className="space-y-2">
+                          <li><Link href="/account" className="text-sm text-muted-foreground hover:text-primary">My orders</Link></li>
+                          <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">My quotes</Link></li>
+                          <li><Link href="/account" className="text-sm text-muted-foreground hover:text-primary">My profile</Link></li>
+                          <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Track order</Link></li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-headline font-semibold mb-4">Shop</h4>
+                        <ul className="space-y-2">
+                          <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">All products</Link></li>
+                          <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Samples</Link></li>
+                        </ul>
+                      </div>
+                      <div className="mt-8 sm:mt-0 col-span-2 sm:col-span-1">
+                        <h4 className="font-headline font-semibold mb-4">Partners</h4>
+                        <ul className="space-y-2">
+                          <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Supplier application</Link></li>
+                        </ul>
+                      </div>
+                  </div>
                 </div>
-              </div>
 
-              <div className="col-span-1 md:col-span-2 lg:col-span-2">
-                <h4 className="font-headline font-semibold mb-2">Join us! Special offers, tips, tricks and more</h4>
-                 <div className="flex w-full max-w-sm items-center space-x-2">
-                    <Input type="email" placeholder="hello@thisismyemail.com" className="bg-white" />
-                    <Button type="submit" style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }}>Subscribe</Button>
+                <div className="col-span-1 md:col-span-2 lg:col-span-2">
+                  <h4 className="font-headline font-semibold mb-2">Join us! Special offers, tips, tricks and more</h4>
+                   <div className="flex w-full max-w-sm items-center space-x-2">
+                      <Input type="email" placeholder="hello@thisismyemail.com" className="bg-white" />
+                      <Button type="submit" style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }}>Subscribe</Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">By subscribing you will receive marketing from noissue. See Privacy Policy</p>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">By subscribing you will receive marketing from noissue. See Privacy Policy</p>
-              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 py-6">
-          <div className="flex items-center gap-4">
-             <Logo />
-             <div className="flex items-center gap-4">
-                <Link href="#" aria-label="Instagram"><Instagram className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-                <Link href="#" aria-label="Facebook"><Facebook className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-                <Link href="#" aria-label="TikTok"><TikTokIcon className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-                <Link href="#" aria-label="Pinterest"><PinterestIcon className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-                <Link href="#" aria-label="LinkedIn"><Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
-             </div>
-          </div>
-          <div className="text-sm text-muted-foreground flex gap-4">
-            <span>&copy; noissue {new Date().getFullYear()}</span>
-            <Link href="#" className="hover:text-primary">T & C's</Link>
-            <Link href="#" className="hover:text-primary">Privacy Policy</Link>
-          </div>
+      <div className="container flex flex-col sm:flex-row justify-between items-center gap-4 py-6">
+        <div className="flex items-center gap-4">
+           <Logo />
+           <div className="flex items-center gap-4">
+              <Link href="#" aria-label="Instagram"><Instagram className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+              <Link href="#" aria-label="Facebook"><Facebook className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+              <Link href="#" aria-label="TikTok"><TikTokIcon className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+              <Link href="#" aria-label="Pinterest"><PinterestIcon className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+              <Link href="#" aria-label="LinkedIn"><Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
+           </div>
+        </div>
+        <div className="text-sm text-muted-foreground flex gap-4">
+          <span>&copy; noissue {new Date().getFullYear()}</span>
+          <Link href="#" className="hover:text-primary">T & C's</Link>
+          <Link href="#" className="hover:text-primary">Privacy Policy</Link>
         </div>
       </div>
     </footer>

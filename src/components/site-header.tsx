@@ -51,8 +51,8 @@ export function SiteHeader() {
           </nav>
         </div>
       </div>
-      <div className="container flex h-20 items-center">
-        <div className="flex items-center gap-6 mr-6">
+      <div className="container flex h-20 items-center justify-between">
+        <div className="flex items-center gap-6">
           <Logo />
           <nav className="hidden items-center gap-6 md:flex">
             {navLinks.map(link => (
@@ -74,7 +74,7 @@ export function SiteHeader() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                 type="search"
-                placeholder="Search for tissue"
+                placeholder="Search for bowls"
                 className="pl-9"
                 />
             </div>

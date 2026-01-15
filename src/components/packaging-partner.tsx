@@ -61,22 +61,20 @@ export function PackagingPartner() {
   return (
     <section className="py-12 md:py-20 overflow-hidden">
        <div className="container">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
-                <h2 className="font-headline text-3xl font-bold md:text-4xl">
-                    Packaging partner to world-leading brands
-                </h2>
-                <div className="flex items-center gap-2 mt-4 sm:mt-0">
-                    {tabs.map(tab => (
-                        <Button
-                            key={tab}
-                            variant={activeTab === tab ? 'default' : 'ghost'}
-                            onClick={() => setActiveTab(tab)}
-                            className={`rounded-full ${activeTab === tab ? 'bg-accent text-accent-foreground' : 'bg-gray-100 hover:bg-gray-200'}`}
-                        >
-                            {tab}
-                        </Button>
-                    ))}
-                </div>
+            <h2 className="font-headline text-3xl font-bold md:text-4xl">
+                Packaging partner to world-leading brands
+            </h2>
+            <div className="flex items-center gap-2 mt-4 mb-8">
+                {tabs.map(tab => (
+                    <Button
+                        key={tab}
+                        variant={activeTab === tab ? 'default' : 'ghost'}
+                        onClick={() => setActiveTab(tab)}
+                        className={`rounded-full ${activeTab === tab ? 'bg-accent text-accent-foreground' : 'bg-gray-100 hover:bg-gray-200'}`}
+                    >
+                        {tab}
+                    </Button>
+                ))}
             </div>
         </div>
       <Carousel

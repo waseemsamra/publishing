@@ -18,6 +18,8 @@ import {
   Calendar,
   FileText,
   BarChart3,
+  Package,
+  ShoppingCart,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,20 +37,28 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/users', label: 'User Management', icon: Users },
+  { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
+  { href: '/admin/products', label: 'Products', icon: Package },
+  { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/admin/content', label: 'Content', icon: FileText },
   { href: '/admin/calendar', label: 'Calendar', icon: Calendar },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 
-function SidebarContent({ pathname }: { pathname: string }) {
+function SidebarContent({ pathname, onLinkClick }: { pathname: string, onLinkClick: () => void }) {
   return (
-    <div className="h-full py-6">
-      <div className="px-4 py-2">
-        <h2 className="text-lg font-semibold">Navigation</h2>
+    <div className="flex h-full flex-col">
+       <div className="p-4 border-b">
+         <Link href="/admin/dashboard" className="flex items-center gap-2" onClick={onLinkClick}>
+            <Shield className="h-6 w-6 text-primary" />
+            <span className="text-xl font-bold">AdminHub</span>
+            <Badge variant="secondary" className="ml-2">
+              Beta
+            </Badge>
+          </Link>
       </div>
-      <nav className="space-y-1 px-2">
+      <nav className="flex-1 space-y-1 p-2">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -56,11 +66,12 @@ function SidebarContent({ pathname }: { pathname: string }) {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onLinkClick}
               className={`
                 flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors
                 ${isActive
                   ? 'bg-primary text-primary-foreground'
-                  : 'hover:bg-accent hover:text-accent-foreground'
+                  : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                 }
               `}
             >
@@ -83,122 +94,104 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const handleLogout = async () => {
     try {
       await logout();
-      router.push('/login');
+      router.push('/admin/login');
     } catch (error) {
       console.error('Logout error:', error);
     }
   };
 
   const getInitials = (name?: string | null) => {
-    return name
-      ? name
-          .split(' ')
-          .map(n => n[0])
-          .join('')
-          .toUpperCase()
-          .slice(0, 2)
-      : 'U';
+    if (!name) return 'U';
+    const parts = name.split(' ');
+    if (parts.length > 1) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
   };
+  
+  const closeSidebar = () => setSidebarOpen(false);
+
 
   return (
-        <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <header className="sticky top-0 z-40 border-b bg-background">
-            <div className="flex h-16 items-center justify-between px-4 md:px-6">
-            {/* Mobile menu button */}
-            <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-                <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
-                    <Menu className="h-5 w-5" />
-                    <span className="sr-only">Toggle menu</span>
-                </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-64 p-0">
-                <SidebarContent pathname={pathname} />
-                </SheetContent>
-            </Sheet>
+        <div className="min-h-screen bg-muted/40">
+        {/* Desktop Sidebar */}
+        <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col md:border-r bg-background">
+          <SidebarContent pathname={pathname} onLinkClick={closeSidebar} />
+        </aside>
 
-            {/* Logo */}
-            <div className="hidden md:flex items-center gap-2">
-                <Shield className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold">AdminHub</span>
-                <Badge variant="secondary" className="ml-2">
-                Beta
-                </Badge>
-            </div>
-
-            {/* Search */}
-            <div className="flex flex-1 max-w-md mx-4">
-                <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                    type="search"
-                    placeholder="Search..."
-                    className="pl-9 w-full"
-                />
-                </div>
-            </div>
-
-            {/* Right side */}
-            <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-destructive" />
-                </Button>
-
-                <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="gap-2">
-                    <Avatar className="h-8 w-8">
-                        <AvatarImage src={user?.photoURL || ''} />
-                        <AvatarFallback>
-                        {getInitials(user?.displayName)}
-                        </AvatarFallback>
-                    </Avatar>
-                    <div className="hidden md:flex flex-col items-start">
-                        <span className="text-sm font-medium">{user?.displayName}</span>
-                        <span className="text-xs text-muted-foreground capitalize">{user?.role}</span>
-                    </div>
-                    <ChevronDown className="h-4 w-4" />
+        <div className="md:pl-64 flex flex-col">
+            {/* Header */}
+            <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+                {/* Mobile menu button */}
+                <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+                    <SheetTrigger asChild>
+                    <Button variant="outline" size="icon" className="md:hidden">
+                        <Menu className="h-5 w-5" />
+                        <span className="sr-only">Toggle menu</span>
                     </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                    <Link href="/admin/profile">
-                        <User className="mr-2 h-4 w-4" />
-                        Profile
-                    </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                    <Link href="/admin/settings">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Settings
-                    </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 focus:bg-red-50">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
-            </div>
-        </header>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="w-64 p-0">
+                      <SidebarContent pathname={pathname} onLinkClick={closeSidebar} />
+                    </SheetContent>
+                </Sheet>
+                
+                <div className="relative flex-1 md:grow-0">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        type="search"
+                        placeholder="Search..."
+                        className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
+                    />
+                </div>
 
-        <div className="flex">
-            {/* Desktop Sidebar */}
-            <aside className="hidden md:block w-64 border-r bg-background">
-            <SidebarContent pathname={pathname} />
-            </aside>
+                <div className="ml-auto flex items-center gap-4">
+                    <Button variant="ghost" size="icon" className="relative rounded-full">
+                        <Bell className="h-5 w-5" />
+                        <span className="sr-only">Toggle notifications</span>
+                    </Button>
+
+                    <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="secondary" size="icon" className="rounded-full">
+                        <Avatar className="h-8 w-8">
+                            <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'}/>
+                            <AvatarFallback>
+                            {getInitials(user?.displayName)}
+                            </AvatarFallback>
+                        </Avatar>
+                        <span className="sr-only">Toggle user menu</span>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuLabel>{user?.displayName || 'My Account'}</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                        <Link href="/admin/profile">
+                            <User className="mr-2 h-4 w-4" />
+                            Profile
+                        </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                        <Link href="/admin/settings">
+                            <Settings className="mr-2 h-4 w-4" />
+                            Settings
+                        </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 focus:bg-red-50">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Logout
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </header>
 
             {/* Main Content */}
-            <main className="flex-1 p-4 md:p-6">
-            {children}
+            <main className="flex-1 p-4 md:p-6 grid gap-6">
+                {children}
             </main>
         </div>
-        </div>
+    </div>
   );
 }

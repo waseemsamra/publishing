@@ -60,11 +60,11 @@ export function LowMinimumMustHaves() {
         }}
         className="mt-8"
       >
-        <CarouselContent className="-ml-4">
+        <CarouselContent className="-ml-4 pl-4 sm:pl-6 lg:pl-8">
           {mustHaveProducts.map((product) => (
             <CarouselItem
               key={product.id}
-              className="basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5 pl-4 first:ml-[max(var(--container-padding,0px),calc(50%-var(--container-width,0px)/2))] last:mr-[max(var(--container-padding,0px),calc(50%-var(--container-width,0px)/2))]"
+              className="basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5 pl-4"
             >
               <MustHaveProductCard product={product} />
             </CarouselItem>

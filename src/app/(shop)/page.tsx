@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { LowMinimumMustHaves } from '@/components/low-minimum-must-haves';
-import { PackagingPartner } from '@/components/packaging-partner';
 import { BrandStories } from '@/components/brand-stories';
 
 const TrendingNowCard = ({ imageId, title }: { imageId: string, title: string }) => {
@@ -95,8 +94,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      
-      <PackagingPartner />
 
       <BrandStories />
     </>

@@ -33,28 +33,31 @@ export default function AdminSignUpPage() {
 
       if (user) {
         const userDocRef = doc(db, 'users', user.uid);
-        // New users are always created with the 'customer' role.
-        // Admin rights must be granted explicitly via the 'Grant Admin' page.
+        // New users signed up via the admin page are granted admin role.
         const userData = {
-            id: user.uid,
-            email: user.email,
-            firstName: name.split(' ')[0] || '',
-            lastName: name.split(' ').slice(1).join(' ') || '',
-            roles: ['customer'],
+          id: user.uid,
+          email: user.email,
+          firstName: name.split(' ')[0] || '',
+          lastName: name.split(' ').slice(1).join(' ') || '',
+          roles: ['admin', 'customer'],
+          status: 'active',
+          createdAt: new Date(),
         };
         await setDoc(userDocRef, userData, { merge: true });
       }
 
       toast({
         title: 'Account Created',
-        description: "You've successfully signed up. You can now sign in.",
+        description:
+          "You've successfully signed up. You can now sign in with admin privileges.",
       });
       router.push('/admin/login');
-    } catch (error: any)
+    } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
-        description: error.message || 'There was a problem with your sign-up request.',
+        description:
+          error.message || 'There was a problem with your sign-up request.',
       });
       console.error('Failed to sign up:', error);
     }

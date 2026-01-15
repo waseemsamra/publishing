@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { LowMinimumMustHaves } from '@/components/low-minimum-must-haves';
+import { PackagingPartner } from '@/components/packaging-partner';
 
 const HBSurgerLogo = () => (
   <svg
@@ -148,41 +149,7 @@ export default function HomePage() {
       
       <LowMinimumMustHaves />
 
-      <section className="py-12 md:py-20">
-        <div className="container">
-          <h2 className="font-headline text-4xl font-bold mb-8">Trending now</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border">
-            <TrendingNowCard imageId="trending-tapes" title="Tapes" />
-            <TrendingNowCard imageId="trending-coffee-bags" title="Coffee Bags" />
-            <TrendingNowCard imageId="trending-product-boxes" title="Product Boxes" />
-            <TrendingNowCard imageId="trending-totes" title="Totes" />
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-[#464E33] text-white">
-        <div className="container grid grid-cols-1 lg:grid-cols-2 items-center">
-          <div className="relative aspect-[4/3] -my-12 lg:-my-24 lg:-ml-24">
-            {allianceImage && <Image
-              src={allianceImage.imageUrl}
-              alt={allianceImage.description}
-              fill
-              className="object-cover"
-              data-ai-hint={allianceImage.imageHint}
-            />}
-          </div>
-          <div className="py-12 lg:py-24 lg:pl-16">
-            <p className="font-semibold text-sm uppercase tracking-wider">noissue packaging alliance</p>
-            <h2 className="font-headline text-4xl lg:text-5xl font-bold mt-4">Making change together.</h2>
-            <p className="mt-6 max-w-md">
-              Sport your support and join a global network of brands focused on making smarter, more sustainable choices.
-            </p>
-            <Button asChild className="mt-8 bg-[#B4D939] text-black hover:bg-[#a0c033] font-bold">
-              <Link href="#">Download badge</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+      <PackagingPartner />
 
       <section className="bg-background">
         <div className="container py-12">

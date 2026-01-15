@@ -145,10 +145,40 @@
       "imageHint": "tote bag"
     },
     {
-      "id": "alliance-background",
-      "description": "A logo stamped on a brown cardboard box",
-      "imageUrl": "https://images.unsplash.com/photo-1617994392158-0d194246d655?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwYWNrYWdpbmclMjBsb2dvfGVufDB8fHx8MTc2OTQ1MDc5NXww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "packaging logo"
+      "id": "brand-story-1",
+      "description": "Custom printed tape on a box next to a brown t-shirt",
+      "imageUrl": "https://images.unsplash.com/photo-1651862590541-81f09c536efc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjdXN0b20lMjB0YXBlJTIwcGFja2FnaW5nfGVufDB8fHx8MTc2ODQ4ODQ2MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "custom tape packaging"
+    },
+    {
+      "id": "brand-story-2",
+      "description": "Hands holding coffee cups with 'The Understudy' branding",
+      "imageUrl": "https://images.unsplash.com/photo-1634400394679-af4bc565d13f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxicmFuZGVkJTIwY29mZmVlJTIwY3Vwc3xlbnwwfHx8fDE3Njg0ODg0NjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "branded coffee cups"
+    },
+    {
+      "id": "brand-story-3",
+      "description": "The storefront of 'The Lunch Lady' restaurant",
+      "imageUrl": "https://images.unsplash.com/photo-1755604708691-cd9b930a56b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxyZXN0YXVyYW50JTIwc3RvcmVmcm9udHxlbnwwfHx8fDE3Njg0ODg0NjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "restaurant storefront"
+    },
+    {
+      "id": "brand-story-4",
+      "description": "A hand holding an iced coffee from 'The Hillmont'",
+      "imageUrl": "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxpY2VkJTIwY29mZmVlfGVufDB8fHx8MTc2ODQ2MDA4M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "iced coffee"
+    },
+    {
+      "id": "brand-story-5",
+      "description": "Coffee and sandwiches on plates with 'Foremost' branding",
+      "imageUrl": "https://images.unsplash.com/photo-1727178392429-b87c025839a2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjb2ZmZWUlMjBzYW5kd2ljaGVzfGVufDB8fHx8MTc2ODQ4ODQ2MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "coffee sandwiches"
+    },
+    {
+      "id": "brand-story-6",
+      "description": "An open refrigerator with 'Fresh Harvest' branding",
+      "imageUrl": "https://images.unsplash.com/photo-1613083042976-463bdde9ec51?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxyZWZyaWdlcmF0b3IlMjBncm9jZXJpZXN8ZW58MHx8fHwxNzY4NDg4NDYxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "refrigerator groceries"
     }
   ]
 }

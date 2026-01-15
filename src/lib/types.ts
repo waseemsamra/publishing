@@ -41,3 +41,10 @@ export interface User {
   email: string;
   joinedDate: string;
 }
+
+export interface BrandStory {
+    id: string;
+    title: string;
+    description: string;
+    image: ImagePlaceholder;
+}

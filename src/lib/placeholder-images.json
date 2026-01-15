@@ -89,6 +89,36 @@
       "description": "A roll of custom branded stickers.",
       "imageUrl": "https://images.unsplash.com/photo-1572950947476-26a6e4111e80?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzdGlja2Vyc3xlbnwwfHx8fDE3Njg0Mzc2MjZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "stickers"
+    },
+    {
+      "id": "must-have-6",
+      "description": "Custom food-grade paper with a logo.",
+      "imageUrl": "https://images.unsplash.com/photo-1560162071-da4c4a91077a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxmb29kJTIwcGFwZXJ8ZW58MHx8fHwxNzY4NDM4MTg0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "food paper"
+    },
+    {
+      "id": "must-have-7",
+      "description": "A roll of custom printed tape.",
+      "imageUrl": "https://images.unsplash.com/photo-1764567386744-090d5ff67d66?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjdXN0b20lMjB0YXBlfGVufDB8fHx8MTc2ODQzODE4NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "custom tape"
+    },
+    {
+      "id": "must-have-8",
+      "description": "A custom food box.",
+      "imageUrl": "https://images.unsplash.com/photo-1652862729869-2f4e80c1849d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxmb29kJTIwYm94fGVufDB8fHx8MTc2ODM0NzMyOXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "food box"
+    },
+    {
+      "id": "must-have-9",
+      "description": "A custom retail box.",
+      "imageUrl": "https://images.unsplash.com/photo-1683252162057-07215f03d1ad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxyZXRhaWwlMjBib3h8ZW58MHx8fHwxNzY4NDM4MTg0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "retail box"
+    },
+    {
+      "id": "must-have-10",
+      "description": "A custom shipping box.",
+      "imageUrl": "https://images.unsplash.com/photo-1577702312706-e23ff063064f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzaGlwcGluZyUyMGJveHxlbnwwfHx8fDE3Njg0MzgxODR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "shipping box"
     }
   ]
 }

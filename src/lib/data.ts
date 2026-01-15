@@ -141,7 +141,39 @@ export const mustHaveProducts: MustHaveProduct[] = [
         price: 'from £0.12 per unit',
         minUnits: 'Min. 500 units',
         delivery: 'Delivery: 3 - 4 weeks',
-        image: imageMap['must-have-1'],
+        image: imageMap['must-have-6'],
+    },
+    {
+        id: 'mh-7',
+        name: 'Custom Printed Tape',
+        price: 'from £1.50 per unit',
+        minUnits: 'Min. 36 units',
+        delivery: 'Delivery: 2 weeks',
+        image: imageMap['must-have-7'],
+    },
+    {
+        id: 'mh-8',
+        name: 'Custom Food Box',
+        price: 'from £0.40 per unit',
+        minUnits: 'Min. 250 units',
+        delivery: 'Delivery: 4 - 5 weeks',
+        image: imageMap['must-have-8'],
+    },
+    {
+        id: 'mh-9',
+        name: 'Custom Retail Box',
+        price: 'from £0.50 per unit',
+        minUnits: 'Min. 100 units',
+        delivery: 'Delivery: 3 - 4 weeks',
+        image: imageMap['must-have-9'],
+    },
+    {
+        id: 'mh-10',
+        name: 'Custom Shipping Box',
+        price: 'from £0.80 per unit',
+        minUnits: 'Min. 50 units',
+        delivery: 'Delivery: 2 - 3 weeks',
+        image: imageMap['must-have-10'],
     }
 ];
 

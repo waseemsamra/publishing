@@ -46,34 +46,33 @@ function MustHaveProductCard({ product }: { product: MustHaveProduct }) {
 
 export function LowMinimumMustHaves() {
   return (
-    <section className="py-12 md:py-20 overflow-hidden">
+    <section className="py-12 md:py-20">
       <div className="container">
-        <Carousel
-          opts={{
-            align: 'start',
-            containScroll: 'keepSnaps',
-          }}
-          className="w-full"
-        >
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="font-headline text-3xl md:text-4xl font-bold">
-              Low Minimum Must-Haves
-            </h2>
-            <CarouselNext className="relative -top-4 -right-4" />
-          </div>
-
-          <CarouselContent className="-ml-4">
-            {mustHaveProducts.map((product) => (
-              <CarouselItem
-                key={product.id}
-                className="basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 pl-4"
-              >
-                <MustHaveProductCard product={product} />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="font-headline text-3xl md:text-4xl font-bold">
+            Low Minimum Must-Haves
+          </h2>
+          <CarouselNext className="relative -top-4 -right-4 hidden md:inline-flex" />
+        </div>
       </div>
+      <Carousel
+        opts={{
+          align: 'start',
+          containScroll: 'keepSnaps',
+        }}
+        className="w-full"
+      >
+        <CarouselContent className="-ml-4 pl-4 md:pl-8 lg:pl-[calc((100vw-var(--container-width))/2)] lg:-ml-0">
+          {mustHaveProducts.map((product) => (
+            <CarouselItem
+              key={product.id}
+              className="basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-[23%] pl-4"
+            >
+              <MustHaveProductCard product={product} />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
     </section>
   );
 }

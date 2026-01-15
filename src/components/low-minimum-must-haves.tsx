@@ -53,28 +53,28 @@ export function LowMinimumMustHaves() {
             Low Minimum Must-Haves
           </h2>
         </div>
+        <Carousel
+          opts={{
+            align: 'start',
+            containScroll: 'keepSnaps',
+          }}
+          className="w-full"
+        >
+          <CarouselContent>
+            {mustHaveProducts.map((product) => (
+              <CarouselItem
+                key={product.id}
+                className="pr-4 basis-3/4 sm:basis-1/2 md:basis-1/3"
+              >
+                <MustHaveProductCard product={product} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <div className="container">
+            <CarouselNext className="relative -top-8 -right-4 hidden md:inline-flex" />
+          </div>
+        </Carousel>
       </div>
-      <Carousel
-        opts={{
-          align: 'start',
-          containScroll: 'keepSnaps',
-        }}
-        className="w-full"
-      >
-        <CarouselContent className="-ml-4 pl-8">
-          {mustHaveProducts.map((product) => (
-            <CarouselItem
-              key={product.id}
-              className="pl-4 basis-3/4 sm:basis-1/2 md:basis-1/3"
-            >
-              <MustHaveProductCard product={product} />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <div className="container">
-           <CarouselNext className="relative -top-8 -right-4 hidden md:inline-flex" />
-        </div>
-      </Carousel>
     </section>
   );
 }

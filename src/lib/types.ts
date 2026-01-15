@@ -37,9 +37,17 @@ export interface Order {
 
 export interface User {
   id: string;
-  name: string;
   email: string;
-  joinedDate: string;
+  firstName?: string;
+  lastName?: string;
+  displayName?: string; // Optional if you use firstName/lastName
+  role: 'admin' | 'editor' | 'viewer' | 'customer';
+  roles: ('admin' | 'customer')[];
+  status: 'active' | 'inactive' | 'pending';
+  createdAt: any; // Consider using Date | firebase.firestore.Timestamp
+  lastLogin?: any; // Consider using Date | firebase.firestore.Timestamp
+  phone?: string;
+  photoURL?: string;
 }
 
 export interface BrandStory {

@@ -20,8 +20,8 @@ function MustHaveProductCard({ product }: { product: MustHaveProduct }) {
           src={product.image.imageUrl}
           alt={product.image.description}
           width={400}
-          height={500}
-          className="aspect-[4/5] w-full object-cover"
+          height={400}
+          className="aspect-square w-full object-cover"
           data-ai-hint={product.image.imageHint}
         />
         {product.badge && (
@@ -47,24 +47,25 @@ function MustHaveProductCard({ product }: { product: MustHaveProduct }) {
 export function LowMinimumMustHaves() {
   return (
     <section className="py-12 md:py-20 overflow-hidden">
+      <div className="container">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="font-headline text-3xl font-bold md:text-4xl">
+            Low Minimum Must-Haves
+          </h2>
+          <CarouselNext className="hidden md:inline-flex relative -top-4 -right-4" />
+        </div>
+      </div>
       <Carousel
         opts={{
           align: 'start',
         }}
         className="w-full"
       >
-        <div className="container flex justify-between items-center mb-8">
-          <h2 className="font-headline text-3xl font-bold md:text-4xl">
-            Low Minimum Must-Haves
-          </h2>
-          <CarouselNext className="hidden md:inline-flex" />
-        </div>
-
         <CarouselContent className="ml-0 pl-[var(--container-padding)]">
           {mustHaveProducts.map((product) => (
             <CarouselItem
               key={product.id}
-              className="px-2 basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-[23.5%]"
+              className="px-2 basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5"
             >
               <MustHaveProductCard product={product} />
             </CarouselItem>

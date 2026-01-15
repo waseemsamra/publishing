@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { CartProvider } from '@/context/cart-context';
 import { AuthContextProvider } from '@/context/auth-context';
+import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
   title: 'EcoCart Marketplace',
@@ -29,12 +30,14 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <AuthContextProvider>
-          <CartProvider>
-            {children}
-            <Toaster />
-          </CartProvider>
-        </AuthContextProvider>
+        <FirebaseClientProvider>
+          <AuthContextProvider>
+            <CartProvider>
+              {children}
+              <Toaster />
+            </CartProvider>
+          </AuthContextProvider>
+        </FirebaseClientProvider>
       </body>
     </html>
   );

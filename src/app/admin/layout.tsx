@@ -64,28 +64,30 @@ export default function AdminLayout({
       return;
     }
 
-    if (user && !userDocLoading && userData) {
+    if (user && !userDocLoading) {
+      if (userData) {
         const roles = (userData as any).roles || [];
         if (roles.includes('admin')) {
-            setIsAdmin(true);
+          setIsAdmin(true);
         } else {
-            setIsAdmin(false);
-            router.push('/'); // Not an admin, redirect to homepage
+          setIsAdmin(false);
+          router.push('/'); // Not an admin, redirect to homepage
         }
-    } else if (user && !userDocLoading && !userData && !isAuthPage) {
-        // User is logged in but no user document found (or it's loading)
-        // and we are not on an auth page, assume not admin and redirect.
+      } else if (!isAuthPage) {
+        // User doc doesn't exist, but they are logged in. Not an admin.
         setIsAdmin(false);
         router.push('/');
+      }
     }
-
   }, [user, authLoading, userData, userDocLoading, router, isAuthPage]);
 
   if (isAuthPage) {
     return <>{children}</>;
   }
 
-  if (authLoading || userDocLoading || isAdmin === null) {
+  const isLoading = authLoading || userDocLoading || isAdmin === null;
+
+  if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         Verifying access...

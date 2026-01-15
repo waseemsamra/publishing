@@ -21,7 +21,7 @@ function CartButton() {
       <Link href="/cart">
         <ShoppingBag className="h-6 w-6" />
         {isClient && cartCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold">
+          <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold">
             {cartCount}
           </span>
         )}
@@ -39,24 +39,23 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-20 items-center">
-        <div className="flex items-center">
+      <div className="container flex h-20 items-center justify-between">
+        <div className="flex items-center gap-6">
           <Logo />
+          <nav className="hidden items-center gap-6 md:flex">
+            {navLinks.map(link => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  link.active ? 'text-accent' : 'text-foreground/60'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
         </div>
-
-        <nav className="hidden md:flex flex-1 justify-center items-center gap-6">
-          {navLinks.map(link => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                link.active ? 'text-accent' : 'text-foreground'
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
 
         <div className="flex items-center justify-end space-x-4">
           <div className="relative w-full max-w-xs hidden sm:block">
@@ -74,21 +73,11 @@ export function SiteHeader() {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
                 className="h-4 w-6 mr-2"
+                // This is a simplified version of a UK flag for demonstration
               >
-                <path
-                  d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM388.1 108.1L123.9 388.1C152.1 409.2 184.8 424.3 220.1 432.7L432.7 220.1c-8.4-35.4-23.5-68-44.6-96.2zM123.9 123.9C152.1 102.8 184.8 87.7 220.1 79.3L79.3 220.1c-8.4-35.4-23.5-68-44.6-96.2z"
-                  fill="#D80027"
-                />
-                <path d="M256 0v512c141.4 0 256-114.6 256-256S397.4 0 256 0z" fill="#F0F0F0" />
-                <path d="M512 256c0 141.4-114.6 256-256 256V0c141.4 0 256 114.6 256 256z" fill="#0052B4" />
-                <path
-                  d="M432.7 291.9L220.1 79.3c-35.4 8.4-68 23.5-96.2 44.6L388.1 403.9c21.1-28.2 36.2-60.8 44.6-96.2z"
-                  fill="#D80027"
-                />
-                <path
-                  d="M220.1 220.1L79.3 79.3C34.7 123.9 0 185.2 0 256h256c-19.3 0-37.3-3.6-54.4-9.9L220.1 220.1zM291.9 291.9L432.7 432.7c44.6-44.6 79.3-105.9 79.3-176.7H256c19.3 0 37.3 3.6 54.4 9.9L291.9 291.9z"
-                  fill="#F0F0F0"
-                />
+                <path fill="#00247d" d="M0 0h512v512H0z"/>
+                <path fill="#fff" d="m64 0 192 128L448 0h64v64L320 256l192 192v64h-64L256 384 64 512H0v-64l192-192L0 64V0h64z"/>
+                <path fill="#cf142b" d="m288 0 160 106.7V0h64v32l-160 106.7V224h-64v-85.3L64 0H0v64l224 149.3V288h64v-74.7L512 384v64l-224-149.3V224h-64v74.7L0 128V64l224 149.3V160h64v-53.3zM224 512l160-106.7V512h64v-32L288 373.3V320h-64v85.3L0 512h64v-64l224-149.3V288h-64v74.7L512 128V64l-224 149.3V224h64v-74.7L0 224v-64l224-149.3V160h-64V85.3L512 0v224h-64V117.3L256 256l256 128v-64h-64L256 192l-192 128v64h64l192-128 192 128h64v-64L320 256l192-192v-64h-64L256 128 64 0H0v64l192 192L0 448v64h64l192-128L448 512h64v-64L320 256l192-192V0h-64L256 128 64 0H0z"/>
               </svg>
               GBP
               <ChevronDown className="h-4 w-4 ml-1" />

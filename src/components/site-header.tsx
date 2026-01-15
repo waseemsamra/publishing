@@ -51,7 +51,8 @@ export function SiteHeader() {
           </nav>
         </div>
       </div>
-      <div className="container flex h-20 items-center justify-between">
+      <div className="container flex h-20 items-center">
+        {/* Left Section */}
         <div className="flex items-center gap-6">
           <Logo />
           <nav className="hidden items-center gap-6 md:flex">
@@ -69,7 +70,8 @@ export function SiteHeader() {
           </nav>
         </div>
 
-        <div className="flex-1 flex justify-center px-4">
+        {/* Center Section */}
+        <div className="flex-1 flex justify-center px-4 lg:px-8">
             <div className="relative w-full max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -80,6 +82,7 @@ export function SiteHeader() {
             </div>
         </div>
 
+        {/* Right Section */}
         <div className="flex items-center justify-end space-x-2">
           <div className="hidden md:flex items-center text-sm font-medium">
             <Button variant="ghost" size="sm" className="ml-1">

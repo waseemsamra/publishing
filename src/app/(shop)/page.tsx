@@ -13,12 +13,11 @@ const TrendingNowCard = ({ imageId, title }: { imageId: string, title: string })
   if (!image) return null;
 
   return (
-    <Link href="#" className="relative group block overflow-hidden">
+    <Link href="#" className="relative group block overflow-hidden aspect-[4/3]">
       <Image
         src={image.imageUrl}
         alt={image.description}
-        width={600}
-        height={400}
+        fill
         className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
         data-ai-hint={image.imageHint}
       />
@@ -85,13 +84,13 @@ export default function HomePage() {
 
       <section className="py-12 md:py-20">
         <div className="container">
-          <h2 className="font-headline text-4xl font-bold mb-8">Trending now</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border">
+            <h2 className="font-headline text-4xl font-bold mb-8">Trending now</h2>
+        </div>
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border">
             <TrendingNowCard imageId="trending-tapes" title="Tapes" />
             <TrendingNowCard imageId="trending-coffee-bags" title="Coffee Bags" />
             <TrendingNowCard imageId="trending-product-boxes" title="Product Boxes" />
             <TrendingNowCard imageId="trending-totes" title="Totes" />
-          </div>
         </div>
       </section>
 

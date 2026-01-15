@@ -1,13 +1,43 @@
+'use client';
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { orders } from '@/lib/data';
+import { useAuth } from '@/context/auth-context';
+import { useRouter } from 'next/navigation';
+import { LogOut } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function AccountPage() {
+  const { user, logout, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+  
+  const handleLogout = async () => {
+    await logout();
+    router.push('/');
+  };
+  
+  if (loading || !user) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="container py-12">
-      <h1 className="font-headline text-4xl font-bold mb-8">My Account</h1>
+      <div className="flex justify-between items-start mb-8">
+        <h1 className="font-headline text-4xl font-bold">My Account</h1>
+         <Button variant="outline" onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+          </Button>
+      </div>
       <Tabs defaultValue="orders" className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="profile">Profile</TabsTrigger>
@@ -21,9 +51,9 @@ export default function AccountPage() {
               <CardDescription>Manage your personal details.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-               <p><strong>Name:</strong> Alex Doe</p>
-               <p><strong>Email:</strong> alex.doe@example.com</p>
-               <p><strong>Member Since:</strong> January 1, 2024</p>
+               <p><strong>Name:</strong> {user.displayName || 'Alex Doe'}</p>
+               <p><strong>Email:</strong> {user.email}</p>
+               <p><strong>Member Since:</strong> {user.metadata.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString() : 'January 1, 2024'}</p>
                <Button>Edit Profile</Button>
             </CardContent>
           </Card>

@@ -1,13 +1,23 @@
 'use client';
 
 import Link from 'next/link';
-import { ShoppingBag, Search, ChevronDown, User } from 'lucide-react';
+import { ShoppingBag, Search, ChevronDown, User, LogOut } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/cart-context';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/auth-context';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { useRouter } from 'next/navigation';
 
 function CartButton() {
   const { cartCount } = useCart();
@@ -33,12 +43,27 @@ function CartButton() {
 }
 
 function AuthButton() {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/');
+  };
+
+  const getInitials = (name?: string | null) => {
+    if (!name) return 'U';
+    const parts = name.split(' ');
+    if (parts.length > 1 && parts[0] && parts[parts.length - 1]) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  };
 
   if (!isClient || loading) {
     return <Button variant="outline" className="w-[120px]">...</Button>;
@@ -46,12 +71,31 @@ function AuthButton() {
 
   if (user) {
     return (
-      <Button asChild variant="outline">
-        <Link href="/account">
-          <User className="mr-2 h-4 w-4" />
-          Account
-        </Link>
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="secondary" size="icon" className="rounded-full">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={user.photoURL || undefined} alt={user.displayName || 'User'} />
+              <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
+            </Avatar>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel>{user.displayName || 'My Account'}</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Link href="/account">
+              <User className="mr-2 h-4 w-4" />
+              <span>My Account</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 focus:bg-red-50">
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Logout</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
   }
 

@@ -23,6 +23,7 @@ import {
   UserCog,
   Ruler,
   Palette,
+  Printer,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,6 +51,7 @@ const navItems = [
   { href: '/admin/settings', label: 'Settings', icon: Settings },
   { href: '/admin/sizes', label: 'Sizes', icon: Ruler },
   { href: '/admin/colours', label: 'Colours', icon: Palette },
+  { href: '/admin/print-options', label: 'Print Options', icon: Printer },
 ];
 
 function SidebarContent({ pathname, onLinkClick, isAdmin }: { pathname: string, onLinkClick: () => void, isAdmin: boolean }) {

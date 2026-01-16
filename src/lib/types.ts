@@ -70,4 +70,11 @@ export interface Colour {
   hexCode: string;
   createdAt?: any;
 }
+
+export interface PrintOption {
+  id: string;
+  name: string;
+  description: string;
+  createdAt?: any;
+}
     

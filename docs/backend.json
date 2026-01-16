@@ -388,6 +388,30 @@
         "name",
         "hexCode"
       ]
+    },
+    "PrintOption": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PrintOption",
+      "type": "object",
+      "description": "Represents a product print option.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the print option."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the print option (e.g., Embossed, Foil Stamp)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the print option."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
     }
   },
   "auth": {
@@ -474,6 +498,22 @@
             {
               "name": "colourId",
               "description": "The unique identifier for the colour."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/printOptions/{printOptionId}",
+        "definition": {
+          "entityName": "PrintOption",
+          "schema": {
+            "$ref": "#/backend/entities/PrintOption"
+          },
+          "description": "Stores available product print options. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "printOptionId",
+              "description": "The unique identifier for the print option."
             }
           ]
         }

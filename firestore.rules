@@ -167,6 +167,17 @@ service cloud.firestore {
     }
 
     /**
+     * @description Stores product print options. Only admins can manage print options.
+     * @path /printOptions/{printOptionId}
+     * @allow (read, write) Any admin user.
+     * @deny (read, write) All non-admin users.
+     * @principle Admin-only management.
+     */
+    match /printOptions/{printOptionId} {
+      allow read, write: if isSignedIn();
+    }
+
+    /**
      * @description Stores a user's shopping cart. Only the owning user can access it.
      * @path /users/{userId}/shoppingCarts/{shoppingCartId}
      * @allow (create) User 'user123' creating their own shopping cart.

@@ -131,89 +131,91 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Right sticky column */}
-        <div className="md:col-span-5 md:sticky md:top-0 md:h-screen flex flex-col p-8 pt-16 md:p-12 lg:p-16">
-          <div className="w-full max-w-md">
-            <div className="text-sm text-muted-foreground">
-              <span>Hot Cups</span> — <span>Custom Coffee Cups Compostable</span>
-            </div>
-
-            <h1 className="font-headline text-3xl lg:text-4xl font-bold mt-2">{product.name}</h1>
-
-            <p className="text-lg text-muted-foreground mt-2">from £{product.price.toFixed(3)} / unit</p>
-
-            <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-md text-sm text-primary">
-              Free standard shipping & proofing available on all orders*
-            </div>
-
-            <div className="mt-6 space-y-3">
-              <h3 className="text-sm font-semibold text-muted-foreground">Estimated arrival:</h3>
-              <div className="flex items-center justify-between p-3 border rounded-md bg-gray-50">
-                <div className="flex items-center gap-3">
-                  <Truck className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-semibold">Standard (Free): Feb 13 - Feb 15</span>
+        <div className="md:col-span-5">
+           <div className="md:sticky md:top-32 p-8 pt-16 md:py-0 md:px-12 lg:px-16">
+              <div className="w-full max-w-md">
+                <div className="text-sm text-muted-foreground">
+                  <span>Hot Cups</span> — <span>Custom Coffee Cups Compostable</span>
                 </div>
-                <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
-                  <Leaf className="h-4 w-4 text-green-600"/>
+
+                <h1 className="font-headline text-3xl lg:text-4xl font-bold mt-2">{product.name}</h1>
+
+                <p className="text-lg text-muted-foreground mt-2">from £{product.price.toFixed(3)} / unit</p>
+
+                <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-md text-sm text-primary">
+                  Free standard shipping & proofing available on all orders*
                 </div>
-              </div>
-              <div className="flex items-center justify-between p-3 border rounded-md bg-gray-50">
-                <div className="flex items-center gap-3">
-                  <Zap className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-semibold">Express: Feb 02 - Feb 04</span>
-                </div>
-                <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
-                  <Leaf className="h-4 w-4 text-green-600"/>
-                </div>
-              </div>
-            </div>
-            
-            <div className="mt-6 space-y-6">
-              {availableWallTypes && availableWallTypes.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-semibold mb-2">Wall</h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {availableWallTypes.map((wall) => (
-                      <Button key={wall.id} variant={selectedWall === wall.id ? 'default' : 'outline'} onClick={() => setSelectedWall(wall.id)}>{wall.name}</Button>
-                    ))}
+
+                <div className="mt-6 space-y-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground">Estimated arrival:</h3>
+                  <div className="flex items-center justify-between p-3 border rounded-md bg-gray-50">
+                    <div className="flex items-center gap-3">
+                      <Truck className="h-5 w-5 text-muted-foreground" />
+                      <span className="font-semibold">Standard (Free): Feb 13 - Feb 15</span>
+                    </div>
+                    <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
+                      <Leaf className="h-4 w-4 text-green-600"/>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between p-3 border rounded-md bg-gray-50">
+                    <div className="flex items-center gap-3">
+                      <Zap className="h-5 w-5 text-muted-foreground" />
+                      <span className="font-semibold">Express: Feb 02 - Feb 04</span>
+                    </div>
+                    <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
+                      <Leaf className="h-4 w-4 text-green-600"/>
+                    </div>
                   </div>
                 </div>
-              )}
-              
-              {availableSizes && availableSizes.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-semibold mb-2 flex items-center gap-1">Size (Capacity) <HelpCircle className="h-4 w-4 text-muted-foreground"/></h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {availableSizes.map((size) => (
-                      <Button key={size.id} variant={selectedSize === size.id ? 'default' : 'outline'} onClick={() => setSelectedSize(size.id)}>{size.name}</Button>
-                    ))}
+                
+                <div className="mt-6 space-y-6">
+                  {availableWallTypes && availableWallTypes.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-semibold mb-2">Wall</h3>
+                      <div className="grid grid-cols-2 gap-2">
+                        {availableWallTypes.map((wall) => (
+                          <Button key={wall.id} variant={selectedWall === wall.id ? 'default' : 'outline'} onClick={() => setSelectedWall(wall.id)}>{wall.name}</Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {availableSizes && availableSizes.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-semibold mb-2 flex items-center gap-1">Size (Capacity) <HelpCircle className="h-4 w-4 text-muted-foreground"/></h3>
+                      <div className="grid grid-cols-2 gap-2">
+                        {availableSizes.map((size) => (
+                          <Button key={size.id} variant={selectedSize === size.id ? 'default' : 'outline'} onClick={() => setSelectedSize(size.id)}>{size.name}</Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <h3 className="text-sm font-semibold mb-2 flex items-center gap-1">Lid Type <HelpCircle className="h-4 w-4 text-muted-foreground"/></h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button variant={selectedLid === 'None' ? 'default' : 'outline'} onClick={() => setSelectedLid('None')}>None</Button>
+                      <Button variant={selectedLid === 'Sip' ? 'default' : 'outline'} onClick={() => setSelectedLid('Sip')}>Sip (Paper)</Button>
+                    </div>
                   </div>
                 </div>
-              )}
 
-              <div>
-                <h3 className="text-sm font-semibold mb-2 flex items-center gap-1">Lid Type <HelpCircle className="h-4 w-4 text-muted-foreground"/></h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button variant={selectedLid === 'None' ? 'default' : 'outline'} onClick={() => setSelectedLid('None')}>None</Button>
-                  <Button variant={selectedLid === 'Sip' ? 'default' : 'outline'} onClick={() => setSelectedLid('Sip')}>Sip (Paper)</Button>
+                <QuantityPricingTable onQuantityChange={setSelectedTier} />
+
+                <div className="mt-6 text-right">
+                  <p className="text-sm text-muted-foreground">Total (excl. VAT)</p>
+                  <p className="font-headline text-3xl font-bold">£{selectedTier.total.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">or financing from £{(selectedTier.total / 4).toFixed(2)}/Mo.</p>
+                </div>
+
+                <div className="mt-6 space-y-3">
+                  <Button size="lg" className="w-full bg-pink-500 hover:bg-pink-600 text-white">Upload design</Button>
+                  <Button size="lg" variant="outline" className="w-full" onClick={handleDesignLater}>
+                    Design later — Add to cart
+                  </Button>
                 </div>
               </div>
             </div>
-
-            <QuantityPricingTable onQuantityChange={setSelectedTier} />
-
-            <div className="mt-6 text-right">
-              <p className="text-sm text-muted-foreground">Total (excl. VAT)</p>
-              <p className="font-headline text-3xl font-bold">£{selectedTier.total.toFixed(2)}</p>
-              <p className="text-xs text-muted-foreground">or financing from £{(selectedTier.total / 4).toFixed(2)}/Mo.</p>
-            </div>
-
-            <div className="mt-6 space-y-3">
-              <Button size="lg" className="w-full bg-pink-500 hover:bg-pink-600 text-white">Upload design</Button>
-              <Button size="lg" variant="outline" className="w-full" onClick={handleDesignLater}>
-                Design later — Add to cart
-              </Button>
-            </div>
-          </div>
         </div>
       </div>
     </>

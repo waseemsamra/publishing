@@ -12,32 +12,32 @@ export function ProductInfoAccordion({ product }: { product: Product }) {
     <div>
       <Accordion type="single" collapsible className="w-full" defaultValue="description">
         <AccordionItem value="description">
-          <AccordionTrigger className="text-base font-semibold">Description</AccordionTrigger>
+          <AccordionTrigger className="text-xl font-semibold">Description</AccordionTrigger>
           <AccordionContent>
             {product.description}
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="specification">
-          <AccordionTrigger className="text-base font-semibold">Specification</AccordionTrigger>
+          <AccordionTrigger className="text-xl font-semibold">Specification</AccordionTrigger>
           <AccordionContent>
             {product.sustainabilityImpact}
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="product-highlights">
-          <AccordionTrigger className="text-base font-semibold">Product Highlights</AccordionTrigger>
+          <AccordionTrigger className="text-xl font-semibold">Product Highlights</AccordionTrigger>
           <AccordionContent>
             - Made from {product.materials?.join(', ')} <br/>
             - Certifications: {product.certifications?.join(', ')}
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="dielines-templates">
-          <AccordionTrigger className="text-base font-semibold">Dielines & Templates</AccordionTrigger>
+          <AccordionTrigger className="text-xl font-semibold">Dielines & Templates</AccordionTrigger>
           <AccordionContent>
             Downloadable templates and dielines will be available here.
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="how-it-works">
-          <AccordionTrigger className="text-base font-semibold">How it works</AccordionTrigger>
+          <AccordionTrigger className="text-xl font-semibold">How it works</AccordionTrigger>
           <AccordionContent>
             A step-by-step guide on the customization and ordering process.
           </AccordionContent>

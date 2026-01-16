@@ -202,12 +202,15 @@ export default function ProductDetailPage() {
               </Button>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div className="container py-12 md:py-20 space-y-16">
-        <ProductInfoAccordion product={product} />
-        <RelatedProducts />
+          <div className="py-12 md:py-20 space-y-16">
+            <div className="w-full max-w-md">
+                <ProductInfoAccordion product={product} />
+            </div>
+            <RelatedProducts />
+          </div>
+
+        </div>
       </div>
     </>
   );

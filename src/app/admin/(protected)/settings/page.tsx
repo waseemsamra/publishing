@@ -6,7 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling } from 'lucide-react';
+import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package } from 'lucide-react';
 
 const settingsLinks = [
     {
@@ -38,6 +38,12 @@ const settingsLinks = [
         title: "Thickness",
         description: "Manage thickness options for paper.",
         icon: Scaling,
+    },
+    {
+        href: "/admin/material-types",
+        title: "Material Types",
+        description: "Manage material types like Standard White or Kraft.",
+        icon: Package,
     },
     {
         href: "#",

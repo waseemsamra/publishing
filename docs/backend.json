@@ -1,100 +1,72 @@
 {
   "entities": {
-    "UserAccount": {
+    "BillingAddress": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "UserAccount",
+      "title": "BillingAddress",
       "type": "object",
-      "description": "Represents a user account in the EcoCart Marketplace.",
+      "description": "Represents a billing address.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the user account."
+          "description": "Unique identifier for the billing address."
         },
-        "email": {
+        "addressLine1": {
           "type": "string",
-          "description": "Email address of the user.",
-          "format": "email"
+          "description": "Address line 1."
         },
-        "firstName": {
+        "addressLine2": {
           "type": "string",
-          "description": "First name of the user."
+          "description": "Address line 2 (optional)."
         },
-        "lastName": {
+        "city": {
           "type": "string",
-          "description": "Last name of the user."
+          "description": "City."
         },
-        "billingAddressId": {
+        "state": {
           "type": "string",
-          "description": "Reference to BillingAddress. (Relationship: UserAccount 1:1 BillingAddress)"
+          "description": "State."
         },
-        "shippingAddressId": {
+        "zipCode": {
           "type": "string",
-          "description": "Reference to ShippingAddress. (Relationship: UserAccount 1:1 ShippingAddress)"
+          "description": "Zip code."
+        },
+        "country": {
+          "type": "string",
+          "description": "Country."
         }
       },
       "required": [
         "id",
-        "email",
-        "firstName",
-        "lastName"
+        "addressLine1",
+        "city",
+        "state",
+        "zipCode",
+        "country"
       ]
     },
-    "Product": {
+    "CartItem": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Product",
+      "title": "CartItem",
       "type": "object",
-      "description": "Represents a product listed in the EcoCart Marketplace.",
+      "description": "Represents an item in a shopping cart.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the product."
+          "description": "Unique identifier for the cart item."
         },
-        "name": {
+        "productId": {
           "type": "string",
-          "description": "Name of the product."
+          "description": "Reference to Product. (Relationship: Product 1:N CartItem)"
         },
-        "description": {
-          "type": "string",
-          "description": "Detailed description of the product."
-        },
-        "price": {
+        "quantity": {
           "type": "number",
-          "description": "Price of the product."
-        },
-        "imageUrl": {
-          "type": "string",
-          "description": "URL of the product image.",
-          "format": "uri"
-        },
-        "materials": {
-          "type": "string",
-          "description": "Materials used to manufacture the product."
-        },
-        "certifications": {
-          "type": "string",
-          "description": "Certifications held by the product (e.g., Fair Trade, Organic)."
-        },
-        "sustainabilityImpact": {
-          "type": "string",
-          "description": "Description of the product's positive impact on sustainability."
-        },
-        "categoryIds": {
-          "type": "array",
-          "description": "References to Categories. (Relationship: Product N:N Category)",
-          "items": {
-            "type": "string"
-          }
+          "description": "Quantity of the product in the cart."
         }
       },
       "required": [
         "id",
-        "name",
-        "description",
-        "price",
-        "imageUrl",
-        "materials",
-        "certifications",
-        "sustainabilityImpact"
+        "productId",
+        "quantity"
       ]
     },
     "Category": {
@@ -122,56 +94,53 @@
         "description"
       ]
     },
-    "ShoppingCart": {
+    "Colour": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "ShoppingCart",
+      "title": "Colour",
       "type": "object",
-      "description": "Represents a user's shopping cart.",
+      "description": "Represents a product colour.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the shopping cart."
+          "description": "Unique identifier for the colour."
         },
-        "userAccountId": {
+        "name": {
           "type": "string",
-          "description": "Reference to UserAccount. (Relationship: UserAccount 1:1 ShoppingCart)"
+          "description": "Name of the colour (e.g., Red, Blue, Green)."
         },
-        "cartItemIds": {
-          "type": "array",
-          "description": "References to CartItems. (Relationship: ShoppingCart 1:N CartItem)",
-          "items": {
-            "type": "string"
-          }
+        "hexCode": {
+          "type": "string",
+          "description": "Hex code for the colour (e.g., #FF0000)."
         }
       },
       "required": [
         "id",
-        "userAccountId"
+        "name",
+        "hexCode"
       ]
     },
-    "CartItem": {
+    "MaterialType": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "CartItem",
+      "title": "MaterialType",
       "type": "object",
-      "description": "Represents an item in a shopping cart.",
+      "description": "Represents a product material type (e.g., Standard White, Kraft).",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the cart item."
+          "description": "Unique identifier for the material type."
         },
-        "productId": {
+        "name": {
           "type": "string",
-          "description": "Reference to Product. (Relationship: Product 1:N CartItem)"
+          "description": "Name of the material type (e.g., Standard White)."
         },
-        "quantity": {
-          "type": "number",
-          "description": "Quantity of the product in the cart."
+        "description": {
+          "type": "string",
+          "description": "Description of the material type."
         }
       },
       "required": [
         "id",
-        "productId",
-        "quantity"
+        "name"
       ]
     },
     "Order": {
@@ -252,6 +221,88 @@
         "price"
       ]
     },
+    "PrintOption": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PrintOption",
+      "type": "object",
+      "description": "Represents a product print option.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the print option."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the print option (e.g., Embossed, Foil Stamp)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the print option."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "Product": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Product",
+      "type": "object",
+      "description": "Represents a product listed in the EcoCart Marketplace.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the product."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the product."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the product."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the product."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the product image.",
+          "format": "uri"
+        },
+        "materials": {
+          "type": "string",
+          "description": "Materials used to manufacture the product."
+        },
+        "certifications": {
+          "type": "string",
+          "description": "Certifications held by the product (e.g., Fair Trade, Organic)."
+        },
+        "sustainabilityImpact": {
+          "type": "string",
+          "description": "Description of the product's positive impact on sustainability."
+        },
+        "categoryIds": {
+          "type": "array",
+          "description": "References to Categories. (Relationship: Product N:N Category)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "price",
+        "imageUrl",
+        "materials",
+        "certifications",
+        "sustainabilityImpact"
+      ]
+    },
     "ShippingAddress": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "ShippingAddress",
@@ -296,48 +347,31 @@
         "country"
       ]
     },
-    "BillingAddress": {
+    "ShoppingCart": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "BillingAddress",
+      "title": "ShoppingCart",
       "type": "object",
-      "description": "Represents a billing address.",
+      "description": "Represents a user's shopping cart.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the billing address."
+          "description": "Unique identifier for the shopping cart."
         },
-        "addressLine1": {
+        "userAccountId": {
           "type": "string",
-          "description": "Address line 1."
+          "description": "Reference to UserAccount. (Relationship: UserAccount 1:1 ShoppingCart)"
         },
-        "addressLine2": {
-          "type": "string",
-          "description": "Address line 2 (optional)."
-        },
-        "city": {
-          "type": "string",
-          "description": "City."
-        },
-        "state": {
-          "type": "string",
-          "description": "State."
-        },
-        "zipCode": {
-          "type": "string",
-          "description": "Zip code."
-        },
-        "country": {
-          "type": "string",
-          "description": "Country."
+        "cartItemIds": {
+          "type": "array",
+          "description": "References to CartItems. (Relationship: ShoppingCart 1:N CartItem)",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
         "id",
-        "addressLine1",
-        "city",
-        "state",
-        "zipCode",
-        "country"
+        "userAccountId"
       ]
     },
     "Size": {
@@ -364,75 +398,6 @@
         "name"
       ]
     },
-    "Colour": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Colour",
-      "type": "object",
-      "description": "Represents a product colour.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the colour."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the colour (e.g., Red, Blue, Green)."
-        },
-        "hexCode": {
-          "type": "string",
-          "description": "Hex code for the colour (e.g., #FF0000)."
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "hexCode"
-      ]
-    },
-    "PrintOption": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "PrintOption",
-      "type": "object",
-      "description": "Represents a product print option.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the print option."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the print option (e.g., Embossed, Foil Stamp)."
-        },
-        "description": {
-          "type": "string",
-          "description": "Description of the print option."
-        }
-      },
-      "required": [
-        "id",
-        "name"
-      ]
-    },
-    "WallType": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "WallType",
-      "type": "object",
-      "description": "Represents a cup wall type (e.g., Single, Double, Ripple).",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the wall type."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the wall type (e.g., Single Wall)."
-        }
-      },
-      "required": [
-        "id",
-        "name"
-      ]
-    },
     "Thickness": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Thickness",
@@ -450,6 +415,65 @@
         "description": {
           "type": "string",
           "description": "Description of the thickness."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "UserAccount": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserAccount",
+      "type": "object",
+      "description": "Represents a user account in the EcoCart Marketplace.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user account."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the user."
+        },
+        "billingAddressId": {
+          "type": "string",
+          "description": "Reference to BillingAddress. (Relationship: UserAccount 1:1 BillingAddress)"
+        },
+        "shippingAddressId": {
+          "type": "string",
+          "description": "Reference to ShippingAddress. (Relationship: UserAccount 1:1 ShippingAddress)"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "firstName",
+        "lastName"
+      ]
+    },
+    "WallType": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WallType",
+      "type": "object",
+      "description": "Represents a cup wall type (e.g., Single, Double, Ripple).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the wall type."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the wall type (e.g., Single Wall)."
         }
       },
       "required": [
@@ -590,6 +614,22 @@
             {
               "name": "thicknessId",
               "description": "The unique identifier for the thickness."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/materialTypes/{materialTypeId}",
+        "definition": {
+          "entityName": "MaterialType",
+          "schema": {
+            "$ref": "#/backend/entities/MaterialType"
+          },
+          "description": "Stores available product material types. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "materialTypeId",
+              "description": "The unique identifier for the material type."
             }
           ]
         }

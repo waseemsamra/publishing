@@ -198,6 +198,17 @@ service cloud.firestore {
     match /thicknesses/{thicknessId} {
       allow read, write: if isSignedIn();
     }
+    
+    /**
+     * @description Stores product material types. Only admins can manage them.
+     * @path /materialTypes/{materialTypeId}
+     * @allow (read, write) Any admin user.
+     * @deny (read, write) All non-admin users.
+     * @principle Admin-only management.
+     */
+    match /materialTypes/{materialTypeId} {
+      allow read, write: if isSignedIn();
+    }
 
     /**
      * @description Stores a user's shopping cart. Only the owning user can access it.

@@ -90,4 +90,11 @@ export interface Thickness {
   description: string;
   createdAt?: any;
 }
+
+export interface MaterialType {
+  id: string;
+  name: string;
+  description: string;
+  createdAt?: any;
+}
     

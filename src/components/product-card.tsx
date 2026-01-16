@@ -9,18 +9,26 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const image = product.images?.[0];
+
   return (
     <Card className="flex flex-col overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-xl">
       <Link href={`/products/${product.id}`} className="flex flex-col h-full">
         <CardHeader className="p-0">
           <div className="aspect-square relative">
-            <Image
-              src={product.image.imageUrl}
-              alt={product.image.description}
-              fill
-              className="object-cover"
-              data-ai-hint={product.image.imageHint}
-            />
+            {image ? (
+                <Image
+                src={image.imageUrl}
+                alt={image.description}
+                fill
+                className="object-cover"
+                data-ai-hint={image.imageHint}
+                />
+            ) : (
+                <div className="bg-muted flex items-center justify-center h-full">
+                    <span className="text-muted-foreground">No Image</span>
+                </div>
+            )}
           </div>
         </CardHeader>
         <CardContent className="p-4 flex-grow">

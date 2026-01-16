@@ -18,7 +18,7 @@ export const products: Product[] = [
     materials: ['Stainless Steel', 'Silicone'],
     certifications: ['B-Corp Certified', '1% for the Planet'],
     sustainabilityImpact: 'Reduces an average of 156 plastic bottles per year from entering landfills and oceans. Ethically manufactured in a solar-powered facility.',
-    image: imageMap['product-1'],
+    images: [imageMap['product-1']],
   },
   {
     id: '2',
@@ -28,7 +28,7 @@ export const products: Product[] = [
     materials: ['Bamboo', 'Nylon-6'],
     certifications: ['FSC Certified Bamboo', 'Vegan'],
     sustainabilityImpact: 'Fully biodegradable handle helps eliminate plastic waste. Bamboo is a fast-growing, renewable resource.',
-    image: imageMap['product-2'],
+    images: [imageMap['product-2']],
   },
   {
     id: '3',
@@ -38,7 +38,7 @@ export const products: Product[] = [
     materials: ['Organic Cotton'],
     certifications: ['GOTS Certified Organic Cotton'],
     sustainabilityImpact: 'Each tote can save up to 500 plastic bags a year. Made with fair-trade practices.',
-    image: imageMap['product-3'],
+    images: [imageMap['product-3']],
   },
   {
     id: '4',
@@ -48,7 +48,7 @@ export const products: Product[] = [
     materials: ['Stainless Steel', 'Cotton'],
     certifications: [],
     sustainabilityImpact: 'Helps reduce the 500 million plastic straws used daily. A long-lasting alternative to single-use plastics.',
-    image: imageMap['product-4'],
+    images: [imageMap['product-4']],
   },
   {
     id: '5',
@@ -58,7 +58,7 @@ export const products: Product[] = [
     materials: ['Recycled Plastic', 'Monocrystalline Silicon'],
     certifications: ['RoHS Compliant'],
     sustainabilityImpact: 'Utilizes clean, renewable solar energy, reducing reliance on fossil fuels. Casing is made from 85% post-consumer recycled plastic.',
-    image: imageMap['product-5'],
+    images: [imageMap['product-5']],
   },
   {
     id: '6',
@@ -68,7 +68,7 @@ export const products: Product[] = [
     materials: ['Organic Cotton', 'Beeswax', 'Jojoba Oil', 'Tree Resin'],
     certifications: ['GOTS Certified Organic Cotton'],
     sustainabilityImpact: 'Eliminates single-use plastic wrap from your kitchen. Can be used for up to a year and is fully biodegradable.',
-    image: imageMap['product-6'],
+    images: [imageMap['product-6']],
   },
   {
     id: '7',
@@ -78,7 +78,7 @@ export const products: Product[] = [
     materials: ['Recycled Stainless Steel', 'Bamboo'],
     certifications: [],
     sustainabilityImpact: 'Diverts food waste from landfills, reducing methane emissions. Creates nutrient-rich compost for gardens.',
-    image: imageMap['product-7'],
+    images: [imageMap['product-7']],
   },
   {
     id: '8',
@@ -88,7 +88,7 @@ export const products: Product[] = [
     materials: ['New Zealand Wool'],
     certifications: ['Leaping Bunny Certified'],
     sustainabilityImpact: 'Replaces single-use dryer sheets and chemical fabric softeners. Saves energy by shortening dryer cycles.',
-    image: imageMap['product-8'],
+    images: [imageMap['product-8']],
   },
 ];
 

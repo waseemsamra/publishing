@@ -119,4 +119,10 @@ export interface Handle {
   createdAt?: any;
 }
     
+export interface Shape {
+  id: string;
+  name: string;
+  description: string;
+  createdAt?: any;
+}
   

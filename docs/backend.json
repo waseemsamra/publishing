@@ -470,6 +470,30 @@
         "name"
       ]
     },
+    "Shape": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Shape",
+      "type": "object",
+      "description": "Represents a product shape (e.g., Circle, Square).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the shape."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the shape (e.g., Circle)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the shape."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
     "Thickness": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Thickness",
@@ -750,6 +774,22 @@
             {
               "name": "handleId",
               "description": "The unique identifier for the handle."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/shapes/{shapeId}",
+        "definition": {
+          "entityName": "Shape",
+          "schema": {
+            "$ref": "#/backend/entities/Shape"
+          },
+          "description": "Stores available product shapes. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "shapeId",
+              "description": "The unique identifier for the shape."
             }
           ]
         }

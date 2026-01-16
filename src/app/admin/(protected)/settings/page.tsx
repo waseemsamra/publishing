@@ -6,7 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote, Hand } from 'lucide-react';
+import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote, Hand, Shapes } from 'lucide-react';
 
 const settingsLinks = [
     {
@@ -62,6 +62,12 @@ const settingsLinks = [
         title: "Handles",
         description: "Manage bag handle types like Flat or Twisted.",
         icon: Hand,
+    },
+    {
+        href: "/admin/shapes",
+        title: "Shapes",
+        description: "Manage coaster shapes like Circle or Square.",
+        icon: Shapes,
     },
     {
         href: "#",

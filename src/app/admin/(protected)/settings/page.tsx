@@ -70,7 +70,7 @@ const settingsLinks = [
         icon: Shapes,
     },
     {
-        href: "#",
+        href: "/admin/settings/store-details",
         title: "Store Details",
         description: "Update your store name, contact info, and address.",
         icon: Store,

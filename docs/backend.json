@@ -494,6 +494,48 @@
         "name"
       ]
     },
+    "StoreSettings": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "StoreSettings",
+      "type": "object",
+      "description": "Represents the general settings for the store.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the settings document."
+        },
+        "storeName": {
+          "type": "string",
+          "description": "The name of the store."
+        },
+        "logoUrl": {
+          "type": "string",
+          "description": "URL of the store's logo.",
+          "format": "uri"
+        },
+        "contactEmail": {
+          "type": "string",
+          "description": "The primary contact email for the store.",
+          "format": "email"
+        },
+        "contactPhone": {
+          "type": "string",
+          "description": "The primary contact phone number for the store."
+        },
+        "address": {
+          "type": "string",
+          "description": "The physical address of the store."
+        },
+        "companyDetails": {
+          "type": "string",
+          "description": "Additional company details for invoices (e.g., VAT number, registration number)."
+        }
+      },
+      "required": [
+        "id",
+        "storeName"
+      ]
+    },
     "Thickness": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Thickness",
@@ -790,6 +832,22 @@
             {
               "name": "shapeId",
               "description": "The unique identifier for the shape."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/settings/{settingId}",
+        "definition": {
+          "entityName": "StoreSettings",
+          "schema": {
+            "$ref": "#/backend/entities/StoreSettings"
+          },
+          "description": "Stores global settings for the application, like store details. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "settingId",
+              "description": "The unique identifier for the settings document (e.g., 'storeDetails')."
             }
           ]
         }

@@ -125,4 +125,15 @@ export interface Shape {
   description: string;
   createdAt?: any;
 }
+
+export interface StoreSettings {
+  id: string;
+  storeName?: string;
+  logoUrl?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  address?: string;
+  companyDetails?: string;
+  updatedAt?: any;
+}
   

@@ -152,7 +152,7 @@ service cloud.firestore {
      * @principle Admin-only management.
      */
     match /sizes/{sizeId} {
-      allow read, write: if isAdmin();
+      allow read, write: if isSignedIn();
     }
 
     /**
@@ -249,5 +249,3 @@ service cloud.firestore {
     }
   }
 }
-
-    

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Image from 'next/image';
@@ -19,7 +19,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Loader2, Save, ArrowLeft } from 'lucide-react';
+import { Loader2, Save, ArrowLeft, PlusCircle, Trash2 } from 'lucide-react';
 
 const productFormSchema = z.object({
   name: z.string().min(1, 'Product name is required.'),
@@ -135,12 +135,12 @@ export function ProductForm({ product }: { product?: Product }) {
         images: product.images?.map(img => ({
             ...img,
             imageUrl: img.imageUrl?.replace(s3BaseUrl, ''),
-        }))
+        })) || []
     } : {
         name: '',
         description: '',
         price: 0,
-        images: [{ id: '1', imageUrl: '', description: '', imageHint: '' }],
+        images: [],
         sustainabilityImpact: '',
         materials: [],
         certifications: [],
@@ -158,8 +158,10 @@ export function ProductForm({ product }: { product?: Product }) {
     },
   });
   
-  const imageUrlPath = form.watch('images.0.imageUrl');
-  const previewUrl = imageUrlPath ? (imageUrlPath.startsWith('http') ? imageUrlPath : `${s3BaseUrl}${imageUrlPath}`) : null;
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "images",
+  });
 
   async function onSubmit(data: ProductFormValues) {
     setIsSubmitting(true);
@@ -223,33 +225,67 @@ export function ProductForm({ product }: { product?: Product }) {
               </CardContent>
             </Card>
             <Card>
-              <CardHeader><CardTitle>Images</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                 <FormField control={form.control} name="images.0.imageUrl" render={({ field }) => (
-                    <FormItem><FormLabel>Primary Image Path</FormLabel><FormControl><Input placeholder="/testcup.webp" {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
-                
-                 {previewUrl && (
-                    <div className="mt-4">
-                    <FormLabel>Image Preview</FormLabel>
-                    <div className="mt-2 aspect-square w-48 relative rounded-md border overflow-hidden">
-                        <Image
-                            src={previewUrl}
-                            alt="Product image preview"
-                            fill
-                            className="object-cover"
-                            unoptimized
-                        />
+              <CardHeader>
+                  <CardTitle>Images</CardTitle>
+                  <CardDescription>Add one or more images for your product gallery.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {fields.map((field, index) => {
+                  const imageUrlPath = form.watch(`images.${index}.imageUrl`);
+                  const previewUrl = imageUrlPath ? (imageUrlPath.startsWith('http') ? imageUrlPath : `${s3BaseUrl}${imageUrlPath}`) : null;
+
+                  return (
+                    <div key={field.id} className="p-4 border rounded-lg relative space-y-4">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-2 h-7 w-7 text-muted-foreground hover:text-destructive"
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      
+                      <FormField
+                        control={form.control}
+                        name={`images.${index}.imageUrl`}
+                        render={({ field }) => (
+                            <FormItem><FormLabel>Image Path</FormLabel><FormControl><Input placeholder="/image.webp" {...field} /></FormControl><FormMessage /></FormItem>
+                        )}
+                      />
+                      
+                      {previewUrl && (
+                        <div className="mt-4">
+                          <FormLabel>Image Preview</FormLabel>
+                          <div className="mt-2 aspect-square w-48 relative rounded-md border overflow-hidden">
+                              <Image
+                                  src={previewUrl}
+                                  alt={`Preview for image ${index + 1}`}
+                                  fill
+                                  className="object-cover"
+                                  unoptimized
+                              />
+                          </div>
+                        </div>
+                      )}
+                      
+                      <FormField control={form.control} name={`images.${index}.description`} render={({ field }) => (
+                          <FormItem><FormLabel>Image Description (for accessibility)</FormLabel><FormControl><Input placeholder="e.g., A stylish blue water bottle" {...field} /></FormControl><FormMessage /></FormItem>
+                      )} />
+                      <FormField control={form.control} name={`images.${index}.imageHint`} render={({ field }) => (
+                          <FormItem><FormLabel>AI Image Hint (1-2 keywords)</FormLabel><FormControl><Input placeholder="e.g., water bottle" {...field} /></FormControl><FormMessage /></FormItem>
+                      )} />
                     </div>
-                    </div>
-                )}
-                
-                <FormField control={form.control} name="images.0.description" render={({ field }) => (
-                    <FormItem><FormLabel>Image Description (for accessibility)</FormLabel><FormControl><Input placeholder="e.g., A stylish blue water bottle" {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
-                <FormField control={form.control} name="images.0.imageHint" render={({ field }) => (
-                    <FormItem><FormLabel>AI Image Hint (1-2 keywords)</FormLabel><FormControl><Input placeholder="e.g., water bottle" {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
+                  );
+                })}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => append({ id: `img-${Date.now()}`, imageUrl: '', description: '', imageHint: '' })}
+                >
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add Image
+                </Button>
               </CardContent>
             </Card>
              <Card>

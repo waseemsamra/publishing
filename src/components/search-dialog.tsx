@@ -62,9 +62,15 @@ export function SearchDialog() {
   }, [open]);
 
   const handleProductClick = (e: React.MouseEvent, productId: string) => {
+    // Prevent the Link component's default navigation behavior.
     e.preventDefault();
-    setOpen(false);
+
+    // Start the navigation to the new page first.
     router.push(`/products/${productId}`);
+    
+    // Then, close the dialog. This order helps prevent race conditions
+    // where the dialog unmounting might interfere with the router.
+    setOpen(false);
   };
 
   return (

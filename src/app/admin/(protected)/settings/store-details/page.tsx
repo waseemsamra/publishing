@@ -4,9 +4,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { doc, setDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useDoc } from '@/firebase/firestore/use-doc';
 import type { StoreSettings } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
@@ -83,9 +82,21 @@ export default function StoreDetailsPage() {
 
       if (logoFile) {
         setIsUploading(true);
-        const storageRef = ref(storage, `store/logo/${logoFile.name}`);
-        const uploadResult = await uploadBytes(storageRef, logoFile);
-        logoUrl = await getDownloadURL(uploadResult.ref);
+        const formData = new FormData();
+        formData.append("file", logoFile);
+
+        const response = await fetch('/image', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`Image upload failed: ${response.status} ${errorBody}`);
+        }
+
+        const result = await response.json();
+        logoUrl = result.url;
         setIsUploading(false);
       }
 
@@ -107,6 +118,7 @@ export default function StoreDetailsPage() {
         title: 'Error',
         description: error.message || 'Failed to update store details.',
       });
+      setIsUploading(false);
     } finally {
       setLoading(false);
     }

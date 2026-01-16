@@ -6,6 +6,8 @@ import {
   DialogContent,
   DialogTrigger,
   DialogClose,
+  DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -74,12 +76,16 @@ export function SearchDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <div>
+        <div className='w-full'>
             <div className="hidden lg:block w-full">{DesktopTrigger}</div>
             <div className="lg:hidden">{MobileTrigger}</div>
         </div>
       </DialogTrigger>
       <DialogContent className="max-w-full w-full h-full sm:rounded-none p-0 flex flex-col gap-0">
+          <DialogTitle className="sr-only">Search Products</DialogTitle>
+          <DialogDescription className="sr-only">
+            Search for products by name or description. Start typing to see results. You can also browse popular searches.
+          </DialogDescription>
           <header className="flex items-center gap-4 border-b p-4 shrink-0">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />

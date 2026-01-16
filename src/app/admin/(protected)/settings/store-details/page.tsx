@@ -15,7 +15,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Loader2, UploadCloud } from 'lucide-react';
-import Image from 'next/image';
 
 const storeSettingsSchema = z.object({
   storeName: z.string().min(1, 'Store name is required'),
@@ -213,7 +212,7 @@ export default function StoreDetailsPage() {
                 <FormLabel>Store Logo</FormLabel>
                 <div className="mt-2 flex items-center gap-6">
                     {logoPreview ? (
-                        <Image src={logoPreview} alt="Logo preview" width={80} height={80} className="rounded-lg object-contain h-20 w-20 bg-muted border p-1" />
+                        <img src={logoPreview} alt="Logo preview" width={80} height={80} className="rounded-lg object-contain h-20 w-20 bg-muted border p-1" />
                     ) : (
                         <div className="h-20 w-20 flex items-center justify-center rounded-lg bg-muted text-muted-foreground border">
                             <UploadCloud className="h-8 w-8" />
@@ -225,7 +224,7 @@ export default function StoreDetailsPage() {
                             {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             {logoFile ? 'Change Logo' : 'Upload Logo'}
                         </Button>
-                        <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 5MB.</p>
+                        <p className="text-xs text-muted-foreground">PNG, JPG, GIF, WebP up to 5MB.</p>
                     </div>
                 </div>
                  <FormMessage />

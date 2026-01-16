@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
@@ -29,7 +29,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
     Card,
@@ -42,14 +41,31 @@ import { Label } from '@/components/ui/label';
 import { MoreHorizontal, Edit, Trash2, PlusCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
-
-function SizeFormDialog({ size, onSave, children }: { size?: Size, onSave: (data: Omit<Size, 'id' | 'createdAt'>) => void, children: React.ReactNode }) {
-    const [isOpen, setIsOpen] = useState(false);
-    const [name, setName] = useState(size?.name || '');
-    const [shortName, setShortName] = useState(size?.shortName || '');
+export default function SizesPage() {
     const { toast } = useToast();
+    const [dialogState, setDialogState] = useState<{open: boolean; size?: Partial<Size>}>({ open: false, size: undefined });
+    
+    // Form state is now in the main component
+    const [name, setName] = useState('');
+    const [shortName, setShortName] = useState('');
 
-    const handleSubmit = () => {
+    const sizesQuery = useMemo(() => {
+        const q = query(collection(db, 'sizes'));
+        (q as any).__memo = true;
+        return q;
+    }, []);
+
+    const { data: sizes, isLoading, error } = useCollection<Size>(sizesQuery);
+    
+    // Update form state when dialog opens for editing
+    useEffect(() => {
+        if (dialogState.open && dialogState.size) {
+            setName(dialogState.size.name || '');
+            setShortName(dialogState.size.shortName || '');
+        }
+    }, [dialogState.open, dialogState.size]);
+
+    const handleSaveSize = async () => {
         if (!name.trim() || !shortName.trim()) {
             toast({
                 variant: 'destructive',
@@ -58,75 +74,23 @@ function SizeFormDialog({ size, onSave, children }: { size?: Size, onSave: (data
             });
             return;
         }
-        onSave({ name, shortName });
-        setIsOpen(false);
-    };
 
-    const handleOpenChange = (open: boolean) => {
-        if (open) {
-            setName(size?.name || '');
-            setShortName(size?.shortName || '');
-        }
-        setIsOpen(open);
-    }
+        const data = { name, shortName };
 
-    return (
-        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-            <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{size ? 'Edit Size' : 'Add New Size'}</DialogTitle>
-                    <DialogDescription>
-                        {size ? `Update the details for ${size.name}.` : 'Enter the details for the new size.'}
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
-                        <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Medium" />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="shortName">Short Name</Label>
-                        <Input id="shortName" value={shortName} onChange={(e) => setShortName(e.target.value)} placeholder="e.g., M" />
-                    </div>
-                </div>
-                <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
-                    <Button onClick={handleSubmit}>Save</Button>
-                </DialogFooter>
-            </DialogContent>
-        );
-}
-
-
-export default function SizesPage() {
-    const { toast } = useToast();
-    
-    const sizesQuery = useMemo(() => {
-        const q = query(collection(db, 'sizes'));
-        (q as any).__memo = true;
-        return q;
-    }, []);
-
-    const { data: sizes, isLoading, error } = useCollection<Size>(sizesQuery);
-
-    const handleAddSize = async (data: Omit<Size, 'id' | 'createdAt'>) => {
         try {
-            await addDoc(collection(db, 'sizes'), {
-                ...data,
-                createdAt: serverTimestamp(),
-            });
-            toast({ title: 'Success', description: 'New size added.' });
-        } catch (e: any) {
-            console.error(e);
-            toast({ variant: 'destructive', title: 'Error', description: e.message });
-        }
-    };
-
-    const handleUpdateSize = async (id: string, data: Omit<Size, 'id' | 'createdAt'>) => {
-        try {
-            await updateDoc(doc(db, 'sizes', id), data);
-            toast({ title: 'Success', description: 'Size updated.' });
+            if (dialogState.size?.id) {
+                // Update
+                await updateDoc(doc(db, 'sizes', dialogState.size.id), data);
+                toast({ title: 'Success', description: 'Size updated.' });
+            } else {
+                // Add
+                await addDoc(collection(db, 'sizes'), {
+                    ...data,
+                    createdAt: serverTimestamp(),
+                });
+                toast({ title: 'Success', description: 'New size added.' });
+            }
+            setDialogState({ open: false, size: undefined });
         } catch (e: any) {
             console.error(e);
             toast({ variant: 'destructive', title: 'Error', description: e.message });
@@ -142,6 +106,14 @@ export default function SizesPage() {
             toast({ variant: 'destructive', title: 'Error', description: e.message });
         }
     };
+    
+    const handleOpenChange = (open: boolean) => {
+        if (!open) {
+            setDialogState({ open: false, size: undefined });
+        } else {
+            setDialogState(prev => ({ ...prev, open }));
+        }
+    }
 
     return (
         <div className="space-y-6">
@@ -150,9 +122,9 @@ export default function SizesPage() {
                     <h1 className="font-headline text-3xl font-bold">Sizes</h1>
                     <p className="text-muted-foreground">Manage product sizes for your store.</p>
                 </div>
-                <SizeFormDialog onSave={handleAddSize}>
-                    <Button><PlusCircle className="mr-2 h-4 w-4" />Add Size</Button>
-                </SizeFormDialog>
+                <Button onClick={() => setDialogState({ open: true, size: {} })}>
+                    <PlusCircle className="mr-2 h-4 w-4" />Add Size
+                </Button>
             </div>
             <Card>
                 <CardHeader>
@@ -196,12 +168,10 @@ export default function SizesPage() {
                                                 <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <SizeFormDialog size={size} onSave={(data) => handleUpdateSize(size.id, data)}>
-                                                     <button className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 w-full text-left">
-                                                        <Edit className="mr-2 h-4 w-4" />
-                                                        <span>Edit</span>
-                                                    </button>
-                                                </SizeFormDialog>
+                                                <DropdownMenuItem onSelect={() => setDialogState({ open: true, size })}>
+                                                    <Edit className="mr-2 h-4 w-4" />
+                                                    <span>Edit</span>
+                                                </DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => handleDeleteSize(size.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50">
                                                     <Trash2 className="mr-2 h-4 w-4" />
                                                     <span>Delete</span>
@@ -215,8 +185,31 @@ export default function SizesPage() {
                     </Table>
                 </CardContent>
             </Card>
+            
+            <Dialog open={dialogState.open} onOpenChange={handleOpenChange}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{dialogState.size?.id ? 'Edit Size' : 'Add New Size'}</DialogTitle>
+                        <DialogDescription>
+                            {dialogState.size?.id ? `Update the details for ${dialogState.size.name}.` : 'Enter the details for the new size.'}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="name">Name</Label>
+                            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Medium" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="shortName">Short Name</Label>
+                            <Input id="shortName" value={shortName} onChange={(e) => setShortName(e.target.value)} placeholder="e.g., M" />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => handleOpenChange(false)}>Cancel</Button>
+                        <Button onClick={handleSaveSize}>Save</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
-
-    

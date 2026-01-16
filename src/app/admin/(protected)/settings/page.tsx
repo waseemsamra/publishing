@@ -6,7 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, PenRuler } from 'lucide-react';
+import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling } from 'lucide-react';
 
 const settingsLinks = [
     {
@@ -37,7 +37,7 @@ const settingsLinks = [
         href: "/admin/thickness",
         title: "Thickness",
         description: "Manage thickness options for paper.",
-        icon: PenRuler,
+        icon: Scaling,
     },
     {
         href: "#",

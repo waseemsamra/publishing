@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { notFound, useParams } from 'next/navigation';
+import { useParams, notFound } from 'next/navigation';
 import { useMemo, useState, useEffect } from 'react';
 import type { Product, Size, WallType } from '@/lib/types';
 import { db } from '@/lib/firebase';
@@ -206,11 +206,7 @@ export default function ProductDetailPage() {
       </div>
 
       <div className="container py-12 md:py-20 space-y-16">
-        <div className="grid md:grid-cols-2 gap-x-16 gap-y-8">
-          <ProductInfoAccordion product={product} />
-          {/* This right side is empty in the design, can be used for an image or graphic */}
-          <div></div>
-        </div>
+        <ProductInfoAccordion product={product} />
         <RelatedProducts />
       </div>
     </>

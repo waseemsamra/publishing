@@ -96,21 +96,23 @@ service cloud.firestore {
     /**
      * @description Manages user account documents. A user can create their own document,
      * and can only read or write to their own document thereafter. Listing users is forbidden.
-     * For a temporary period, any authenticated user can update another user's document
-     * to grant admin roles. This should be reverted after initial setup.
      * @path /users/{userId}
      * @allow (create) A new user with UID 'user123' creating their own document at /users/user123.
      * @allow (get) An authenticated user with UID 'user123' reading their own document at /users/user123.
      * @deny (list) Any user attempting to list all documents in the /users collection.
      * @deny (get) User 'user456' trying to read /users/user123.
-     * @principle Restricts access to a user's own data tree, with a temporary exception for role management.
+     * @principle Restricts access to a user's own data tree.
      */
     match /users/{userId} {
-      allow get: if isOwner(userId) || isAdmin();
-      // Temporarily allow any signed-in user to list and create users to bootstrap the first admin.
-      // This should be locked down after setup.
-      allow list, create: if isSignedIn();
-      allow update: if isAdmin() || isOwner(userId);
+      // Any signed-in user can read any user profile (e.g. for display names). Admins have wider read access.
+      allow get: if isSignedIn() || isAdmin();
+      // Only admins can list all users.
+      allow list: if isAdmin();
+      // A user can create their own user document.
+      allow create: if isOwner(userId);
+      // A user can update their own document. Admins can also update any user document.
+      allow update: if isOwner(userId) || isAdmin();
+      // Only admins can delete users.
       allow delete: if isAdmin();
     }
 

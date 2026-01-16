@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Card,
   CardContent,
@@ -12,36 +10,20 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  updateDoc,
-  setDoc,
-  arrayUnion,
-} from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import AdminLayout from '@/components/layout/AdminLayout';
+import { useRouter } from 'next/navigation';
 
 function GrantAdminContent() {
-  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const router = useRouter();
 
   const handleGrantAdmin = async () => {
-    if (!email) {
-      toast({
-        variant: 'destructive',
-        title: 'Email is required',
-        description: 'Please enter the email of the user to grant admin rights.',
-      });
-      return;
-    }
     if (!user) {
       toast({
         variant: 'destructive',
@@ -53,49 +35,30 @@ function GrantAdminContent() {
 
     setLoading(true);
     try {
-      const usersRef = collection(db, 'users');
-      const q = query(usersRef, where('email', '==', email));
-      const querySnapshot = await getDocs(q);
+      const userRef = doc(db, 'users', user.uid);
+      const nameParts = user.displayName?.split(' ') || [''];
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ');
 
-      if (querySnapshot.empty) {
-        // User document does not exist, so create it.
-        // This is the fix for the "User not found" issue.
-        const newUserId = user.uid; // Use the currently logged-in user's UID
-        const userDocRef = doc(db, 'users', newUserId);
-        const nameParts = user.displayName?.split(' ') || [''];
-        const firstName = nameParts[0];
-        const lastName = nameParts.slice(1).join(' ');
+      // Use setDoc with merge to either create or update the document.
+      await setDoc(userRef, {
+        id: user.uid,
+        email: user.email,
+        firstName: firstName,
+        lastName: lastName,
+        roles: ['admin', 'customer'],
+        status: 'active'
+      }, { merge: true });
 
-        await setDoc(userDocRef, {
-          id: newUserId,
-          email: email,
-          firstName: firstName,
-          lastName: lastName,
-          roles: ['admin', 'customer'],
-          status: 'active',
-          createdAt: new Date(),
-        });
-        
-        toast({
-          title: 'Admin User Created!',
-          description: `New admin user created for ${email}. Please log out and log back in.`,
-        });
+      toast({
+        title: 'Success!',
+        description: 'Admin role granted. Please log out and log back in for the changes to take effect.',
+      });
 
-      } else {
-        // User exists, update their roles.
-        const userDoc = querySnapshot.docs[0];
-        const userRef = doc(db, 'users', userDoc.id);
+      // Log the user out so they can log back in with new roles.
+      await logout();
+      router.push('/admin/login');
 
-        await updateDoc(userRef, {
-          roles: arrayUnion('admin'),
-        });
-
-        toast({
-          title: 'Success!',
-          description: `Admin role granted to ${email}. Please log out and log back in to see the changes.`,
-        });
-      }
-      setEmail('');
     } catch (error: any) {
       console.error('Error granting admin role:', error);
       toast({
@@ -110,44 +73,36 @@ function GrantAdminContent() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-headline text-3xl font-bold">Grant Admin Role</h1>
+      <h1 className="font-headline text-3xl font-bold">Become Admin</h1>
       <Card>
         <CardHeader>
-          <CardTitle>Create or Grant Admin Privileges</CardTitle>
+          <CardTitle>Grant Yourself Admin Privileges</CardTitle>
           <CardDescription>
-            Enter a user's email. If the user doesn't exist in the database, a new profile will be created with admin rights. If they do exist, the 'admin' role will be added.
+            Click the button below to add the 'admin' role to your current user account. This is a one-time action to bootstrap the first administrator.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">User Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="user@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <Button onClick={handleGrantAdmin} disabled={loading}>
+          <p className="text-sm">
+            You are currently logged in as: <span className="font-semibold">{user?.email}</span>
+          </p>
+          <Button onClick={handleGrantAdmin} disabled={loading} className="w-full">
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Processing...
               </>
             ) : (
-              'Create or Grant Admin'
+              'Make Me Admin'
             )}
           </Button>
            <p className="text-sm text-muted-foreground pt-4">
-              After granting the role, the user must sign out and sign back in for the changes to take effect.
+              After clicking the button, you will be automatically logged out. Please log back in to access the admin dashboard.
             </p>
         </CardContent>
       </Card>
     </div>
   );
 }
-
 
 export default function GrantAdminPage() {
     return (

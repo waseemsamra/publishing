@@ -52,36 +52,28 @@ export function ProductCard({ product, layout = 'grid' }: ProductCardProps) {
       )
   }
 
-  // Default grid layout
+  // Grid layout
   return (
-    <Card className="flex flex-col overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-xl">
-      <Link href={`/products/${product.id}`} className="flex flex-col h-full">
-        <CardHeader className="p-0">
-          <div className="aspect-square relative">
-            {image ? (
-                <Image
-                src={image.imageUrl}
-                alt={image.description || product.name}
-                fill
-                className="object-cover"
-                data-ai-hint={image.imageHint}
-                />
-            ) : (
-                <div className="bg-muted flex items-center justify-center h-full">
-                    <span className="text-muted-foreground">No Image</span>
-                </div>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="p-4 flex-grow">
-          <CardTitle className="font-headline text-lg mb-2">{product.name}</CardTitle>
-          <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
-        </CardContent>
-        <CardFooter className="p-4 pt-0 flex justify-between items-center">
-          <p className="text-lg font-semibold">£{product.price.toFixed(2)}</p>
-          <Button variant="outline" size="sm">View Details</Button>
-        </CardFooter>
-      </Link>
-    </Card>
+    <Link href={`/products/${product.id}`} className="group block">
+      <div className="relative overflow-hidden aspect-square rounded-xl bg-muted">
+        {image ? (
+            <Image
+            src={image.imageUrl}
+            alt={image.description || product.name}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            data-ai-hint={image.imageHint}
+            />
+        ) : (
+            <div className="flex items-center justify-center h-full">
+                <span className="text-muted-foreground">No Image</span>
+            </div>
+        )}
+      </div>
+      <div className="mt-4">
+        <h3 className="font-headline font-semibold mt-1 group-hover:text-primary transition-colors">{product.name}</h3>
+        <p className="mt-1 text-sm text-muted-foreground">from £{product.price.toFixed(2)}</p>
+      </div>
+    </Link>
   );
 }

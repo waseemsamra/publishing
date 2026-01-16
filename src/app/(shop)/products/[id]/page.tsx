@@ -90,7 +90,7 @@ export default function ProductDetailPage() {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2">
         <div className="md:sticky md:top-0 md:h-screen flex items-center justify-center bg-muted/30">
-          <Carousel className="w-full max-w-xl mx-auto">
+          <Carousel className="w-full max-w-2xl mx-auto">
             <CarouselContent>
               {product.images && product.images.length > 0 ? (
                 product.images.map((image) => (
@@ -100,7 +100,7 @@ export default function ProductDetailPage() {
                         src={image.imageUrl || 'https://placehold.co/800x600'}
                         alt={image.description || product.name}
                         fill
-                        className="object-contain"
+                        className="object-cover"
                         data-ai-hint={image.imageHint}
                       />
                     </div>
@@ -114,8 +114,8 @@ export default function ProductDetailPage() {
                 </CarouselItem>
               )}
             </CarouselContent>
-            <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 hidden md:flex" />
-            <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex" />
+            <CarouselPrevious className="absolute -left-10 top-1/2 -translate-y-1/2 hidden md:flex" />
+            <CarouselNext className="absolute -right-10 top-1/2 -translate-y-1/2 hidden md:flex" />
           </Carousel>
         </div>
 

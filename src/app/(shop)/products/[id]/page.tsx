@@ -21,6 +21,7 @@ import { useCart } from '@/context/cart-context';
 import { QuantityPricingTable } from '@/components/quantity-pricing-table';
 import { ProductInfoAccordion } from '@/components/product-info-accordion';
 import { RelatedProducts } from '@/components/related-products';
+import { BrandStories } from '@/components/brand-stories';
 
 // Define the tier type locally for this page
 type PricingTier = { qty: number; pricePerUnit: number; save: number; total: number; };
@@ -218,6 +219,7 @@ export default function ProductDetailPage() {
             </div>
         </div>
       </div>
+      <BrandStories />
     </>
   );
 }

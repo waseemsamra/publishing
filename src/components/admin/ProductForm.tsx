@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import Image from 'next/image';
 import { db } from '@/lib/firebase';
 import { collection, doc, addDoc, updateDoc, serverTimestamp, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
@@ -26,9 +27,9 @@ const productFormSchema = z.object({
   price: z.coerce.number().min(0, 'Price must be a positive number.'),
   images: z.array(z.object({
     id: z.string(),
-    imageUrl: z.string().url('Invalid URL'),
-    description: z.string(),
-    imageHint: z.string(),
+    imageUrl: z.string().optional(),
+    description: z.string().optional(),
+    imageHint: z.string().optional(),
   })).optional(),
   sustainabilityImpact: z.string().optional(),
   materials: z.array(z.string()).optional(),
@@ -148,6 +149,8 @@ export function ProductForm({ product }: { product?: Product }) {
         shapeIds: [],
     },
   });
+  
+  const imageUrl = form.watch('images.0.imageUrl');
 
   async function onSubmit(data: ProductFormValues) {
     setIsSubmitting(true);
@@ -208,11 +211,32 @@ export function ProductForm({ product }: { product?: Product }) {
             </Card>
             <Card>
               <CardHeader><CardTitle>Images</CardTitle></CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
                  <FormField control={form.control} name="images.0.imageUrl" render={({ field }) => (
                     <FormItem><FormLabel>Primary Image URL</FormLabel><FormControl><Input placeholder="https://..." {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
-                {/* TODO: Implement multi-image upload */}
+                
+                 {imageUrl && (
+                    <div className="mt-4">
+                    <FormLabel>Image Preview</FormLabel>
+                    <div className="mt-2 aspect-square w-48 relative rounded-md border overflow-hidden">
+                        <Image
+                            src={imageUrl}
+                            alt="Product image preview"
+                            fill
+                            className="object-cover"
+                            unoptimized
+                        />
+                    </div>
+                    </div>
+                )}
+                
+                <FormField control={form.control} name="images.0.description" render={({ field }) => (
+                    <FormItem><FormLabel>Image Description (for accessibility)</FormLabel><FormControl><Input placeholder="e.g., A stylish blue water bottle" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="images.0.imageHint" render={({ field }) => (
+                    <FormItem><FormLabel>AI Image Hint (1-2 keywords)</FormLabel><FormControl><Input placeholder="e.g., water bottle" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
               </CardContent>
             </Card>
              <Card>

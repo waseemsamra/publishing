@@ -1,49 +1,97 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, query } from 'firebase/firestore';
+import { collection, query, where, Query, DocumentData } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import type { Product } from '@/lib/types';
 import { ProductCard } from '@/components/product-card';
-import { Loader2 } from 'lucide-react';
+import { Loader2, LayoutGrid, List } from 'lucide-react';
+import { ProductFilters } from '@/components/product-filters';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export default function ProductsPage() {
+  const [filters, setFilters] = useState<Record<string, string[]>>({});
+  const [layout, setLayout] = useState<'grid' | 'list'>('grid');
+
   const productsQuery = useMemo(() => {
-    const q = query(collection(db, 'products'));
+    let q: Query<DocumentData> = collection(db, 'products');
+
+    Object.entries(filters).forEach(([key, values]) => {
+      if (values.length > 0) {
+        q = query(q, where(key, 'array-contains-any', values));
+      }
+    });
+
     (q as any).__memo = true;
     return q;
-  }, []);
+  }, [filters]);
 
   const { data: products, isLoading, error } = useCollection<Product>(productsQuery);
 
   return (
     <div className="container py-12">
-      <h1 className="font-headline text-4xl font-bold mb-8">All Products</h1>
+      <div className="text-center mb-12">
+        <h1 className="font-headline text-4xl font-bold">Find Your Perfect Packaging</h1>
+        <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">Use our advanced filters to discover products tailored to your brand's needs. Select materials, sizes, colors, and more.</p>
+      </div>
       
-      {isLoading && (
-        <div className="flex justify-center items-center min-h-[50vh]">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      )}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+        <aside className="lg:col-span-1">
+          <div className="sticky top-24">
+            <ProductFilters onFiltersChange={setFilters} />
+          </div>
+        </aside>
 
-      {error && (
-        <div className="text-center text-red-500">
-          <p>Error loading products: {error.message}</p>
-        </div>
-      )}
-
-      {!isLoading && !error && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {products && products.length > 0 ? (
-            products.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))
-          ) : (
-            <p>No products found.</p>
+        <main className="lg:col-span-3">
+          <div className="flex justify-between items-center mb-6">
+            <p className="text-sm text-muted-foreground">
+              {isLoading ? 'Searching...' : `Showing ${products?.length || 0} products`}
+            </p>
+            <div className="flex items-center gap-2">
+                <Button variant="ghost" size="icon" onClick={() => setLayout('grid')} className={cn(layout === 'grid' && 'bg-accent')}>
+                    <LayoutGrid className="h-5 w-5" />
+                </Button>
+                 <Button variant="ghost" size="icon" onClick={() => setLayout('list')} className={cn(layout === 'list' && 'bg-accent')}>
+                    <List className="h-5 w-5" />
+                </Button>
+            </div>
+          </div>
+          
+          {isLoading && (
+            <div className="flex justify-center items-center min-h-[50vh]">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
           )}
-        </div>
-      )}
+
+          {error && (
+            <div className="text-center text-red-500 py-12">
+              <p>Error loading products: {error.message}</p>
+            </div>
+          )}
+
+          {!isLoading && !error && (
+            <>
+            {products && products.length > 0 ? (
+                <div className={cn(
+                    "grid gap-8",
+                    layout === 'grid' ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1"
+                )}>
+                    {products.map(product => (
+                        <ProductCard key={product.id} product={product} layout={layout} />
+                    ))}
+                </div>
+             ) : (
+                <div className="text-center py-24 border-2 border-dashed rounded-lg">
+                    <h3 className="font-headline text-2xl font-bold">No Products Found</h3>
+                    <p className="text-muted-foreground mt-2">Try adjusting your filters to find what you're looking for.</p>
+                </div>
+            )}
+            </>
+          )}
+        </main>
+      </div>
     </div>
   );
 }

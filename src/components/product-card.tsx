@@ -9,7 +9,7 @@ import { ArrowRight } from 'lucide-react';
 interface ProductCardProps {
   product: Product;
   layout?: 'grid' | 'list';
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 export function ProductCard({ product, layout = 'grid', onClick }: ProductCardProps) {

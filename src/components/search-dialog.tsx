@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Dialog,
   DialogContent,
@@ -20,6 +21,7 @@ import { ProductCard } from './product-card';
 export function SearchDialog() {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const router = useRouter();
 
   const productsQuery = useMemo(() => {
     if (!open) return null;
@@ -58,6 +60,12 @@ export function SearchDialog() {
       return () => clearTimeout(timer);
     }
   }, [open]);
+
+  const handleProductClick = (e: React.MouseEvent, productId: string) => {
+    e.preventDefault();
+    setOpen(false);
+    router.push(`/products/${productId}`);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -111,7 +119,7 @@ export function SearchDialog() {
                   {!searchTerm && <h3 className="font-headline text-2xl font-bold mb-6 text-center">Trending Products</h3>}
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                       {filteredProducts.map(product => (
-                          <ProductCard key={product.id} product={product} onClick={() => setOpen(false)} />
+                          <ProductCard key={product.id} product={product} onClick={(e) => handleProductClick(e, product.id)} />
                       ))}
                   </div>
                 </>

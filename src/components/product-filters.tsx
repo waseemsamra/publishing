@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
@@ -74,6 +74,10 @@ function FilterSection({
 export function ProductFilters({ onFiltersChange }: { onFiltersChange: (filters: Record<string, string[]>) => void }) {
     const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
 
+    useEffect(() => {
+        onFiltersChange(activeFilters);
+    }, [activeFilters, onFiltersChange]);
+
     const handleFilterChange = (filterGroup: string, value: string) => {
         setActiveFilters(prev => {
             const groupValues = prev[filterGroup] || [];
@@ -91,13 +95,8 @@ export function ProductFilters({ onFiltersChange }: { onFiltersChange: (filters:
         });
     };
 
-    const applyFilters = () => {
-        onFiltersChange(activeFilters);
-    };
-
     const clearFilters = () => {
         setActiveFilters({});
-        onFiltersChange({});
     }
 
     return (
@@ -117,7 +116,6 @@ export function ProductFilters({ onFiltersChange }: { onFiltersChange: (filters:
                     />
                 ))}
             </Accordion>
-            <Button onClick={applyFilters} className="w-full">Apply Filters</Button>
         </div>
     );
 }

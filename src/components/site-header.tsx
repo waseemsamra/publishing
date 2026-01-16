@@ -109,7 +109,7 @@ function AuthButton() {
 
 export function SiteHeader() {
   const navLinks = [
-    { href: '#', label: 'Products' },
+    { href: '/products', label: 'All Products' },
     { href: '#', label: 'Industries', active: true },
   ];
 

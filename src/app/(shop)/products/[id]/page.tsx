@@ -62,7 +62,7 @@ export default function ProductDetailPage() {
     }
   }, [availableWallTypes, availableSizes, selectedWall, selectedSize]);
 
-  if (isLoading) {
+  if (isLoading || !params.id) {
     return (
       <div className="container py-12 flex justify-center items-center min-h-[50vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

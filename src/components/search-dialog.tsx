@@ -74,10 +74,10 @@ export function SearchDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <>
+        <div>
             <div className="hidden lg:block w-full">{DesktopTrigger}</div>
             <div className="lg:hidden">{MobileTrigger}</div>
-        </>
+        </div>
       </DialogTrigger>
       <DialogContent className="max-w-full w-full h-full sm:rounded-none p-0 flex flex-col gap-0">
           <header className="flex items-center gap-4 border-b p-4 shrink-0">

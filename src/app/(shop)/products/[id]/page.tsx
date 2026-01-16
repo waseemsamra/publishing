@@ -6,10 +6,9 @@ import { useMemo, useState, useEffect } from 'react';
 import type { Product, Size, WallType } from '@/lib/types';
 import { db } from '@/lib/firebase';
 import { doc, collection, query, where, documentId } from 'firebase/firestore';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { useDoc } from '@/firebase/firestore/use-doc';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { Button } from '@/components/ui/button';
 import {
   Carousel,
   CarouselContent,
@@ -18,9 +17,19 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Loader2, Truck, Zap, Leaf, HelpCircle } from 'lucide-react';
+import { useCart } from '@/context/cart-context';
+import { QuantityPricingTable } from '@/components/quantity-pricing-table';
+import { ProductInfoAccordion } from '@/components/product-info-accordion';
+import { RelatedProducts } from '@/components/related-products';
+
+// Define the tier type locally for this page
+type PricingTier = { qty: number; pricePerUnit: number; save: number; total: number; };
+const defaultTier = { qty: 1000, pricePerUnit: 0.130, save: 0, total: 130.00 };
+
 
 export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
+  const { addToCart } = useCart();
   const productRef = useMemo(() => {
     if (!params.id) return null;
     const ref = doc(db, 'products', params.id);
@@ -49,6 +58,8 @@ export default function ProductDetailPage() {
   const [selectedWall, setSelectedWall] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedLid, setSelectedLid] = useState<string | null>('None');
+  const [selectedTier, setSelectedTier] = useState<PricingTier>(defaultTier);
+
 
   useEffect(() => {
     if (availableWallTypes && availableWallTypes.length > 0 && !selectedWall) {
@@ -70,42 +81,48 @@ export default function ProductDetailPage() {
   if (error || !product) {
     return notFound();
   }
+  
+  const handleDesignLater = () => {
+    addToCart(product, selectedTier.qty);
+  };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 md:min-h-[calc(100vh-120px)]">
-        <div className="md:h-auto flex items-center justify-center bg-muted/30">
-            <Carousel className="w-full">
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        <div className="md:sticky md:top-0 md:h-screen flex items-center justify-center bg-muted/30">
+          <Carousel className="w-full max-w-xl mx-auto">
             <CarouselContent>
-                {product.images && product.images.length > 0 ? (
+              {product.images && product.images.length > 0 ? (
                 product.images.map((image) => (
-                    <CarouselItem key={image.id}>
-                    <div className="aspect-[4/3] relative">
-                        <Image
+                  <CarouselItem key={image.id}>
+                    <div className="aspect-square relative">
+                      <Image
                         src={image.imageUrl || 'https://placehold.co/800x600'}
                         alt={image.description || product.name}
                         fill
-                        className="object-cover"
+                        className="object-contain"
                         data-ai-hint={image.imageHint}
-                        />
+                      />
                     </div>
-                    </CarouselItem>
+                  </CarouselItem>
                 ))
-                ) : (
-                    <CarouselItem>
-                        <div className="aspect-[4/3] relative bg-muted flex items-center justify-center">
-                            <span className="text-muted-foreground">No Image</span>
-                        </div>
-                    </CarouselItem>
-                )}
+              ) : (
+                <CarouselItem>
+                  <div className="aspect-square relative bg-muted flex items-center justify-center">
+                    <span className="text-muted-foreground">No Image</span>
+                  </div>
+                </CarouselItem>
+              )}
             </CarouselContent>
             <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 hidden md:flex" />
             <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex" />
-            </Carousel>
+          </Carousel>
         </div>
-        <div className="flex flex-col justify-center p-8 sm:p-12">
-            <div className="mx-auto w-full max-w-md">
+
+        <div className="flex flex-col p-8 sm:p-12">
+          <div className="mx-auto w-full max-w-md">
             <div className="text-sm text-muted-foreground">
-                <span>Hot Cups</span> — <span>Custom Coffee Cups Compostable</span>
+              <span>Hot Cups</span> — <span>Custom Coffee Cups Compostable</span>
             </div>
 
             <h1 className="font-headline text-3xl lg:text-4xl font-bold mt-2">{product.name}</h1>
@@ -113,74 +130,89 @@ export default function ProductDetailPage() {
             <p className="text-lg text-muted-foreground mt-2">from ${product.price.toFixed(3)} / unit</p>
 
             <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-md text-sm text-primary">
-                Free standard shipping & proofing available on all orders*
-            </div>
-
-            <p className="mt-4 text-muted-foreground">{product.description}</p>
-            
-            <div className="flex flex-wrap gap-2 mt-4">
-                <Badge variant="outline">Low Minimums</Badge>
-                <Badge variant="outline">Fast Delivery</Badge>
-                <Badge variant="outline">Compostable</Badge>
-                <Badge variant="outline">Custom</Badge>
+              Free standard shipping & proofing available on all orders*
             </div>
 
             <div className="mt-6 space-y-3">
-                <h3 className="text-sm font-semibold text-muted-foreground">Estimated arrival:</h3>
-                <div className="flex items-center justify-between p-3 border rounded-md bg-gray-50">
-                    <div className="flex items-center gap-3">
-                        <Truck className="h-5 w-5 text-muted-foreground" />
-                        <span className="font-semibold">Standard (Free): Feb 13 - Feb 15</span>
-                    </div>
-                    <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
-                        <Leaf className="h-4 w-4 text-green-600"/>
-                    </div>
+              <h3 className="text-sm font-semibold text-muted-foreground">Estimated arrival:</h3>
+              <div className="flex items-center justify-between p-3 border rounded-md bg-gray-50">
+                <div className="flex items-center gap-3">
+                  <Truck className="h-5 w-5 text-muted-foreground" />
+                  <span className="font-semibold">Standard (Free): Feb 13 - Feb 15</span>
                 </div>
-                <div className="flex items-center justify-between p-3 border rounded-md bg-gray-50">
-                    <div className="flex items-center gap-3">
-                        <Zap className="h-5 w-5 text-muted-foreground" />
-                        <span className="font-semibold">Express: Feb 02 - Feb 04</span>
-                    </div>
-                    <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
-                        <Leaf className="h-4 w-4 text-green-600"/>
-                    </div>
+                <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
+                  <Leaf className="h-4 w-4 text-green-600"/>
                 </div>
-                <p className="text-xs text-muted-foreground">*Lead times temporarily affected due to public holidays observed in some of our production hubs, please see checkout for updated lead times.</p>
+              </div>
+              <div className="flex items-center justify-between p-3 border rounded-md bg-gray-50">
+                <div className="flex items-center gap-3">
+                  <Zap className="h-5 w-5 text-muted-foreground" />
+                  <span className="font-semibold">Express: Feb 02 - Feb 04</span>
+                </div>
+                <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
+                  <Leaf className="h-4 w-4 text-green-600"/>
+                </div>
+              </div>
             </div>
             
             <div className="mt-6 space-y-6">
-                {availableWallTypes && availableWallTypes.length > 0 && (
-                    <div>
-                    <h3 className="text-sm font-semibold mb-2">Wall</h3>
-                    <div className="grid grid-cols-2 gap-2">
-                        {availableWallTypes.map((wall) => (
-                            <Button key={wall.id} variant={selectedWall === wall.id ? 'default' : 'outline'} onClick={() => setSelectedWall(wall.id)}>{wall.name}</Button>
-                        ))}
-                    </div>
-                    </div>
-                )}
-                
-                {availableSizes && availableSizes.length > 0 && (
-                    <div>
-                        <h3 className="text-sm font-semibold mb-2 flex items-center gap-1">Size (Capacity) <HelpCircle className="h-4 w-4 text-muted-foreground"/></h3>
-                        <div className="grid grid-cols-2 gap-2">
-                            {availableSizes.map((size) => (
-                                <Button key={size.id} variant={selectedSize === size.id ? 'default' : 'outline'} onClick={() => setSelectedSize(size.id)}>{size.name}</Button>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
+              {availableWallTypes && availableWallTypes.length > 0 && (
                 <div>
-                    <h3 className="text-sm font-semibold mb-2 flex items-center gap-1">Lid Type <HelpCircle className="h-4 w-4 text-muted-foreground"/></h3>
-                    <div className="grid grid-cols-2 gap-2">
-                        <Button variant={selectedLid === 'None' ? 'default' : 'outline'} onClick={() => setSelectedLid('None')}>None</Button>
-                        <Button variant={selectedLid === 'Sip' ? 'default' : 'outline'} onClick={() => setSelectedLid('Sip')}>Sip (Fiber)</Button>
-                    </div>
+                  <h3 className="text-sm font-semibold mb-2">Wall</h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {availableWallTypes.map((wall) => (
+                      <Button key={wall.id} variant={selectedWall === wall.id ? 'default' : 'outline'} onClick={() => setSelectedWall(wall.id)}>{wall.name}</Button>
+                    ))}
+                  </div>
                 </div>
+              )}
+              
+              {availableSizes && availableSizes.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold mb-2 flex items-center gap-1">Size (Capacity) <HelpCircle className="h-4 w-4 text-muted-foreground"/></h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {availableSizes.map((size) => (
+                      <Button key={size.id} variant={selectedSize === size.id ? 'default' : 'outline'} onClick={() => setSelectedSize(size.id)}>{size.name}</Button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <h3 className="text-sm font-semibold mb-2 flex items-center gap-1">Lid Type <HelpCircle className="h-4 w-4 text-muted-foreground"/></h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button variant={selectedLid === 'None' ? 'default' : 'outline'} onClick={() => setSelectedLid('None')}>None</Button>
+                  <Button variant={selectedLid === 'Sip' ? 'default' : 'outline'} onClick={() => setSelectedLid('Sip')}>Sip (Paper)</Button>
+                </div>
+              </div>
             </div>
+
+            <QuantityPricingTable onQuantityChange={setSelectedTier} />
+
+            <div className="mt-6 text-right">
+              <p className="text-sm text-muted-foreground">Total (excl. VAT)</p>
+              <p className="font-headline text-3xl font-bold">GBP £{selectedTier.total.toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground">or financing from £{(selectedTier.total / 4).toFixed(2)}/Mo.</p>
             </div>
+
+            <div className="mt-6 space-y-3">
+              <Button size="lg" className="w-full bg-pink-500 hover:bg-pink-600 text-white">Upload design</Button>
+              <Button size="lg" variant="outline" className="w-full" onClick={handleDesignLater}>
+                Design later — Add to cart
+              </Button>
+            </div>
+          </div>
         </div>
-    </div>
+      </div>
+
+      <div className="container py-12 md:py-20 space-y-16">
+        <div className="grid md:grid-cols-2 gap-x-16 gap-y-8">
+          <ProductInfoAccordion product={product} />
+          {/* This right side is empty in the design, can be used for an image or graphic */}
+          <div></div>
+        </div>
+        <RelatedProducts />
+      </div>
+    </>
   );
 }

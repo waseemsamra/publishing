@@ -6,7 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles } from 'lucide-react';
+import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, Glue } from 'lucide-react';
 
 const settingsLinks = [
     {
@@ -50,6 +50,12 @@ const settingsLinks = [
         title: "Finish Types",
         description: "Manage finish types like Matt or Glossy.",
         icon: Sparkles,
+    },
+    {
+        href: "/admin/adhesives",
+        title: "Adhesives",
+        description: "Manage adhesive types like single or double.",
+        icon: Glue,
     },
     {
         href: "#",
@@ -105,3 +111,5 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+
+  

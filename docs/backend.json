@@ -1,5 +1,29 @@
 {
   "entities": {
+    "Adhesive": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Adhesive",
+      "type": "object",
+      "description": "Represents a product adhesive type (e.g., Single, Double).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the adhesive type."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the adhesive type (e.g., Single)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the adhesive type."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
     "BillingAddress": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "BillingAddress",
@@ -675,6 +699,22 @@
         }
       },
       {
+        "path": "/adhesives/{adhesiveId}",
+        "definition": {
+          "entityName": "Adhesive",
+          "schema": {
+            "$ref": "#/backend/entities/Adhesive"
+          },
+          "description": "Stores available product adhesive types. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "adhesiveId",
+              "description": "The unique identifier for the adhesive."
+            }
+          ]
+        }
+      },
+      {
         "path": "/users/{userId}/shoppingCarts/{shoppingCartId}",
         "definition": {
           "entityName": "ShoppingCart",
@@ -807,3 +847,4 @@
   }
 }
     
+  

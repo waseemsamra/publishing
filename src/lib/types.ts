@@ -104,4 +104,12 @@ export interface FinishType {
   description: string;
   createdAt?: any;
 }
+
+export interface Adhesive {
+  id: string;
+  name: string;
+  description: string;
+  createdAt?: any;
+}
     
+  

@@ -432,6 +432,30 @@
         "id",
         "name"
       ]
+    },
+    "Thickness": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Thickness",
+      "type": "object",
+      "description": "Represents a product thickness option (e.g., 100gsm).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the thickness."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the thickness (e.g., 100gsm, 12pt)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the thickness."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
     }
   },
   "auth": {
@@ -550,6 +574,22 @@
             {
               "name": "wallTypeId",
               "description": "The unique identifier for the wall type."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/thicknesses/{thicknessId}",
+        "definition": {
+          "entityName": "Thickness",
+          "schema": {
+            "$ref": "#/backend/entities/Thickness"
+          },
+          "description": "Stores available product thicknesses. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "thicknessId",
+              "description": "The unique identifier for the thickness."
             }
           ]
         }

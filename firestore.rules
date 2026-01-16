@@ -189,6 +189,17 @@ service cloud.firestore {
     }
 
     /**
+     * @description Stores product thicknesses. Only admins can manage them.
+     * @path /thicknesses/{thicknessId}
+     * @allow (read, write) Any admin user.
+     * @deny (read, write) All non-admin users.
+     * @principle Admin-only management.
+     */
+    match /thicknesses/{thicknessId} {
+      allow read, write: if isSignedIn();
+    }
+
+    /**
      * @description Stores a user's shopping cart. Only the owning user can access it.
      * @path /users/{userId}/shoppingCarts/{shoppingCartId}
      * @allow (create) User 'user123' creating their own shopping cart.

@@ -70,7 +70,7 @@ function SidebarContent({ pathname, onLinkClick, isAdmin }: { pathname: string, 
         {visibleNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname.startsWith(item.href) && (item.href !== '/admin/settings' || pathname === '/admin/settings');
-          const isSettingsActive = pathname.startsWith('/admin/settings') || pathname.startsWith('/admin/sizes') || pathname.startsWith('/admin/colours') || pathname.startsWith('/admin/print-options') || pathname.startsWith('/admin/wall-types');
+          const isSettingsActive = pathname.startsWith('/admin/settings') || pathname.startsWith('/admin/sizes') || pathname.startsWith('/admin/colours') || pathname.startsWith('/admin/print-options') || pathname.startsWith('/admin/wall-types') || pathname.startsWith('/admin/thickness');
           
           let effectiveIsActive = isActive;
           if (item.href === '/admin/settings') {
@@ -212,5 +212,3 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </div>
   );
 }
-
-    

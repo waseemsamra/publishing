@@ -6,7 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers } from 'lucide-react';
+import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, PenRuler } from 'lucide-react';
 
 const settingsLinks = [
     {
@@ -32,6 +32,12 @@ const settingsLinks = [
         title: "Wall Types",
         description: "Manage cup wall types like single or double.",
         icon: Layers,
+    },
+    {
+        href: "/admin/thickness",
+        title: "Thickness",
+        description: "Manage thickness options for paper.",
+        icon: PenRuler,
     },
     {
         href: "#",

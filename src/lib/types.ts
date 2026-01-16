@@ -83,4 +83,11 @@ export interface WallType {
   name: string;
   createdAt?: any;
 }
+
+export interface Thickness {
+  id: string;
+  name: string;
+  description: string;
+  createdAt?: any;
+}
     

@@ -1,13 +1,6 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, X, Loader2 } from 'lucide-react';
@@ -16,7 +9,6 @@ import { collection, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import type { Product } from '@/lib/types';
 import { ProductCard } from './product-card';
-import { ScrollArea } from './ui/scroll-area';
 
 const searchSuggestions = [
   'cups',
@@ -102,8 +94,8 @@ export function SearchDialog() {
       </div>
 
       {open && (
-        <div className="fixed inset-0 z-30 bg-background pt-32 overflow-y-auto">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="fixed left-0 right-0 bottom-0 top-[120px] z-30 bg-background overflow-y-auto">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="max-w-2xl mx-auto relative">
                <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                <Input

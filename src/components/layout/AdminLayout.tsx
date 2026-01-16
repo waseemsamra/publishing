@@ -49,9 +49,6 @@ const navItems = [
   { href: '/admin/calendar', label: 'Calendar', icon: Calendar },
   { href: '/admin/grant-admin', label: 'Grant Admin', icon: UserCog, isPublic: true }, // Allow public access
   { href: '/admin/settings', label: 'Settings', icon: Settings },
-  { href: '/admin/sizes', label: 'Sizes', icon: Ruler },
-  { href: '/admin/colours', label: 'Colours', icon: Palette },
-  { href: '/admin/print-options', label: 'Print Options', icon: Printer },
 ];
 
 function SidebarContent({ pathname, onLinkClick, isAdmin }: { pathname: string, onLinkClick: () => void, isAdmin: boolean }) {
@@ -71,7 +68,15 @@ function SidebarContent({ pathname, onLinkClick, isAdmin }: { pathname: string, 
       <nav className="flex-1 space-y-1 p-2">
         {visibleNavItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
+          const isActive = pathname.startsWith(item.href) && (item.href !== '/admin/settings' || pathname === '/admin/settings');
+          const isSettingsActive = pathname.startsWith('/admin/settings') || pathname.startsWith('/admin/sizes') || pathname.startsWith('/admin/colours') || pathname.startsWith('/admin/print-options');
+          
+          let effectiveIsActive = isActive;
+          if (item.href === '/admin/settings') {
+            effectiveIsActive = isSettingsActive;
+          }
+
+
           return (
             <Link
               key={item.href}
@@ -79,7 +84,7 @@ function SidebarContent({ pathname, onLinkClick, isAdmin }: { pathname: string, 
               onClick={onLinkClick}
               className={`
                 flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors
-                ${isActive
+                ${effectiveIsActive
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                 }

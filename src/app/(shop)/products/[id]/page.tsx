@@ -127,7 +127,7 @@ export default function ProductDetailPage() {
 
             <h1 className="font-headline text-3xl lg:text-4xl font-bold mt-2">{product.name}</h1>
 
-            <p className="text-lg text-muted-foreground mt-2">from ${product.price.toFixed(3)} / unit</p>
+            <p className="text-lg text-muted-foreground mt-2">from £{product.price.toFixed(3)} / unit</p>
 
             <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-md text-sm text-primary">
               Free standard shipping & proofing available on all orders*
@@ -191,7 +191,7 @@ export default function ProductDetailPage() {
 
             <div className="mt-6 text-right">
               <p className="text-sm text-muted-foreground">Total (excl. VAT)</p>
-              <p className="font-headline text-3xl font-bold">GBP £{selectedTier.total.toFixed(2)}</p>
+              <p className="font-headline text-3xl font-bold">£{selectedTier.total.toFixed(2)}</p>
               <p className="text-xs text-muted-foreground">or financing from £{(selectedTier.total / 4).toFixed(2)}/Mo.</p>
             </div>
 

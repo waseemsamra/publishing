@@ -119,8 +119,8 @@ export default function ProductDetailPage() {
           </Carousel>
         </div>
 
-        <div className="flex flex-col p-8 sm:p-12">
-          <div className="mx-auto w-full max-w-md">
+        <div className="flex flex-col justify-center p-8 sm:p-12 md:p-16">
+          <div className="w-full max-w-md">
             <div className="text-sm text-muted-foreground">
               <span>Hot Cups</span> — <span>Custom Coffee Cups Compostable</span>
             </div>

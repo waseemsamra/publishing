@@ -363,6 +363,31 @@
         "id",
         "name"
       ]
+    },
+    "Colour": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Colour",
+      "type": "object",
+      "description": "Represents a product colour.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the colour."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the colour (e.g., Red, Blue, Green)."
+        },
+        "hexCode": {
+          "type": "string",
+          "description": "Hex code for the colour (e.g., #FF0000)."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "hexCode"
+      ]
     }
   },
   "auth": {
@@ -433,6 +458,22 @@
             {
               "name": "sizeId",
               "description": "The unique identifier for the size."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/colours/{colourId}",
+        "definition": {
+          "entityName": "Colour",
+          "schema": {
+            "$ref": "#/backend/entities/Colour"
+          },
+          "description": "Stores available product colours. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "colourId",
+              "description": "The unique identifier for the colour."
             }
           ]
         }

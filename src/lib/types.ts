@@ -64,4 +64,10 @@ export interface Size {
   createdAt?: any;
 }
 
+export interface Colour {
+  id: string;
+  name: string;
+  hexCode: string;
+  createdAt?: any;
+}
     

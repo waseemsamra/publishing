@@ -22,6 +22,7 @@ import {
   ShoppingCart,
   UserCog,
   Ruler,
+  Palette,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -48,6 +49,7 @@ const navItems = [
   { href: '/admin/grant-admin', label: 'Grant Admin', icon: UserCog, isPublic: true }, // Allow public access
   { href: '/admin/settings', label: 'Settings', icon: Settings },
   { href: '/admin/sizes', label: 'Sizes', icon: Ruler },
+  { href: '/admin/colours', label: 'Colours', icon: Palette },
 ];
 
 function SidebarContent({ pathname, onLinkClick, isAdmin }: { pathname: string, onLinkClick: () => void, isAdmin: boolean }) {

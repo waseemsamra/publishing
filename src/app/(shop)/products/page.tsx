@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { db } from '@/lib/firebase';
 import { collection, query, where, Query, DocumentData } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
@@ -11,9 +12,16 @@ import { ProductFilters } from '@/components/product-filters';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-export default function ProductsPage() {
+function ProductsPageContent() {
   const [filters, setFilters] = useState<Record<string, string[]>>({});
   const [layout, setLayout] = useState<'grid' | 'list'>('grid');
+  
+  const searchParams = useSearchParams();
+  const categoryId = searchParams.get('category');
+
+  const initialFilters = useMemo(() => {
+    return categoryId ? { categoryIds: [categoryId] } : {};
+  }, [categoryId]);
 
   const productsQuery = useMemo(() => {
     let q: Query<DocumentData> = collection(db, 'products');
@@ -40,7 +48,7 @@ export default function ProductsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
         <aside className="lg:col-span-1">
           <div className="sticky top-24">
-            <ProductFilters onFiltersChange={setFilters} />
+            <ProductFilters onFiltersChange={setFilters} initialFilters={initialFilters} />
           </div>
         </aside>
 
@@ -94,4 +102,16 @@ export default function ProductsPage() {
       </div>
     </div>
   );
+}
+
+export default function ProductsPage() {
+    return (
+        <Suspense fallback={
+            <div className="container py-12 flex justify-center items-center min-h-[50vh]">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        }>
+            <ProductsPageContent />
+        </Suspense>
+    )
 }

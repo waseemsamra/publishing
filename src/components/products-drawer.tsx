@@ -1,0 +1,94 @@
+'use client';
+
+import { useMemo } from 'react';
+import Link from 'next/link';
+import { db } from '@/lib/firebase';
+import { collection, query } from 'firebase/firestore';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import type { Category } from '@/lib/types';
+import { Loader2 } from 'lucide-react';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+
+export function ProductsDrawer({ onLinkClick }: { onLinkClick?: () => void }) {
+  const categoriesQuery = useMemo(() => {
+    const q = query(collection(db, 'categories'));
+    (q as any).__memo = true;
+    return q;
+  }, []);
+
+  const { data: categories, isLoading, error } = useCollection<Category>(categoriesQuery);
+
+  const categoryTree = useMemo(() => {
+    if (!categories) return [];
+    
+    const categoryMap = new Map(categories.map(c => [c.id, { ...c, subCategories: [] as Category[] }]));
+    const tree: (Category & { subCategories: Category[] })[] = [];
+    
+    categories.forEach(category => {
+      const categoryNode = categoryMap.get(category.id)!;
+      if (category.parentId && categoryMap.has(category.parentId)) {
+        categoryMap.get(category.parentId)!.subCategories.push(categoryNode);
+      } else {
+        tree.push(categoryNode);
+      }
+    });
+
+    return tree;
+  }, [categories]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-full p-8">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <p className="p-4 text-destructive">Error loading categories.</p>;
+  }
+
+  return (
+    <div className="p-6">
+      <h2 className="text-2xl font-headline font-bold mb-4">Shop by Category</h2>
+      <Accordion type="multiple" className="w-full">
+        {categoryTree.map(category => (
+          <AccordionItem key={category.id} value={category.id}>
+            <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+              {category.name}
+            </AccordionTrigger>
+            <AccordionContent>
+              <ul className="space-y-3 pl-4">
+                <li>
+                  <Link
+                    href={`/products?category=${category.id}`}
+                    className="block hover:text-primary font-medium"
+                    onClick={onLinkClick}
+                  >
+                    All {category.name}
+                  </Link>
+                </li>
+                {category.subCategories.map(subCategory => (
+                  <li key={subCategory.id}>
+                    <Link
+                      href={`/products?category=${subCategory.id}`}
+                      className="block hover:text-primary"
+                      onClick={onLinkClick}
+                    >
+                      {subCategory.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </div>
+  );
+}

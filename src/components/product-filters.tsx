@@ -9,12 +9,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
-import type { Size, Colour, PrintOption, WallType, Thickness, MaterialType, FinishType, Adhesive, Handle, Shape } from '@/lib/types';
+import type { Size, Colour, PrintOption, WallType, Thickness, MaterialType, FinishType, Adhesive, Handle, Shape, Category } from '@/lib/types';
 
-type OptionCollection = 'sizes' | 'colours' | 'printOptions' | 'wallTypes' | 'thicknesses' | 'materialTypes' | 'finishTypes' | 'adhesives' | 'handles' | 'shapes';
-type OptionType = Size | Colour | PrintOption | WallType | Thickness | MaterialType | FinishType | Adhesive | Handle | Shape;
+type OptionCollection = 'categories' | 'sizes' | 'colours' | 'printOptions' | 'wallTypes' | 'thicknesses' | 'materialTypes' | 'finishTypes' | 'adhesives' | 'handles' | 'shapes';
+type OptionType = Category | Size | Colour | PrintOption | WallType | Thickness | MaterialType | FinishType | Adhesive | Handle | Shape;
 
 const filterOptions: { collectionName: OptionCollection; title: string; formFieldName: string }[] = [
+    { collectionName: 'categories', title: 'Categories', formFieldName: 'categoryIds' },
     { collectionName: 'sizes', title: 'Sizes', formFieldName: 'sizeIds' },
     { collectionName: 'colours', title: 'Colours', formFieldName: 'colourIds' },
     { collectionName: 'printOptions', title: 'Print Options', formFieldName: 'printOptionIds' },
@@ -71,8 +72,18 @@ function FilterSection({
     );
 }
 
-export function ProductFilters({ onFiltersChange }: { onFiltersChange: (filters: Record<string, string[]>) => void }) {
-    const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
+export function ProductFilters({ 
+    onFiltersChange,
+    initialFilters = {}
+}: { 
+    onFiltersChange: (filters: Record<string, string[]>) => void;
+    initialFilters?: Record<string, string[]>;
+}) {
+    const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>(initialFilters);
+
+    useEffect(() => {
+        setActiveFilters(initialFilters);
+    }, [initialFilters]);
 
     useEffect(() => {
         onFiltersChange(activeFilters);
@@ -105,7 +116,7 @@ export function ProductFilters({ onFiltersChange }: { onFiltersChange: (filters:
                 <h3 className="font-headline text-lg font-bold">Filters</h3>
                 <Button variant="ghost" size="sm" onClick={clearFilters} disabled={Object.keys(activeFilters).length === 0}>Clear All</Button>
             </div>
-            <Accordion type="multiple" className="w-full">
+            <Accordion type="multiple" className="w-full" defaultValue={Object.keys(initialFilters)}>
                 {filterOptions.map(option => (
                     <FilterSection
                         key={option.collectionName}

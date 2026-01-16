@@ -18,6 +18,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useRouter } from 'next/navigation';
 import { SearchDialog } from './search-dialog';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { ProductsDrawer } from './products-drawer';
 
 function CartButton() {
   const { cartCount } = useCart();
@@ -108,9 +110,11 @@ function AuthButton() {
 
 
 export function SiteHeader() {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   const navLinks = [
-    { href: '/products', label: 'All Products' },
     { href: '#', label: 'Industries', active: true },
+    { href: '/products', label: 'All Products' },
   ];
 
   return (
@@ -132,6 +136,18 @@ export function SiteHeader() {
         <div className="flex items-center gap-6">
           <Logo />
           <nav className="hidden items-center gap-6 md:flex">
+             <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+              <SheetTrigger asChild>
+                <button
+                  className="text-sm font-medium transition-colors hover:text-primary"
+                >
+                  Products
+                </button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-full sm:max-w-sm">
+                <ProductsDrawer onLinkClick={() => setDrawerOpen(false)} />
+              </SheetContent>
+            </Sheet>
             {navLinks.map(link => (
               <Link
                 key={link.label}

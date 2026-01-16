@@ -68,9 +68,11 @@ export function SearchDialog() {
     // Start the navigation to the new page first.
     router.push(`/products/${productId}`);
     
-    // Then, close the dialog. This order helps prevent race conditions
-    // where the dialog unmounting might interfere with the router.
-    setOpen(false);
+    // Then, close the dialog after a short delay. This prevents a race
+    // condition where unmounting the dialog interrupts the router.
+    setTimeout(() => {
+      setOpen(false);
+    }, 100);
   };
 
   return (

@@ -339,18 +339,29 @@
           "type": "number",
           "description": "Price of the product."
         },
-        "imageUrl": {
-          "type": "string",
-          "description": "URL of the product image.",
-          "format": "uri"
+        "images": {
+          "type": "array",
+          "description": "Array of product images.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "description": { "type": "string" },
+              "imageUrl": { "type": "string", "format": "uri" },
+              "imageHint": { "type": "string" }
+            },
+            "required": ["id", "imageUrl"]
+          }
         },
         "materials": {
-          "type": "string",
-          "description": "Materials used to manufacture the product."
+          "type": "array",
+          "description": "Materials used to manufacture the product.",
+          "items": { "type": "string" }
         },
         "certifications": {
-          "type": "string",
-          "description": "Certifications held by the product (e.g., Fair Trade, Organic)."
+          "type": "array",
+          "description": "Certifications held by the product (e.g., Fair Trade, Organic).",
+          "items": { "type": "string" }
         },
         "sustainabilityImpact": {
           "type": "string",
@@ -359,20 +370,64 @@
         "categoryIds": {
           "type": "array",
           "description": "References to Categories. (Relationship: Product N:N Category)",
-          "items": {
-            "type": "string"
-          }
+          "items": { "type": "string" }
+        },
+        "sizeIds": {
+          "type": "array",
+          "description": "References to Sizes.",
+          "items": { "type": "string" }
+        },
+        "colourIds": {
+          "type": "array",
+          "description": "References to Colours.",
+          "items": { "type": "string" }
+        },
+        "printOptionIds": {
+          "type": "array",
+          "description": "References to Print Options.",
+          "items": { "type": "string" }
+        },
+        "wallTypeIds": {
+          "type": "array",
+          "description": "References to Wall Types.",
+          "items": { "type": "string" }
+        },
+        "thicknessIds": {
+          "type": "array",
+          "description": "References to Thicknesses.",
+          "items": { "type": "string" }
+        },
+        "materialTypeIds": {
+          "type": "array",
+          "description": "References to Material Types.",
+          "items": { "type": "string" }
+        },
+        "finishTypeIds": {
+          "type": "array",
+          "description": "References to Finish Types.",
+          "items": { "type": "string" }
+        },
+        "adhesiveIds": {
+          "type": "array",
+          "description": "References to Adhesives.",
+          "items": { "type": "string" }
+        },
+        "handleIds": {
+          "type": "array",
+          "description": "References to Handles.",
+          "items": { "type": "string" }
+        },
+        "shapeIds": {
+          "type": "array",
+          "description": "References to Shapes.",
+          "items": { "type": "string" }
         }
       },
       "required": [
         "id",
         "name",
         "description",
-        "price",
-        "imageUrl",
-        "materials",
-        "certifications",
-        "sustainabilityImpact"
+        "price"
       ]
     },
     "ShippingAddress": {

@@ -5,11 +5,26 @@ export interface Product {
   name: string;
   price: number;
   description: string;
+  images?: ImagePlaceholder[];
   materials: string[];
   certifications: string[];
   sustainabilityImpact: string;
-  image: ImagePlaceholder;
+  
+  // Option relationships
+  categoryIds?: string[];
+  sizeIds?: string[];
+  colourIds?: string[];
+  printOptionIds?: string[];
+  wallTypeIds?: string[];
+  thicknessIds?: string[];
+  materialTypeIds?: string[];
+  finishTypeIds?: string[];
+  adhesiveIds?: string[];
+  handleIds?: string[];
+  shapeIds?: string[];
+
   createdAt?: any;
+  updatedAt?: any;
 }
 
 export interface MustHaveProduct {

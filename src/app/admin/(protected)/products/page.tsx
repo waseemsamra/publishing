@@ -1,15 +1,14 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query } from 'firebase/firestore';
+import { collection, doc, deleteDoc, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import type { Product } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
@@ -25,14 +24,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -50,24 +41,11 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 
-const emptyProduct: Partial<Product> = {
-    name: '',
-    price: 0,
-    description: '',
-    materials: [],
-    certifications: [],
-    sustainabilityImpact: '',
-    image: { id: '', imageUrl: '', description: '', imageHint: '' }
-};
-
 export default function AdminProductsPage() {
     const { toast } = useToast();
-    const [dialogState, setDialogState] = useState<{ open: boolean; product?: Partial<Product> }>({ open: false });
-    const [formState, setFormState] = useState<Partial<Product>>(emptyProduct);
     const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     
@@ -79,59 +57,6 @@ export default function AdminProductsPage() {
 
     const { data: products, isLoading, error } = useCollection<Product>(productsQuery);
 
-    useEffect(() => {
-        if (dialogState.open && dialogState.product) {
-            setFormState(dialogState.product);
-        } else {
-            setFormState(emptyProduct);
-        }
-    }, [dialogState.open, dialogState.product]);
-    
-    const handleFormChange = (field: keyof Product, value: any) => {
-        setFormState(prev => ({ ...prev, [field]: value }));
-    };
-    
-    const handleImageChange = (field: keyof Product['image'], value: string) => {
-        setFormState(prev => ({ ...prev, image: { ...prev.image!, [field]: value } }));
-    };
-
-    const handleSaveProduct = async () => {
-        if (!formState.name?.trim()) {
-            toast({ variant: 'destructive', title: 'Validation Error', description: 'Name is required.' });
-            return;
-        }
-
-        const dataToSave = {
-            ...formState,
-            price: Number(formState.price) || 0,
-            materials: Array.isArray(formState.materials) ? formState.materials : (formState.materials as string || '').split(',').map(s => s.trim()).filter(Boolean),
-            certifications: Array.isArray(formState.certifications) ? formState.certifications : (formState.certifications as string || '').split(',').map(s => s.trim()).filter(Boolean),
-            image: {
-                id: formState.id || formState.name!,
-                imageUrl: formState.image?.imageUrl || '',
-                description: formState.name!,
-                imageHint: formState.name?.toLowerCase().split(' ').slice(0,2).join(' ') || ''
-            }
-        };
-
-        try {
-            if (formState.id) {
-                await updateDoc(doc(db, 'products', formState.id), dataToSave);
-                toast({ title: 'Success', description: 'Product updated.' });
-            } else {
-                await addDoc(collection(db, 'products'), {
-                    ...dataToSave,
-                    createdAt: serverTimestamp(),
-                });
-                toast({ title: 'Success', description: 'New product added.' });
-            }
-            setDialogState({ open: false });
-        } catch (e: any) {
-            console.error(e);
-            toast({ variant: 'destructive', title: 'Error', description: e.message });
-        }
-    };
-    
     const handleDeleteSelected = async () => {
         try {
             const deletePromises = selectedProductIds.map(id => deleteDoc(doc(db, 'products', id)));
@@ -149,12 +74,6 @@ export default function AdminProductsPage() {
             });
         } finally {
             setShowDeleteConfirm(false);
-        }
-    };
-
-    const handleOpenChange = (open: boolean) => {
-        if (!open) {
-            setDialogState({ open: false });
         }
     };
     
@@ -190,8 +109,10 @@ export default function AdminProductsPage() {
                         Delete ({selectedProductIds.length})
                     </Button>
                 ) : (
-                    <Button onClick={() => setDialogState({ open: true, product: emptyProduct })}>
-                        <PlusCircle className="mr-2 h-4 w-4" /> Add Product
+                    <Button asChild>
+                        <Link href="/admin/products/new">
+                            <PlusCircle className="mr-2 h-4 w-4" /> Add Product
+                        </Link>
                     </Button>
                 )}
             </div>
@@ -237,7 +158,7 @@ export default function AdminProductsPage() {
                                             alt={product.name}
                                             className="aspect-square rounded-md object-cover"
                                             height="64"
-                                            src={product.image.imageUrl || 'https://placehold.co/64x64'}
+                                            src={product.images?.[0]?.imageUrl || 'https://placehold.co/64x64'}
                                             width="64"
                                         />
                                     </TableCell>
@@ -248,8 +169,10 @@ export default function AdminProductsPage() {
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <DropdownMenuItem onSelect={() => setDialogState({ open: true, product })}>
-                                                    <Edit className="mr-2 h-4 w-4" /><span>Edit</span>
+                                                <DropdownMenuItem asChild>
+                                                    <Link href={`/admin/products/${product.id}/edit`}>
+                                                        <Edit className="mr-2 h-4 w-4" /><span>Edit</span>
+                                                    </Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => { setSelectedProductIds([product.id]); setShowDeleteConfirm(true); }} className="text-red-600 focus:text-red-600 focus:bg-red-50">
                                                     <Trash2 className="mr-2 h-4 w-4" /><span>Delete</span>
@@ -263,28 +186,6 @@ export default function AdminProductsPage() {
                     </Table>
                 </CardContent>
             </Card>
-
-            <Dialog open={dialogState.open} onOpenChange={handleOpenChange}>
-                <DialogContent className="max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle>{formState.id ? 'Edit Product' : 'Add New Product'}</DialogTitle>
-                        <DialogDescription>{formState.id ? `Update the details for ${formState.name}.` : 'Enter the details for the new product.'}</DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2"><Label htmlFor="name">Name</Label><Input id="name" value={formState.name} onChange={(e) => handleFormChange('name', e.target.value)} /></div>
-                        <div className="space-y-2"><Label htmlFor="price">Price</Label><Input id="price" type="number" value={formState.price} onChange={(e) => handleFormChange('price', e.target.value)} /></div>
-                        <div className="space-y-2"><Label htmlFor="description">Description</Label><Textarea id="description" value={formState.description} onChange={(e) => handleFormChange('description', e.target.value)} /></div>
-                        <div className="space-y-2"><Label htmlFor="imageUrl">Image URL</Label><Input id="imageUrl" value={formState.image?.imageUrl} onChange={(e) => handleImageChange('imageUrl', e.target.value)} /></div>
-                        <div className="space-y-2"><Label htmlFor="materials">Materials (comma-separated)</Label><Textarea id="materials" value={(formState.materials as any)?.join(', ')} onChange={(e) => handleFormChange('materials', e.target.value.split(',').map(s => s.trim()))} /></div>
-                        <div className="space-y-2"><Label htmlFor="certifications">Certifications (comma-separated)</Label><Textarea id="certifications" value={(formState.certifications as any)?.join(', ')} onChange={(e) => handleFormChange('certifications', e.target.value.split(',').map(s => s.trim()))} /></div>
-                        <div className="space-y-2"><Label htmlFor="sustainabilityImpact">Sustainability Impact</Label><Textarea id="sustainabilityImpact" value={formState.sustainabilityImpact} onChange={(e) => handleFormChange('sustainabilityImpact', e.target.value)} /></div>
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => handleOpenChange(false)}>Cancel</Button>
-                        <Button onClick={handleSaveProduct}>Save</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
             
             <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
                 <AlertDialogContent>

@@ -1,6 +1,14 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, X, Loader2 } from 'lucide-react';
@@ -23,6 +31,7 @@ export function SearchDialog() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const productsQuery = useMemo(() => {
+    // Only run query when dialog is open to save resources
     if (!open) return null;
     const q = query(collection(db, 'products'));
     (q as any).__memo = true;
@@ -41,61 +50,39 @@ export function SearchDialog() {
     );
   }, [searchTerm, allProducts]);
 
-  // Handle body scroll and Escape key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setOpen(false);
-      }
-    };
-
-    if (open) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [open]);
-
   // Reset search term when closing
   useEffect(() => {
     if (!open) {
-      const timer = setTimeout(() => setSearchTerm(''), 150);
+      const timer = setTimeout(() => setSearchTerm(''), 150); // delay to prevent flash of old content
       return () => clearTimeout(timer);
     }
   }, [open]);
 
-  const DesktopTriggerContent = (
-    <div className="relative w-full max-w-md cursor-pointer" role="button">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <div className="pl-9 w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground ring-offset-background flex items-center">
-            Search for mailers
-        </div>
-    </div>
-  );
-
-  const MobileTriggerContent = (
-    <Button variant="ghost" size="icon">
-        <Search className="h-5 w-5" />
-        <span className="sr-only">Search</span>
-    </Button>
-  );
-
   return (
-    <>
-      <div className="w-full" onClick={() => setOpen(true)}>
-        <div className="hidden lg:block w-full">{DesktopTriggerContent}</div>
-        <div className="lg:hidden">{MobileTriggerContent}</div>
-      </div>
-
-      {open && (
-        <div className="fixed left-0 right-0 bottom-0 top-[120px] z-30 bg-background overflow-y-auto">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <div className="w-full">
+            <div className="hidden lg:block w-full">
+                 <div className="relative w-full max-w-md cursor-pointer" role="button">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <div className="pl-9 w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground ring-offset-background flex items-center">
+                        Search for mailers
+                    </div>
+                </div>
+            </div>
+            <div className="lg:hidden">
+                <Button variant="ghost" size="icon">
+                    <Search className="h-5 w-5" />
+                    <span className="sr-only">Search</span>
+                </Button>
+            </div>
+        </div>
+      </DialogTrigger>
+      <DialogContent className="max-w-none w-screen h-screen sm:max-w-none sm:h-screen sm:rounded-none p-0 overflow-y-auto bg-background">
+        <DialogTitle className="sr-only">Search Products</DialogTitle>
+        <DialogDescription className="sr-only">Search for products, view suggestions, and see results as you type.</DialogDescription>
+        
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="max-w-2xl mx-auto relative">
                <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                <Input
@@ -107,9 +94,11 @@ export function SearchDialog() {
               />
               <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
                  {filteredProducts && <span className="text-sm text-muted-foreground">{filteredProducts.length} results</span>}
-                 <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 bg-background/50 hover:bg-background" onClick={() => setOpen(false)}>
-                    <X className="h-5 w-5" />
-                 </Button>
+                 <DialogClose asChild>
+                    <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 bg-background/50 hover:bg-background">
+                        <X className="h-5 w-5" />
+                    </Button>
+                 </DialogClose>
               </div>
             </div>
 
@@ -143,9 +132,9 @@ export function SearchDialog() {
                 </div>
               )}
             </div>
-          </div>
         </div>
-      )}
-    </>
+
+      </DialogContent>
+    </Dialog>
   );
 }

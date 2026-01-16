@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
@@ -16,8 +16,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, user, loading: authLoading } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    // If auth state is resolved and user is an admin, redirect to dashboard.
+    if (!authLoading && user?.role === 'admin') {
+      router.push('/admin/dashboard');
+    }
+    // If auth state is resolved and user is logged in but not an admin, deny access.
+    if (!authLoading && user && user.role !== 'admin') {
+      router.push('/unauthorized');
+    }
+  }, [user, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,13 +37,22 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      router.push('/admin/dashboard');
+      // The redirect is now handled by the useEffect hook, which waits for the auth context to update.
     } catch (error: any) {
       setError(error.message || 'Failed to login');
     } finally {
       setLoading(false);
     }
   };
+
+  // Show a loader while the auth state is being determined or if a redirect is imminent.
+  if (authLoading || user) {
+     return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">

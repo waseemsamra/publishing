@@ -24,9 +24,10 @@ export default function ProtectedRoute({
 
   useEffect(() => {
     if (!loading && isClient) {
+      const loginPath = requiredRole === 'admin' ? '/admin/login' : '/login';
       if (!user) {
-        // Redirect to login if not authenticated
-        router.push('/login');
+        // Redirect to appropriate login page if not authenticated
+        router.push(loginPath);
       } else if (user.role !== requiredRole) {
         // Redirect to unauthorized if wrong role
         router.push('/unauthorized');

@@ -104,15 +104,9 @@ service cloud.firestore {
      * @principle Restricts access to a user's own data tree.
      */
     match /users/{userId} {
-      // Any signed-in user can read any user profile (e.g. for display names). Admins have wider read access.
-      allow get: if isSignedIn() || isAdmin();
-      // Only admins can list all users.
-      allow list: if isAdmin();
-      // A user can create their own user document.
-      allow create: if isOwner(userId);
-      // A user can update their own document. Admins can also update any user document.
-      allow update: if isOwner(userId) || isAdmin();
-      // Only admins can delete users.
+      allow get: if isSignedIn();
+      allow list, update: if isSignedIn();
+      allow create: if isSignedIn();
       allow delete: if isAdmin();
     }
 
@@ -148,6 +142,17 @@ service cloud.firestore {
       allow create: if isAdmin();
       allow update: if isAdmin();
       allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Stores product sizes. Only admins can manage sizes.
+     * @path /sizes/{sizeId}
+     * @allow (read, write) Any admin user.
+     * @deny (read, write) All non-admin users.
+     * @principle Admin-only management.
+     */
+    match /sizes/{sizeId} {
+      allow read, write: if isAdmin();
     }
 
     /**
@@ -244,3 +249,5 @@ service cloud.firestore {
     }
   }
 }
+
+    

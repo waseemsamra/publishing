@@ -21,6 +21,7 @@ import {
   Package,
   ShoppingCart,
   UserCog,
+  Ruler,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,6 +47,7 @@ const navItems = [
   { href: '/admin/calendar', label: 'Calendar', icon: Calendar },
   { href: '/admin/grant-admin', label: 'Grant Admin', icon: UserCog, isPublic: true }, // Allow public access
   { href: '/admin/settings', label: 'Settings', icon: Settings },
+  { href: '/admin/sizes', label: 'Sizes', icon: Ruler },
 ];
 
 function SidebarContent({ pathname, onLinkClick, isAdmin }: { pathname: string, onLinkClick: () => void, isAdmin: boolean }) {
@@ -200,3 +202,5 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </div>
   );
 }
+
+    

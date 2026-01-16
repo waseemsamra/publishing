@@ -56,3 +56,12 @@ export interface BrandStory {
     description: string;
     image: ImagePlaceholder;
 }
+
+export interface Size {
+  id: string;
+  name: string;
+  shortName: string;
+  createdAt?: any;
+}
+
+    

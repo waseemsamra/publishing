@@ -49,6 +49,28 @@ export function SearchDialog() {
     );
   }, [searchTerm, allProducts]);
 
+  // Handle body scroll and Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+      }
+    };
+
+    if (open) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open]);
+
+  // Reset search term when closing
   useEffect(() => {
     if (!open) {
       const timer = setTimeout(() => setSearchTerm(''), 150);
@@ -56,7 +78,7 @@ export function SearchDialog() {
     }
   }, [open]);
 
-  const DesktopTrigger = (
+  const DesktopTriggerContent = (
     <div className="relative w-full max-w-md cursor-pointer" role="button">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <div className="pl-9 w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground ring-offset-background flex items-center">
@@ -65,7 +87,7 @@ export function SearchDialog() {
     </div>
   );
 
-  const MobileTrigger = (
+  const MobileTriggerContent = (
     <Button variant="ghost" size="icon">
         <Search className="h-5 w-5" />
         <span className="sr-only">Search</span>
@@ -73,72 +95,65 @@ export function SearchDialog() {
   );
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <div className='w-full'>
-            <div className="hidden lg:block w-full">{DesktopTrigger}</div>
-            <div className="lg:hidden">{MobileTrigger}</div>
-        </div>
-      </DialogTrigger>
-      <DialogContent className="max-w-full w-full h-full sm:rounded-none p-0 flex flex-col gap-0">
-          <DialogTitle className="sr-only">Search Products</DialogTitle>
-          <DialogDescription className="sr-only">
-            Search for products by name or description. Start typing to see results. You can also browse popular searches.
-          </DialogDescription>
-          <header className="flex items-center gap-4 border-b p-4 shrink-0 bg-background">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
+    <>
+      <div className="w-full" onClick={() => setOpen(true)}>
+        <div className="hidden lg:block w-full">{DesktopTriggerContent}</div>
+        <div className="lg:hidden">{MobileTriggerContent}</div>
+      </div>
+
+      {open && (
+        <div className="fixed inset-0 z-30 bg-background pt-32 overflow-y-auto">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mx-auto relative">
+               <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+               <Input
                 autoFocus
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search for mailers, boxes, and more..."
-                className="text-lg h-12 pl-10 pr-24"
+                className="w-full h-16 rounded-full text-lg pl-14 pr-36 bg-secondary border-none focus-visible:ring-2 focus-visible:ring-ring"
               />
-              {searchTerm && (
-                <div className="absolute right-12 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                  {filteredProducts?.length ?? 0} results
-                </div>
-              )}
-            </div>
-            <Button variant="ghost" size="icon" className="rounded-full shrink-0" onClick={() => setOpen(false)}>
-                <X className="h-6 w-6" />
-                <span className="sr-only">Close</span>
-            </Button>
-          </header>
-          
-          <ScrollArea className="flex-1 bg-background">
-            {isLoading && searchTerm ? (
-              <div className="flex justify-center items-center h-full p-8 pt-24">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                 {filteredProducts && <span className="text-sm text-muted-foreground">{filteredProducts.length} results</span>}
+                 <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 bg-background/50 hover:bg-background" onClick={() => setOpen(false)}>
+                    <X className="h-5 w-5" />
+                 </Button>
               </div>
-            ) : filteredProducts === null ? (
-                <div className="p-8">
-                    <h3 className="font-semibold text-muted-foreground mb-4">Popular Searches</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {searchSuggestions.map(suggestion => (
-                            <Button key={suggestion} variant="outline" className="rounded-full" onClick={() => setSearchTerm(suggestion)}>
-                                {suggestion}
-                            </Button>
-                        ))}
-                    </div>
+            </div>
+
+            <div className="mt-8">
+              {isLoading && searchTerm ? (
+                <div className="flex justify-center items-center h-full p-8 pt-24">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
-            ) : filteredProducts.length > 0 ? (
-                <div className="p-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+              ) : filteredProducts === null ? (
+                <div className="text-center">
+                  <div className="flex flex-wrap gap-2 justify-center max-w-2xl mx-auto">
+                      {searchSuggestions.map(suggestion => (
+                          <Button key={suggestion} variant="outline" className="rounded-full" onClick={() => setSearchTerm(suggestion)}>
+                              {suggestion}
+                          </Button>
+                      ))}
+                  </div>
+                </div>
+              ) : filteredProducts.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                     {filteredProducts.map(product => (
                         <div key={product.id} onClick={() => setOpen(false)}>
                             <ProductCard product={product} />
                         </div>
                     ))}
                 </div>
-            ) : (
+              ) : (
                 <div className="text-center py-24 px-8">
                     <h3 className="font-headline text-2xl font-bold">No Products Found</h3>
                     <p className="text-muted-foreground mt-2">Your search for "{searchTerm}" did not match any products.</p>
                 </div>
-            )}
-          </ScrollArea>
-      </DialogContent>
-    </Dialog>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

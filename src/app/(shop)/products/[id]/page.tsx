@@ -83,43 +83,55 @@ export default function ProductDetailPage() {
   }
   
   const handleDesignLater = () => {
-    addToCart(product, selectedTier.qty);
+    if (product) {
+        addToCart(product, selectedTier.qty);
+    }
   };
 
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-12">
-        <div className="md:col-span-7 md:sticky md:top-0 md:h-screen flex items-start bg-muted/30 pt-16">
-          <Carousel className="w-full max-w-2xl mx-auto">
-            <CarouselContent>
-              {product.images && product.images.length > 0 ? (
-                product.images.map((image) => (
-                  <CarouselItem key={image.id}>
-                    <div className="aspect-square relative">
-                      <Image
-                        src={image.imageUrl || 'https://placehold.co/800x600'}
-                        alt={image.description || product.name}
-                        fill
-                        className="object-cover"
-                        data-ai-hint={image.imageHint}
-                      />
+        {/* Left scrolling column */}
+        <div className="md:col-span-7">
+          <div className="bg-muted/30 pt-16">
+            <Carousel className="w-full max-w-2xl mx-auto">
+              <CarouselContent>
+                {product.images && product.images.length > 0 ? (
+                  product.images.map((image) => (
+                    <CarouselItem key={image.id}>
+                      <div className="aspect-square relative">
+                        <Image
+                          src={image.imageUrl || 'https://placehold.co/800x600'}
+                          alt={image.description || product.name}
+                          fill
+                          className="object-cover"
+                          data-ai-hint={image.imageHint}
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))
+                ) : (
+                  <CarouselItem>
+                    <div className="aspect-square relative bg-muted flex items-center justify-center">
+                      <span className="text-muted-foreground">No Image</span>
                     </div>
                   </CarouselItem>
-                ))
-              ) : (
-                <CarouselItem>
-                  <div className="aspect-square relative bg-muted flex items-center justify-center">
-                    <span className="text-muted-foreground">No Image</span>
-                  </div>
-                </CarouselItem>
-              )}
-            </CarouselContent>
-            <CarouselPrevious className="absolute -left-10 top-1/2 -translate-y-1/2 hidden md:flex" />
-            <CarouselNext className="absolute -right-10 top-1/2 -translate-y-1/2 hidden md:flex" />
-          </Carousel>
+                )}
+              </CarouselContent>
+              <CarouselPrevious className="absolute -left-10 top-1/2 -translate-y-1/2 hidden md:flex" />
+              <CarouselNext className="absolute -right-10 top-1/2 -translate-y-1/2 hidden md:flex" />
+            </Carousel>
+          </div>
+          <div className="bg-background">
+             <div className="container py-12 md:py-20 space-y-16">
+                <ProductInfoAccordion product={product} />
+                <RelatedProducts />
+            </div>
+          </div>
         </div>
 
-        <div className="md:col-span-5 flex flex-col p-8 pt-16 md:p-12 lg:p-16">
+        {/* Right sticky column */}
+        <div className="md:col-span-5 md:sticky md:top-0 md:h-screen flex flex-col p-8 pt-16 md:p-12 lg:p-16">
           <div className="w-full max-w-md">
             <div className="text-sm text-muted-foreground">
               <span>Hot Cups</span> — <span>Custom Coffee Cups Compostable</span>
@@ -202,14 +214,6 @@ export default function ProductDetailPage() {
               </Button>
             </div>
           </div>
-
-          <div className="py-12 md:py-20 space-y-16">
-            <div className="w-full max-w-md">
-                <ProductInfoAccordion product={product} />
-            </div>
-            <RelatedProducts />
-          </div>
-
         </div>
       </div>
     </>

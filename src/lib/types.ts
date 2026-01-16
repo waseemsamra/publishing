@@ -9,6 +9,7 @@ export interface Product {
   certifications: string[];
   sustainabilityImpact: string;
   image: ImagePlaceholder;
+  createdAt?: any;
 }
 
 export interface MustHaveProduct {

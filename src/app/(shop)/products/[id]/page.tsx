@@ -1,16 +1,52 @@
+'use client';
+
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { products } from '@/lib/data';
-import { Card, CardContent } from '@/components/ui/card';
+import { useEffect, useState } from 'react';
+import type { Product } from '@/lib/types';
+import { db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AddToCartForm } from '@/components/add-to-cart-form';
-import { CheckCircle, Leaf } from 'lucide-react';
+import { CheckCircle, Leaf, Loader2 } from 'lucide-react';
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
-  const product = products.find((p) => p.id === params.id);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const docRef = doc(db, 'products', params.id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setProduct({ id: docSnap.id, ...docSnap.data() } as Product);
+        } else {
+          notFound();
+        }
+      } catch (error) {
+        console.error("Error fetching product:", error);
+        notFound();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [params.id]);
+
+  if (loading) {
+    return (
+      <div className="container py-12 flex justify-center items-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!product) {
-    notFound();
+    return notFound();
   }
 
   return (
@@ -20,8 +56,8 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           <Card className="overflow-hidden">
             <div className="aspect-square relative">
               <Image
-                src={product.image.imageUrl}
-                alt={product.image.description}
+                src={product.image.imageUrl || 'https://placehold.co/600x600'}
+                alt={product.image.description || product.name}
                 fill
                 className="object-cover"
                 data-ai-hint={product.image.imageHint}
@@ -51,7 +87,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               </div>
             </div>
 
-            {product.certifications.length > 0 && (
+            {product.certifications && product.certifications.length > 0 && (
               <div>
                 <h3 className="font-headline text-lg font-semibold mb-2 flex items-center"><CheckCircle className="mr-2 h-5 w-5 text-blue-600" />Certifications</h3>
                 <div className="flex flex-wrap gap-2">
@@ -66,10 +102,4 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       </div>
     </div>
   );
-}
-
-export async function generateStaticParams() {
-  return products.map((product) => ({
-    id: product.id,
-  }));
 }

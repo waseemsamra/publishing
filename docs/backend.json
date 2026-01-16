@@ -119,6 +119,30 @@
         "hexCode"
       ]
     },
+    "FinishType": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FinishType",
+      "type": "object",
+      "description": "Represents a product finish type (e.g., Matt, Glossy).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the finish type."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the finish type (e.g., Matt)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the finish type."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
     "MaterialType": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "MaterialType",
@@ -630,6 +654,22 @@
             {
               "name": "materialTypeId",
               "description": "The unique identifier for the material type."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/finishTypes/{finishTypeId}",
+        "definition": {
+          "entityName": "FinishType",
+          "schema": {
+            "$ref": "#/backend/entities/FinishType"
+          },
+          "description": "Stores available product finish types. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "finishTypeId",
+              "description": "The unique identifier for the finish type."
             }
           ]
         }

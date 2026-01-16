@@ -6,7 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package } from 'lucide-react';
+import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles } from 'lucide-react';
 
 const settingsLinks = [
     {
@@ -44,6 +44,12 @@ const settingsLinks = [
         title: "Material Types",
         description: "Manage material types like Standard White or Kraft.",
         icon: Package,
+    },
+    {
+        href: "/admin/finish-types",
+        title: "Finish Types",
+        description: "Manage finish types like Matt or Glossy.",
+        icon: Sparkles,
     },
     {
         href: "#",

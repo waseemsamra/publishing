@@ -97,4 +97,11 @@ export interface MaterialType {
   description: string;
   createdAt?: any;
 }
+
+export interface FinishType {
+  id: string;
+  name: string;
+  description: string;
+  createdAt?: any;
+}
     

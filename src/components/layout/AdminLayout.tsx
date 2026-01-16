@@ -69,7 +69,7 @@ function SidebarContent({ pathname, onLinkClick, isAdmin }: { pathname: string, 
       <nav className="flex-1 space-y-1 p-2">
         {visibleNavItems.map((item) => {
           const Icon = item.icon;
-          const isSettingsActive = pathname.startsWith('/admin/settings') || pathname.startsWith('/admin/sizes') || pathname.startsWith('/admin/colours') || pathname.startsWith('/admin/print-options') || pathname.startsWith('/admin/wall-types') || pathname.startsWith('/admin/thickness') || pathname.startsWith('/admin/material-types');
+          const isSettingsActive = pathname.startsWith('/admin/settings') || pathname.startsWith('/admin/sizes') || pathname.startsWith('/admin/colours') || pathname.startsWith('/admin/print-options') || pathname.startsWith('/admin/wall-types') || pathname.startsWith('/admin/thickness') || pathname.startsWith('/admin/material-types') || pathname.startsWith('/admin/finish-types');
           const isActive = pathname.startsWith(item.href) && (item.href !== '/admin/settings' || pathname === '/admin/settings');
           
           let effectiveIsActive = isActive;

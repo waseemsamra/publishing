@@ -7,7 +7,6 @@ import {
   DialogTrigger,
   DialogTitle,
   DialogDescription,
-  DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -96,11 +95,9 @@ export function SearchDialog() {
               />
               <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
                  {searchTerm && <span className="text-sm text-muted-foreground">{filteredProducts.length} results</span>}
-                 <DialogClose asChild>
-                    <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 bg-background/50 hover:bg-background">
-                        <X className="h-5 w-5" />
-                    </Button>
-                 </DialogClose>
+                 <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 bg-background/50 hover:bg-background" onClick={() => setOpen(false)}>
+                    <X className="h-5 w-5" />
+                </Button>
               </div>
             </div>
 
@@ -114,9 +111,7 @@ export function SearchDialog() {
                   {!searchTerm && <h3 className="font-headline text-2xl font-bold mb-6 text-center">Trending Products</h3>}
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                       {filteredProducts.map(product => (
-                          <div key={product.id} onClick={() => setOpen(false)}>
-                              <ProductCard product={product} />
-                          </div>
+                          <ProductCard key={product.id} product={product} onClick={() => setOpen(false)} />
                       ))}
                   </div>
                 </>

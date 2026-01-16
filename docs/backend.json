@@ -110,6 +110,10 @@
         "description": {
           "type": "string",
           "description": "Description of the category."
+        },
+        "parentId": {
+          "type": "string",
+          "description": "ID of the parent category. If absent, this is a top-level category."
         }
       },
       "required": [

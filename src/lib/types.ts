@@ -152,4 +152,12 @@ export interface StoreSettings {
   companyDetails?: string;
   updatedAt?: any;
 }
+
+export interface Category {
+  id: string;
+  name: string;
+  description: string;
+  parentId?: string;
+  createdAt?: any;
+}
   

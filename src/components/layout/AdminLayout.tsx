@@ -21,10 +21,7 @@ import {
   Package,
   ShoppingCart,
   UserCog,
-  Ruler,
-  Palette,
-  Printer,
-  Layers,
+  ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,11 +36,24 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
-  { href: '/admin/products', label: 'Products', icon: Package },
+  {
+    id: 'products',
+    label: 'Products',
+    icon: Package,
+    subItems: [
+      { href: '/admin/products', label: 'All Products' },
+      { href: '/admin/products/categories', label: 'Categories' },
+    ],
+  },
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/admin/content', label: 'Content', icon: FileText },
@@ -69,8 +79,49 @@ function SidebarContent({ pathname, onLinkClick, isAdmin }: { pathname: string, 
       <nav className="flex-1 space-y-1 p-2">
         {visibleNavItems.map((item) => {
           const Icon = item.icon;
+
+          if (item.subItems) {
+            const isSectionActive = pathname.startsWith('/admin/products');
+            return (
+              <Collapsible key={item.id} defaultOpen={isSectionActive} className="space-y-1">
+                <CollapsibleTrigger asChild>
+                  <div
+                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors cursor-pointer text-muted-foreground hover:bg-accent hover:text-foreground
+                      ${isSectionActive ? 'font-semibold text-foreground' : ''}
+                    `}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                    <ChevronRight className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90" />
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pl-7 mt-1 space-y-1">
+                  {item.subItems.map(subItem => {
+                    const isSubItemActive = pathname === subItem.href;
+                    return (
+                      <Link
+                        key={subItem.href}
+                        href={subItem.href}
+                        onClick={onLinkClick}
+                        className={`
+                          flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors
+                          ${isSubItemActive
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                          }
+                        `}
+                      >
+                        {subItem.label}
+                      </Link>
+                    )
+                  })}
+                </CollapsibleContent>
+              </Collapsible>
+            )
+          }
+
           const isSettingsActive = pathname.startsWith('/admin/settings') || pathname.startsWith('/admin/sizes') || pathname.startsWith('/admin/colours') || pathname.startsWith('/admin/print-options') || pathname.startsWith('/admin/wall-types') || pathname.startsWith('/admin/thickness') || pathname.startsWith('/admin/material-types') || pathname.startsWith('/admin/finish-types') || pathname.startsWith('/admin/adhesives') || pathname.startsWith('/admin/handles') || pathname.startsWith('/admin/shapes');
-          const isActive = pathname.startsWith(item.href) && (item.href !== '/admin/settings' || pathname === '/admin/settings');
+          const isActive = item.href && pathname.startsWith(item.href) && (item.href !== '/admin/settings' || pathname === '/admin/settings');
           
           let effectiveIsActive = isActive;
           if (item.href === '/admin/settings') {

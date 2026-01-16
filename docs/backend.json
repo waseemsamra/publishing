@@ -167,6 +167,30 @@
         "name"
       ]
     },
+    "Handle": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Handle",
+      "type": "object",
+      "description": "Represents a bag handle type (e.g., Flat, Twisted).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the handle type."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the handle type (e.g., Flat)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the handle type."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
     "MaterialType": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "MaterialType",
@@ -715,6 +739,22 @@
         }
       },
       {
+        "path": "/handles/{handleId}",
+        "definition": {
+          "entityName": "Handle",
+          "schema": {
+            "$ref": "#/backend/entities/Handle"
+          },
+          "description": "Stores available bag handle types. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "handleId",
+              "description": "The unique identifier for the handle."
+            }
+          ]
+        }
+      },
+      {
         "path": "/users/{userId}/shoppingCarts/{shoppingCartId}",
         "definition": {
           "entityName": "ShoppingCart",
@@ -847,4 +887,3 @@
   }
 }
     
-  

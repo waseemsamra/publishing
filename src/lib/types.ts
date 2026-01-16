@@ -111,5 +111,12 @@ export interface Adhesive {
   description: string;
   createdAt?: any;
 }
+
+export interface Handle {
+  id: string;
+  name: string;
+  description: string;
+  createdAt?: any;
+}
     
   

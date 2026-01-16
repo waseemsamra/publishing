@@ -6,7 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote } from 'lucide-react';
+import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote, Hand } from 'lucide-react';
 
 const settingsLinks = [
     {
@@ -56,6 +56,12 @@ const settingsLinks = [
         title: "Adhesives",
         description: "Manage adhesive types like single or double.",
         icon: StickyNote,
+    },
+    {
+        href: "/admin/handles",
+        title: "Handles",
+        description: "Manage bag handle types like Flat or Twisted.",
+        icon: Hand,
     },
     {
         href: "#",

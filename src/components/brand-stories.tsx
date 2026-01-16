@@ -29,7 +29,7 @@ function BrandStoryCard({ story }: { story: BrandStory }) {
         </div>
         <div className="mt-4">
           <h3 className="font-headline font-semibold mt-1 group-hover:text-primary">{story.title}</h3>
-          <p className="text-sm text-muted-foreground mt-1 line-clamp-3">{story.description}</p>
+          <p className="text-xs text-muted-foreground mt-1 line-clamp-3">{story.description}</p>
         </div>
       </Link>
     </div>
@@ -39,10 +39,12 @@ function BrandStoryCard({ story }: { story: BrandStory }) {
 export function BrandStories() {
   return (
     <section className="py-12 md:py-20">
-        <div className="container text-center">
-            <h2 className="font-headline text-4xl font-bold">Ready to get inspired?</h2>
-            <p className="mt-2 text-muted-foreground max-w-xl mx-auto">Unwrap our Brand Stories and read insights from industry experts</p>
-        </div>
+      <div className="container text-center">
+        <h2 className="font-headline text-4xl font-bold">Ready to get inspired?</h2>
+        <p className="mt-2 text-muted-foreground max-w-xl mx-auto">
+          Unwrap our Brand Stories and read insights from industry experts
+        </p>
+      </div>
 
       <div className="container mt-8 relative">
         <Carousel
@@ -67,8 +69,14 @@ export function BrandStories() {
       </div>
 
       <div className="container text-center mt-8">
-        <Button size="lg" style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }}>
-            Explore More
+        <Button
+          size="lg"
+          style={{
+            backgroundColor: 'hsl(var(--accent))',
+            color: 'hsl(var(--accent-foreground))',
+          }}
+        >
+          Explore More
         </Button>
       </div>
     </section>

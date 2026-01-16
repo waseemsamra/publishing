@@ -44,27 +44,27 @@ import { Textarea } from '@/components/ui/textarea';
 
 export default function MaterialTypesPage() {
     const { toast } = useToast();
-    const [dialogState, setDialogState] = useState<{open: boolean; materialType?: Partial<MaterialType>}>({ open: false, materialType: undefined });
+    const [dialogState, setDialogState] = useState<{open: boolean; material?: Partial<MaterialType>}>({ open: false, material: undefined });
     
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
 
-    const materialTypesQuery = useMemo(() => {
+    const materialsQuery = useMemo(() => {
         const q = query(collection(db, 'materialTypes'));
         (q as any).__memo = true;
         return q;
     }, []);
 
-    const { data: materialTypes, isLoading, error } = useCollection<MaterialType>(materialTypesQuery);
+    const { data: materials, isLoading, error } = useCollection<MaterialType>(materialsQuery);
     
     useEffect(() => {
-        if (dialogState.open && dialogState.materialType) {
-            setName(dialogState.materialType.name || '');
-            setDescription(dialogState.materialType.description || '');
+        if (dialogState.open && dialogState.material) {
+            setName(dialogState.material.name || '');
+            setDescription(dialogState.material.description || '');
         }
-    }, [dialogState.open, dialogState.materialType]);
+    }, [dialogState.open, dialogState.material]);
 
-    const handleSaveMaterialType = async () => {
+    const handleSaveMaterial = async () => {
         if (!name.trim()) {
             toast({
                 variant: 'destructive',
@@ -77,27 +77,27 @@ export default function MaterialTypesPage() {
         const data = { name, description };
 
         try {
-            if (dialogState.materialType?.id) {
-                await updateDoc(doc(db, 'materialTypes', dialogState.materialType.id), data);
-                toast({ title: 'Success', description: 'Material Type updated.' });
+            if (dialogState.material?.id) {
+                await updateDoc(doc(db, 'materialTypes', dialogState.material.id), data);
+                toast({ title: 'Success', description: 'Material updated.' });
             } else {
                 await addDoc(collection(db, 'materialTypes'), {
                     ...data,
                     createdAt: serverTimestamp(),
                 });
-                toast({ title: 'Success', description: 'New Material Type added.' });
+                toast({ title: 'Success', description: 'New material added.' });
             }
-            setDialogState({ open: false, materialType: undefined });
+            setDialogState({ open: false, material: undefined });
         } catch (e: any) {
             console.error(e);
             toast({ variant: 'destructive', title: 'Error', description: e.message });
         }
     };
 
-    const handleDeleteMaterialType = async (id: string) => {
+    const handleDeleteMaterial = async (id: string) => {
         try {
             await deleteDoc(doc(db, 'materialTypes', id));
-            toast({ title: 'Success', description: 'Material Type deleted.' });
+            toast({ title: 'Success', description: 'Material deleted.' });
         } catch (e: any) {
             console.error(e);
             toast({ variant: 'destructive', title: 'Error', description: e.message });
@@ -106,7 +106,7 @@ export default function MaterialTypesPage() {
     
     const handleOpenChange = (open: boolean) => {
         if (!open) {
-            setDialogState({ open: false, materialType: undefined });
+            setDialogState({ open: false, material: undefined });
         } else {
             setDialogState(prev => ({ ...prev, open }));
         }
@@ -116,17 +116,17 @@ export default function MaterialTypesPage() {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="font-headline text-3xl font-bold">Material Types</h1>
-                    <p className="text-muted-foreground">Manage material types for your store.</p>
+                    <h1 className="font-headline text-3xl font-bold">Materials</h1>
+                    <p className="text-muted-foreground">Manage materials for your store.</p>
                 </div>
-                <Button onClick={() => setDialogState({ open: true, materialType: {} })}>
-                    <PlusCircle className="mr-2 h-4 w-4" />Add Material Type
+                <Button onClick={() => setDialogState({ open: true, material: {} })}>
+                    <PlusCircle className="mr-2 h-4 w-4" />Add Material
                 </Button>
             </div>
             <Card>
                 <CardHeader>
-                    <CardTitle>All Material Types</CardTitle>
-                    <CardDescription>A list of all available material types.</CardDescription>
+                    <CardTitle>All Materials</CardTitle>
+                    <CardDescription>A list of all available materials.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -149,27 +149,27 @@ export default function MaterialTypesPage() {
                                     <TableCell colSpan={4} className="text-center text-red-500">{error.message}</TableCell>
                                 </TableRow>
                             )}
-                            {!isLoading && materialTypes?.length === 0 && (
+                            {!isLoading && materials?.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="h-24 text-center">No material types found. Add one to get started.</TableCell>
+                                    <TableCell colSpan={4} className="h-24 text-center">No materials found. Add materials like 'Standard White' or 'Kraft' to get started.</TableCell>
                                 </TableRow>
                             )}
-                            {materialTypes?.map((materialType) => (
-                                <TableRow key={materialType.id}>
-                                    <TableCell className="font-medium">{materialType.name}</TableCell>
-                                    <TableCell>{materialType.description}</TableCell>
-                                    <TableCell>{materialType.createdAt ? format(materialType.createdAt.toDate(), 'MMM d, yyyy') : 'N/A'}</TableCell>
+                            {materials?.map((material) => (
+                                <TableRow key={material.id}>
+                                    <TableCell className="font-medium">{material.name}</TableCell>
+                                    <TableCell>{material.description}</TableCell>
+                                    <TableCell>{material.createdAt ? format(material.createdAt.toDate(), 'MMM d, yyyy') : 'N/A'}</TableCell>
                                     <TableCell className="text-right">
                                          <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <DropdownMenuItem onSelect={() => setDialogState({ open: true, materialType })}>
+                                                <DropdownMenuItem onSelect={() => setDialogState({ open: true, material })}>
                                                     <Edit className="mr-2 h-4 w-4" />
                                                     <span>Edit</span>
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleDeleteMaterialType(materialType.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50">
+                                                <DropdownMenuItem onClick={() => handleDeleteMaterial(material.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50">
                                                     <Trash2 className="mr-2 h-4 w-4" />
                                                     <span>Delete</span>
                                                 </DropdownMenuItem>
@@ -186,9 +186,9 @@ export default function MaterialTypesPage() {
             <Dialog open={dialogState.open} onOpenChange={handleOpenChange}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{dialogState.materialType?.id ? 'Edit Material Type' : 'Add New Material Type'}</DialogTitle>
+                        <DialogTitle>{dialogState.material?.id ? 'Edit Material' : 'Add New Material'}</DialogTitle>
                         <DialogDescription>
-                            {dialogState.materialType?.id ? `Update the details for ${dialogState.materialType.name}.` : 'Enter the details for the new material type.'}
+                            {dialogState.material?.id ? `Update the details for ${dialogState.material.name}.` : 'Enter the details for the new material.'}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
@@ -203,7 +203,7 @@ export default function MaterialTypesPage() {
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => handleOpenChange(false)}>Cancel</Button>
-                        <Button onClick={handleSaveMaterialType}>Save</Button>
+                        <Button onClick={handleSaveMaterial}>Save</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

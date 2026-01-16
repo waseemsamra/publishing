@@ -41,8 +41,8 @@ const settingsLinks = [
     },
     {
         href: "/admin/material-types",
-        title: "Material Types",
-        description: "Manage material types like Standard White or Kraft.",
+        title: "Materials",
+        description: "Manage materials like Standard White or Kraft.",
         icon: Package,
     },
     {

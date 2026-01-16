@@ -13,6 +13,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import {
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet';
 
 export function ProductsDrawer({ onLinkClick }: { onLinkClick?: () => void }) {
   const categoriesQuery = useMemo(() => {
@@ -54,41 +59,48 @@ export function ProductsDrawer({ onLinkClick }: { onLinkClick?: () => void }) {
   }
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-headline font-bold mb-4">Shop by Category</h2>
-      <Accordion type="multiple" className="w-full">
-        {categoryTree.map(category => (
-          <AccordionItem key={category.id} value={category.id}>
-            <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-              {category.name}
-            </AccordionTrigger>
-            <AccordionContent>
-              <ul className="space-y-3 pl-4">
-                <li>
-                  <Link
-                    href={`/products?category=${category.id}`}
-                    className="block hover:text-primary font-medium"
-                    onClick={onLinkClick}
-                  >
-                    All {category.name}
-                  </Link>
-                </li>
-                {category.subCategories.map(subCategory => (
-                  <li key={subCategory.id}>
+    <>
+      <SheetHeader className="text-left">
+        <SheetTitle className="text-2xl font-headline font-bold">Shop by Category</SheetTitle>
+        <SheetDescription>
+          Browse our products by category and sub-category.
+        </SheetDescription>
+      </SheetHeader>
+      <div className="flex-1 overflow-y-auto py-4 -mx-6 px-6">
+        <Accordion type="multiple" className="w-full">
+          {categoryTree.map(category => (
+            <AccordionItem key={category.id} value={category.id}>
+              <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                {category.name}
+              </AccordionTrigger>
+              <AccordionContent>
+                <ul className="space-y-3 pl-4">
+                  <li>
                     <Link
-                      href={`/products?category=${subCategory.id}`}
-                      className="block hover:text-primary"
+                      href={`/products?category=${category.id}`}
+                      className="block hover:text-primary font-medium"
                       onClick={onLinkClick}
                     >
-                      {subCategory.name}
+                      All {category.name}
                     </Link>
                   </li>
-                ))}
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
-    </div>
+                  {category.subCategories.map(subCategory => (
+                    <li key={subCategory.id}>
+                      <Link
+                        href={`/products?category=${subCategory.id}`}
+                        className="block hover:text-primary"
+                        onClick={onLinkClick}
+                      >
+                        {subCategory.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
+    </>
   );
 }

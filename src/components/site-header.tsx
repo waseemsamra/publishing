@@ -144,7 +144,7 @@ export function SiteHeader() {
                   Products
                 </button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-full sm:max-w-sm">
+              <SheetContent side="left" className="w-full sm:max-w-sm flex flex-col">
                 <ProductsDrawer onLinkClick={() => setDrawerOpen(false)} />
               </SheetContent>
             </Sheet>

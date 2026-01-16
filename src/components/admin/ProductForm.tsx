@@ -121,6 +121,8 @@ function OptionsSection({
   );
 }
 
+const s3BaseUrl = 'https://printinweb.s3.us-east-1.amazonaws.com';
+
 export function ProductForm({ product }: { product?: Product }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -128,7 +130,13 @@ export function ProductForm({ product }: { product?: Product }) {
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
-    defaultValues: product || {
+    defaultValues: product ? {
+        ...product,
+        images: product.images?.map(img => ({
+            ...img,
+            imageUrl: img.imageUrl?.replace(s3BaseUrl, ''),
+        }))
+    } : {
         name: '',
         description: '',
         price: 0,
@@ -150,13 +158,18 @@ export function ProductForm({ product }: { product?: Product }) {
     },
   });
   
-  const imageUrl = form.watch('images.0.imageUrl');
+  const imageUrlPath = form.watch('images.0.imageUrl');
+  const previewUrl = imageUrlPath ? (imageUrlPath.startsWith('http') ? imageUrlPath : `${s3BaseUrl}${imageUrlPath}`) : null;
 
   async function onSubmit(data: ProductFormValues) {
     setIsSubmitting(true);
     try {
         const dataToSave = {
             ...data,
+            images: data.images?.map(img => ({
+                ...img,
+                imageUrl: img.imageUrl ? (img.imageUrl.startsWith('http') ? img.imageUrl : `${s3BaseUrl}${img.imageUrl}`) : ''
+            })),
             updatedAt: serverTimestamp(),
         };
 
@@ -213,15 +226,15 @@ export function ProductForm({ product }: { product?: Product }) {
               <CardHeader><CardTitle>Images</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                  <FormField control={form.control} name="images.0.imageUrl" render={({ field }) => (
-                    <FormItem><FormLabel>Primary Image URL</FormLabel><FormControl><Input placeholder="https://..." {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Primary Image Path</FormLabel><FormControl><Input placeholder="/testcup.webp" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 
-                 {imageUrl && (
+                 {previewUrl && (
                     <div className="mt-4">
                     <FormLabel>Image Preview</FormLabel>
                     <div className="mt-2 aspect-square w-48 relative rounded-md border overflow-hidden">
                         <Image
-                            src={imageUrl}
+                            src={previewUrl}
                             alt="Product image preview"
                             fill
                             className="object-cover"

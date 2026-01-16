@@ -18,20 +18,11 @@ import { useCollection } from '@/firebase/firestore/use-collection';
 import type { Product } from '@/lib/types';
 import { ProductCard } from './product-card';
 
-const searchSuggestions = [
-  'cups',
-  'coffee cups',
-  'cold cups',
-  'hot cups',
-  'compostable cups',
-];
-
 export function SearchDialog() {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   const productsQuery = useMemo(() => {
-    // Only run query when dialog is open to save resources
     if (!open) return null;
     const q = query(collection(db, 'products'));
     (q as any).__memo = true;
@@ -40,20 +31,31 @@ export function SearchDialog() {
 
   const { data: allProducts, isLoading } = useCollection<Product>(productsQuery);
 
+  const [defaultProducts, setDefaultProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    if (allProducts && allProducts.length > 0) {
+      // Shuffle the array and take the first 20
+      const shuffled = [...allProducts].sort(() => 0.5 - Math.random());
+      setDefaultProducts(shuffled.slice(0, 20));
+    }
+  }, [allProducts]);
+
   const filteredProducts = useMemo(() => {
-    if (!searchTerm) return null;
+    if (!searchTerm) {
+      return defaultProducts;
+    }
     if (!allProducts) return [];
     return allProducts.filter(
       (product) =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.description.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [searchTerm, allProducts]);
+  }, [searchTerm, allProducts, defaultProducts]);
 
-  // Reset search term when closing
   useEffect(() => {
     if (!open) {
-      const timer = setTimeout(() => setSearchTerm(''), 150); // delay to prevent flash of old content
+      const timer = setTimeout(() => setSearchTerm(''), 150);
       return () => clearTimeout(timer);
     }
   }, [open]);
@@ -93,7 +95,7 @@ export function SearchDialog() {
                 className="w-full h-16 rounded-full text-lg pl-14 pr-36 bg-secondary border-none focus-visible:ring-2 focus-visible:ring-ring"
               />
               <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                 {filteredProducts && <span className="text-sm text-muted-foreground">{filteredProducts.length} results</span>}
+                 {searchTerm && <span className="text-sm text-muted-foreground">{filteredProducts.length} results</span>}
                  <DialogClose asChild>
                     <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 bg-background/50 hover:bg-background">
                         <X className="h-5 w-5" />
@@ -103,28 +105,21 @@ export function SearchDialog() {
             </div>
 
             <div className="mt-8">
-              {isLoading && searchTerm ? (
+              {isLoading ? (
                 <div className="flex justify-center items-center h-full p-8 pt-24">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
-              ) : filteredProducts === null ? (
-                <div className="text-center">
-                  <div className="flex flex-wrap gap-2 justify-center max-w-2xl mx-auto">
-                      {searchSuggestions.map(suggestion => (
-                          <Button key={suggestion} variant="outline" className="rounded-full" onClick={() => setSearchTerm(suggestion)}>
-                              {suggestion}
-                          </Button>
+              ) : filteredProducts && filteredProducts.length > 0 ? (
+                <>
+                  {!searchTerm && <h3 className="font-headline text-2xl font-bold mb-6 text-center">Trending Products</h3>}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                      {filteredProducts.map(product => (
+                          <div key={product.id} onClick={() => setOpen(false)}>
+                              <ProductCard product={product} />
+                          </div>
                       ))}
                   </div>
-                </div>
-              ) : filteredProducts.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                    {filteredProducts.map(product => (
-                        <div key={product.id} onClick={() => setOpen(false)}>
-                            <ProductCard product={product} />
-                        </div>
-                    ))}
-                </div>
+                </>
               ) : (
                 <div className="text-center py-24 px-8">
                     <h3 className="font-headline text-2xl font-bold">No Products Found</h3>

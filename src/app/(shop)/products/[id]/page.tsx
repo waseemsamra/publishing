@@ -88,8 +88,8 @@ export default function ProductDetailPage() {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2">
-        <div className="md:sticky md:top-0 md:h-screen flex items-start justify-center bg-muted/30 pt-16">
+      <div className="grid grid-cols-1 md:grid-cols-12">
+        <div className="md:col-span-7 md:sticky md:top-0 md:h-screen flex items-start bg-muted/30 pt-16">
           <Carousel className="w-full max-w-2xl mx-auto">
             <CarouselContent>
               {product.images && product.images.length > 0 ? (
@@ -119,7 +119,7 @@ export default function ProductDetailPage() {
           </Carousel>
         </div>
 
-        <div className="flex flex-col p-8 sm:p-12 md:p-16">
+        <div className="md:col-span-5 flex flex-col p-8 pt-16 md:p-12 lg:p-16">
           <div className="w-full max-w-md">
             <div className="text-sm text-muted-foreground">
               <span>Hot Cups</span> — <span>Custom Coffee Cups Compostable</span>

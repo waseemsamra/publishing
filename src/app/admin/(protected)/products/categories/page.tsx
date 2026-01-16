@@ -87,16 +87,11 @@ export default function CategoriesPage() {
             });
             return;
         }
-
-        const data: { name: string; description: string; parentId?: string } = { name, description };
-        if (parentId) {
-          data.parentId = parentId;
-        } else {
-            data.parentId = undefined;
-        }
-
+    
+        const data: any = { name, description };
+    
         try {
-            if (dialogState.category?.id) {
+            if (dialogState.category?.id) { // UPDATE
                 if (dialogState.category.id === parentId) {
                     toast({
                         variant: 'destructive',
@@ -105,16 +100,27 @@ export default function CategoriesPage() {
                     });
                     return;
                 }
+                
                 await updateDoc(doc(db, 'categories', dialogState.category.id), {
-                  ...data,
+                  name,
+                  description,
+                  parentId: parentId || null, // Set to null if removing parent
                   updatedAt: serverTimestamp(),
                 });
+
                 toast({ title: 'Success', description: 'Category updated.' });
-            } else {
-                await addDoc(collection(db, 'categories'), {
-                    ...data,
+    
+            } else { // CREATE
+                const dataToCreate: any = {
+                    name,
+                    description,
                     createdAt: serverTimestamp(),
-                });
+                };
+                if (parentId) {
+                    dataToCreate.parentId = parentId; // Only add parentId if it exists
+                }
+
+                await addDoc(collection(db, 'categories'), dataToCreate);
                 toast({ title: 'Success', description: 'New category added.' });
             }
             setDialogState({ open: false, category: undefined });

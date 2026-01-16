@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import { useMemo, useState, useEffect } from 'react';
 import type { Product, Size, Colour } from '@/lib/types';
 import { db } from '@/lib/firebase';
@@ -15,7 +15,8 @@ import { useCollection } from '@/firebase/firestore/use-collection';
 import { cn } from '@/lib/utils';
 import type { ImagePlaceholder } from '@/lib/placeholder-images';
 
-export default function ProductDetailPage({ params }: { params: { id: string } }) {
+export default function ProductDetailPage() {
+  const params = useParams<{ id: string }>();
   const productRef = useMemo(() => {
     if (!params.id) return null;
     const ref = doc(db, 'products', params.id);

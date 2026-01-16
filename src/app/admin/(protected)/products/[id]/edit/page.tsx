@@ -7,9 +7,10 @@ import { doc } from 'firebase/firestore';
 import { useDoc } from '@/firebase/firestore/use-doc';
 import { useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 
-export default function EditProductPage({ params }: { params: { id: string } }) {
+export default function EditProductPage() {
+  const params = useParams<{ id: string }>();
   const productRef = useMemo(() => {
     if (!params.id) return null;
     const ref = doc(db, 'products', params.id);

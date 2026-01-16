@@ -114,6 +114,14 @@
         "parentId": {
           "type": "string",
           "description": "ID of the parent category. If absent, this is a top-level category."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the category image."
+        },
+        "imageHint": {
+          "type": "string",
+          "description": "A hint for AI image generation tools."
         }
       },
       "required": [

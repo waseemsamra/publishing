@@ -158,6 +158,8 @@ export interface Category {
   name: string;
   description: string;
   parentId?: string;
+  imageUrl?: string;
+  imageHint?: string;
   createdAt?: any;
 }
   

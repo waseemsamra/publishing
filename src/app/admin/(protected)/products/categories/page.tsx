@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import Image from 'next/image';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
@@ -49,6 +50,8 @@ import { MoreHorizontal, Edit, Trash2, PlusCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
 
+const s3BaseUrl = 'https://printinweb.s3.us-east-1.amazonaws.com';
+
 export default function CategoriesPage() {
     const { toast } = useToast();
     const [dialogState, setDialogState] = useState<{open: boolean; category?: Partial<Category>}>({ open: false, category: undefined });
@@ -56,6 +59,8 @@ export default function CategoriesPage() {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [parentId, setParentId] = useState<string | undefined>(undefined);
+    const [imageUrl, setImageUrl] = useState('');
+    const [imageHint, setImageHint] = useState('');
 
     const categoriesQuery = useMemo(() => {
         const q = query(collection(db, 'categories'));
@@ -69,12 +74,19 @@ export default function CategoriesPage() {
       if (!categories) return new Map();
       return new Map(categories.map(c => [c.id, c.name]));
     }, [categories]);
+
+    const previewUrl = useMemo(() => {
+        if (!imageUrl) return null;
+        return imageUrl.startsWith('http') ? imageUrl : `${s3BaseUrl}${imageUrl}`;
+    }, [imageUrl]);
     
     useEffect(() => {
         if (dialogState.open && dialogState.category) {
             setName(dialogState.category.name || '');
             setDescription(dialogState.category.description || '');
             setParentId(dialogState.category.parentId);
+            setImageUrl(dialogState.category.imageUrl?.replace(s3BaseUrl, '') || '');
+            setImageHint(dialogState.category.imageHint || '');
         }
     }, [dialogState.open, dialogState.category]);
 
@@ -87,9 +99,9 @@ export default function CategoriesPage() {
             });
             return;
         }
-    
-        const data: any = { name, description };
-    
+        
+        const finalImageUrl = imageUrl ? (imageUrl.startsWith('http') ? imageUrl : `${s3BaseUrl}${imageUrl}`) : '';
+
         try {
             if (dialogState.category?.id) { // UPDATE
                 if (dialogState.category.id === parentId) {
@@ -104,7 +116,9 @@ export default function CategoriesPage() {
                 await updateDoc(doc(db, 'categories', dialogState.category.id), {
                   name,
                   description,
-                  parentId: parentId || null, // Set to null if removing parent
+                  parentId: parentId || null,
+                  imageUrl: finalImageUrl,
+                  imageHint,
                   updatedAt: serverTimestamp(),
                 });
 
@@ -114,10 +128,12 @@ export default function CategoriesPage() {
                 const dataToCreate: any = {
                     name,
                     description,
+                    imageUrl: finalImageUrl,
+                    imageHint,
                     createdAt: serverTimestamp(),
                 };
                 if (parentId) {
-                    dataToCreate.parentId = parentId; // Only add parentId if it exists
+                    dataToCreate.parentId = parentId;
                 }
 
                 await addDoc(collection(db, 'categories'), dataToCreate);
@@ -155,6 +171,8 @@ export default function CategoriesPage() {
             setName('');
             setDescription('');
             setParentId(undefined);
+            setImageUrl('');
+            setImageHint('');
         } else {
             setDialogState(prev => ({ ...prev, open }));
         }
@@ -182,6 +200,7 @@ export default function CategoriesPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead className="hidden w-[100px] sm:table-cell">Image</TableHead>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Description</TableHead>
                                 <TableHead>Parent Category</TableHead>
@@ -192,21 +211,35 @@ export default function CategoriesPage() {
                         <TableBody>
                             {isLoading && (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center">Loading...</TableCell>
+                                    <TableCell colSpan={6} className="text-center">Loading...</TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && error && (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center text-red-500">{error.message}</TableCell>
+                                    <TableCell colSpan={6} className="text-center text-red-500">{error.message}</TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && categories?.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="h-24 text-center">No categories found. Add one to get started.</TableCell>
+                                    <TableCell colSpan={6} className="h-24 text-center">No categories found. Add one to get started.</TableCell>
                                 </TableRow>
                             )}
                             {categories?.map((category) => (
                                 <TableRow key={category.id}>
+                                    <TableCell className="hidden sm:table-cell">
+                                        {category.imageUrl ? (
+                                            <Image
+                                                alt={category.name}
+                                                className="aspect-square rounded-md object-cover"
+                                                height="64"
+                                                src={category.imageUrl}
+                                                width="64"
+                                                unoptimized
+                                            />
+                                        ) : (
+                                          <div className="h-16 w-16 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">No Image</div>
+                                        )}
+                                    </TableCell>
                                     <TableCell className="font-medium">{category.name}</TableCell>
                                     <TableCell>{category.description}</TableCell>
                                     <TableCell>{category.parentId ? categoryMap.get(category.parentId) || 'N/A' : 'Top Level'}</TableCell>
@@ -236,7 +269,7 @@ export default function CategoriesPage() {
             </Card>
             
             <Dialog open={dialogState.open} onOpenChange={handleOpenChange}>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[525px]">
                     <DialogHeader>
                         <DialogTitle>{dialogState.category?.id ? 'Edit Category' : 'Add New Category'}</DialogTitle>
                         <DialogDescription>
@@ -265,6 +298,30 @@ export default function CategoriesPage() {
                                     ))}
                                 </SelectContent>
                             </Select>
+                        </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="imageUrl">Image Path</Label>
+                            <Input id="imageUrl" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="e.g., /categories/apparel.jpg" />
+                        </div>
+
+                        {previewUrl && (
+                            <div className="space-y-2">
+                                <Label>Image Preview</Label>
+                                <div className="mt-2 aspect-square w-24 relative rounded-md border overflow-hidden">
+                                    <Image
+                                        src={previewUrl}
+                                        alt="Category image preview"
+                                        fill
+                                        className="object-cover"
+                                        unoptimized
+                                    />
+                                </div>
+                            </div>
+                        )}
+                        
+                        <div className="space-y-2">
+                            <Label htmlFor="imageHint">AI Image Hint</Label>
+                            <Input id="imageHint" value={imageHint} onChange={(e) => setImageHint(e.target.value)} placeholder="e.g., summer shirts" />
                         </div>
                     </div>
                     <DialogFooter>

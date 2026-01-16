@@ -63,7 +63,7 @@ export default function AdminProductsPage() {
   };
   
   const handleDeleteSelected = () => {
-    setProducts(products.filter((p) => !selectedProductIds.includes(p.id)));
+    setProducts((currentProducts) => currentProducts.filter((p) => !selectedProductIds.includes(p.id)));
     toast({
       title: `${selectedProductIds.length} product(s) deleted.`,
       description: 'The selected products have been removed.',

@@ -11,7 +11,7 @@ import { collection, doc, addDoc, updateDoc, serverTimestamp, query } from 'fire
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useToast } from '@/hooks/use-toast';
 
-import type { Product, Size, Colour, PrintOption, WallType, Thickness, MaterialType, FinishType, Adhesive, Handle, Shape } from '@/lib/types';
+import type { Product, Category, Size, Colour, PrintOption, WallType, Thickness, MaterialType, FinishType, Adhesive, Handle, Shape } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -49,8 +49,8 @@ const productFormSchema = z.object({
 
 type ProductFormValues = z.infer<typeof productFormSchema>;
 
-type OptionCollection = 'sizes' | 'colours' | 'printOptions' | 'wallTypes' | 'thicknesses' | 'materialTypes' | 'finishTypes' | 'adhesives' | 'handles' | 'shapes';
-type OptionType = Size | Colour | PrintOption | WallType | Thickness | MaterialType | FinishType | Adhesive | Handle | Shape;
+type OptionCollection = 'categories' | 'sizes' | 'colours' | 'printOptions' | 'wallTypes' | 'thicknesses' | 'materialTypes' | 'finishTypes' | 'adhesives' | 'handles' | 'shapes';
+type OptionType = Category | Size | Colour | PrintOption | WallType | Thickness | MaterialType | FinishType | Adhesive | Handle | Shape;
 
 function OptionsSection({
   control,
@@ -316,6 +316,7 @@ export function ProductForm({ product }: { product?: Product }) {
               <CardHeader><CardTitle>Product Options</CardTitle><CardDescription>Select all relevant options.</CardDescription></CardHeader>
               <CardContent>
                 <Accordion type="multiple" className="w-full">
+                  <OptionsSection control={form.control} collectionName="categories" title="Categories" formFieldName="categoryIds" />
                   <OptionsSection control={form.control} collectionName="sizes" title="Sizes" formFieldName="sizeIds" />
                   <OptionsSection control={form.control} collectionName="colours" title="Colours" formFieldName="colourIds" />
                   <OptionsSection control={form.control} collectionName="printOptions" title="Print Options" formFieldName="printOptionIds" />

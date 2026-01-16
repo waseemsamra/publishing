@@ -3,17 +3,24 @@
 import Image from 'next/image';
 import { notFound, useParams } from 'next/navigation';
 import { useMemo, useState, useEffect } from 'react';
-import type { Product, Size, Colour } from '@/lib/types';
+import type { Product, Size, WallType } from '@/lib/types';
 import { db } from '@/lib/firebase';
 import { doc, collection, query, where, documentId } from 'firebase/firestore';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { AddToCartForm } from '@/components/add-to-cart-form';
-import { CheckCircle, Leaf, Loader2, Ruler, Palette } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useDoc } from '@/firebase/firestore/use-doc';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { cn } from '@/lib/utils';
 import type { ImagePlaceholder } from '@/lib/placeholder-images';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+import { Loader2, Truck, Zap, Leaf, HelpCircle } from 'lucide-react';
 
 export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
@@ -25,13 +32,6 @@ export default function ProductDetailPage() {
   }, [params.id]);
 
   const { data: product, isLoading, error } = useDoc<Product>(productRef);
-  const [selectedImage, setSelectedImage] = useState<ImagePlaceholder | null>(null);
-
-  useEffect(() => {
-    if (product && product.images && product.images.length > 0) {
-      setSelectedImage(product.images[0]);
-    }
-  }, [product]);
 
   const sizesQuery = useMemo(() => {
     if (!product?.sizeIds || product.sizeIds.length === 0) return null;
@@ -41,13 +41,26 @@ export default function ProductDetailPage() {
   }, [product]);
   const { data: availableSizes } = useCollection<Size>(sizesQuery);
 
-  const coloursQuery = useMemo(() => {
-    if (!product?.colourIds || product.colourIds.length === 0) return null;
-    const q = query(collection(db, 'colours'), where(documentId(), 'in', product.colourIds));
+  const wallTypesQuery = useMemo(() => {
+    if (!product?.wallTypeIds || product.wallTypeIds.length === 0) return null;
+    const q = query(collection(db, 'wallTypes'), where(documentId(), 'in', product.wallTypeIds));
     (q as any).__memo = true;
     return q;
   }, [product]);
-  const { data: availableColours } = useCollection<Colour>(coloursQuery);
+  const { data: availableWallTypes } = useCollection<WallType>(wallTypesQuery);
+
+  const [selectedWall, setSelectedWall] = useState<string | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedLid, setSelectedLid] = useState<string | null>('None');
+
+  useEffect(() => {
+    if (availableWallTypes && availableWallTypes.length > 0 && !selectedWall) {
+      setSelectedWall(availableWallTypes[0].id);
+    }
+    if (availableSizes && availableSizes.length > 0 && !selectedSize) {
+      setSelectedSize(availableSizes[0].id);
+    }
+  }, [availableWallTypes, availableSizes, selectedWall, selectedSize]);
 
   if (isLoading) {
     return (
@@ -60,110 +73,120 @@ export default function ProductDetailPage() {
   if (error || !product) {
     return notFound();
   }
-  
+
   return (
     <div className="container py-12">
-      <div className="grid md:grid-cols-2 gap-8 lg:gap-16">
-        <div>
-          <Card className="overflow-hidden mb-4">
-            <div className="aspect-square relative">
-              {selectedImage ? (
-                <Image
-                  src={selectedImage.imageUrl || 'https://placehold.co/600x600'}
-                  alt={selectedImage.description || product.name}
-                  fill
-                  className="object-cover"
-                  data-ai-hint={selectedImage.imageHint}
-                />
+      <div className="grid lg:grid-cols-5 gap-8 lg:gap-12">
+        <div className="lg:col-span-3">
+          <Carousel className="w-full">
+            <CarouselContent>
+              {product.images && product.images.length > 0 ? (
+                product.images.map((image) => (
+                  <CarouselItem key={image.id}>
+                    <Card className="overflow-hidden border-0 rounded-none shadow-none">
+                      <div className="aspect-[4/3] relative">
+                        <Image
+                          src={image.imageUrl || 'https://placehold.co/800x600'}
+                          alt={image.description || product.name}
+                          fill
+                          className="object-cover"
+                          data-ai-hint={image.imageHint}
+                        />
+                      </div>
+                    </Card>
+                  </CarouselItem>
+                ))
               ) : (
-                <div className="bg-muted flex items-center justify-center h-full">
-                    <span className="text-muted-foreground">No Image</span>
-                </div>
+                 <CarouselItem>
+                    <Card className="overflow-hidden border-0 rounded-none shadow-none">
+                        <div className="aspect-[4/3] relative bg-muted flex items-center justify-center">
+                             <span className="text-muted-foreground">No Image</span>
+                        </div>
+                    </Card>
+                  </CarouselItem>
               )}
-            </div>
-          </Card>
-           {product.images && product.images.length > 1 && (
-            <div className="grid grid-cols-5 gap-2">
-              {product.images.map((image) => (
-                <button
-                  key={image.id}
-                  className={cn(
-                    'aspect-square relative overflow-hidden rounded-md border-2 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                    selectedImage?.id === image.id ? 'border-primary' : 'border-transparent'
-                  )}
-                  onClick={() => setSelectedImage(image)}
-                >
-                  <Image
-                    src={image.imageUrl || 'https://placehold.co/100x100'}
-                    alt={image.description || product.name}
-                    fill
-                    className="object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
+            </CarouselContent>
+            <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 hidden md:flex" />
+            <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex" />
+          </Carousel>
         </div>
-        <div>
-          <h1 className="font-headline text-4xl font-bold text-primary">{product.name}</h1>
-          <p className="text-2xl font-semibold mt-2 mb-4">${product.price.toFixed(2)}</p>
-          <p className="text-muted-foreground leading-relaxed">{product.description}</p>
-          
-          <AddToCartForm product={product} />
+        <div className="lg:col-span-2">
+          <div className="text-sm text-muted-foreground">
+            <span>Hot Cups</span> — <span>Custom Coffee Cups Compostable</span>
+          </div>
 
-          <div className="mt-8 space-y-6">
-            {availableSizes && availableSizes.length > 0 && (
+          <h1 className="font-headline text-3xl lg:text-4xl font-bold mt-2">{product.name}</h1>
+
+          <p className="text-lg text-muted-foreground mt-2">from ${product.price.toFixed(3)} / unit</p>
+
+          <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-md text-sm text-primary">
+            Free standard shipping & proofing available on all orders*
+          </div>
+
+          <p className="mt-4 text-muted-foreground">{product.description}</p>
+          
+          <div className="flex flex-wrap gap-2 mt-4">
+            <Badge variant="outline">Low Minimums</Badge>
+            <Badge variant="outline">Fast Delivery</Badge>
+            <Badge variant="outline">Compostable</Badge>
+            <Badge variant="outline">Custom</Badge>
+          </div>
+
+           <div className="mt-6 space-y-3">
+            <h3 className="text-sm font-semibold text-muted-foreground">Estimated arrival:</h3>
+            <div className="flex items-center justify-between p-3 border rounded-md bg-gray-50">
+                <div className="flex items-center gap-3">
+                    <Truck className="h-5 w-5 text-muted-foreground" />
+                    <span className="font-semibold">Standard (Free): Feb 13 - Feb 15</span>
+                </div>
+                <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
+                    <Leaf className="h-4 w-4 text-green-600"/>
+                </div>
+            </div>
+            <div className="flex items-center justify-between p-3 border rounded-md bg-gray-50">
+                <div className="flex items-center gap-3">
+                    <Zap className="h-5 w-5 text-muted-foreground" />
+                    <span className="font-semibold">Express: Feb 02 - Feb 04</span>
+                </div>
+                 <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
+                    <Leaf className="h-4 w-4 text-green-600"/>
+                </div>
+            </div>
+            <p className="text-xs text-muted-foreground">*Lead times temporarily affected due to public holidays observed in some of our production hubs, please see checkout for updated lead times.</p>
+          </div>
+          
+           <div className="mt-6 space-y-6">
+            {availableWallTypes && availableWallTypes.length > 0 && (
                 <div>
-                    <h3 className="font-headline text-lg font-semibold mb-2 flex items-center"><Ruler className="mr-2 h-5 w-5 text-gray-600" />Available Sizes</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {availableSizes.map((size) => (
-                        <Badge key={size.id} variant="secondary">{size.name}</Badge>
-                        ))}
-                    </div>
+                  <h3 className="text-sm font-semibold mb-2">Wall</h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {availableWallTypes.map((wall) => (
+                        <Button key={wall.id} variant={selectedWall === wall.id ? 'default' : 'outline'} onClick={() => setSelectedWall(wall.id)}>{wall.name}</Button>
+                    ))}
+                  </div>
                 </div>
             )}
-
-            {availableColours && availableColours.length > 0 && (
-                <div>
-                    <h3 className="font-headline text-lg font-semibold mb-2 flex items-center"><Palette className="mr-2 h-5 w-5 text-purple-600" />Available Colours</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {availableColours.map((colour) => (
-                            <div key={colour.id} className="flex items-center gap-2 border rounded-full px-3 py-1 text-sm bg-secondary">
-                                <div className="h-4 w-4 rounded-full border" style={{ backgroundColor: colour.hexCode }}></div>
-                                <span>{colour.name}</span>
-                            </div>
+            
+            {availableSizes && availableSizes.length > 0 && (
+                 <div>
+                    <h3 className="text-sm font-semibold mb-2 flex items-center gap-1">Size (Capacity) <HelpCircle className="h-4 w-4 text-muted-foreground"/></h3>
+                    <div className="grid grid-cols-2 gap-2">
+                        {availableSizes.map((size) => (
+                            <Button key={size.id} variant={selectedSize === size.id ? 'default' : 'outline'} onClick={() => setSelectedSize(size.id)}>{size.name}</Button>
                         ))}
                     </div>
                 </div>
             )}
 
             <div>
-              <h3 className="font-headline text-lg font-semibold mb-2 flex items-center"><Leaf className="mr-2 h-5 w-5 text-green-600" />Sustainability Impact</h3>
-              <p className="text-sm text-muted-foreground">{product.sustainabilityImpact}</p>
+                <h3 className="text-sm font-semibold mb-2 flex items-center gap-1">Lid Type <HelpCircle className="h-4 w-4 text-muted-foreground"/></h3>
+                <div className="grid grid-cols-2 gap-2">
+                    <Button variant={selectedLid === 'None' ? 'default' : 'outline'} onClick={() => setSelectedLid('None')}>None</Button>
+                    <Button variant={selectedLid === 'Sip' ? 'default' : 'outline'} onClick={() => setSelectedLid('Sip')}>Sip (Fiber)</Button>
+                </div>
             </div>
-            
-            {product.materials && product.materials.length > 0 && (
-                <div>
-                    <h3 className="font-headline text-lg font-semibold mb-2">Materials</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {product.materials.map((material) => (
-                        <Badge key={material} variant="secondary">{material}</Badge>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {product.certifications && product.certifications.length > 0 && (
-              <div>
-                <h3 className="font-headline text-lg font-semibold mb-2 flex items-center"><CheckCircle className="mr-2 h-5 w-5 text-blue-600" />Certifications</h3>
-                <div className="flex flex-wrap gap-2">
-                  {product.certifications.map((cert) => (
-                    <Badge key={cert} variant="outline">{cert}</Badge>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
+
         </div>
       </div>
     </div>

@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogContent,
   DialogTrigger,
-  DialogClose,
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
@@ -86,7 +85,7 @@ export function SearchDialog() {
           <DialogDescription className="sr-only">
             Search for products by name or description. Start typing to see results. You can also browse popular searches.
           </DialogDescription>
-          <header className="flex items-center gap-4 border-b p-4 shrink-0">
+          <header className="flex items-center gap-4 border-b p-4 shrink-0 bg-background">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
@@ -102,15 +101,13 @@ export function SearchDialog() {
                 </div>
               )}
             </div>
-            <DialogClose asChild>
-              <Button variant="ghost" size="icon" className="rounded-full shrink-0">
+            <Button variant="ghost" size="icon" className="rounded-full shrink-0" onClick={() => setOpen(false)}>
                 <X className="h-6 w-6" />
                 <span className="sr-only">Close</span>
-              </Button>
-            </DialogClose>
+            </Button>
           </header>
           
-          <ScrollArea className="flex-1">
+          <ScrollArea className="flex-1 bg-background">
             {isLoading && searchTerm ? (
               <div className="flex justify-center items-center h-full p-8 pt-24">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />

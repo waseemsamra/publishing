@@ -412,6 +412,26 @@
         "id",
         "name"
       ]
+    },
+    "WallType": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WallType",
+      "type": "object",
+      "description": "Represents a cup wall type (e.g., Single, Double, Ripple).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the wall type."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the wall type (e.g., Single Wall)."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
     }
   },
   "auth": {
@@ -514,6 +534,22 @@
             {
               "name": "printOptionId",
               "description": "The unique identifier for the print option."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/wallTypes/{wallTypeId}",
+        "definition": {
+          "entityName": "WallType",
+          "schema": {
+            "$ref": "#/backend/entities/WallType"
+          },
+          "description": "Stores available cup wall types. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "wallTypeId",
+              "description": "The unique identifier for the wall type."
             }
           ]
         }

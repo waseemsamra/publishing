@@ -77,4 +77,10 @@ export interface PrintOption {
   description: string;
   createdAt?: any;
 }
+
+export interface WallType {
+  id: string;
+  name: string;
+  createdAt?: any;
+}
     

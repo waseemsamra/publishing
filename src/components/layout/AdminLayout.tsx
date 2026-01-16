@@ -24,6 +24,7 @@ import {
   Ruler,
   Palette,
   Printer,
+  Layers,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -69,7 +70,7 @@ function SidebarContent({ pathname, onLinkClick, isAdmin }: { pathname: string, 
         {visibleNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname.startsWith(item.href) && (item.href !== '/admin/settings' || pathname === '/admin/settings');
-          const isSettingsActive = pathname.startsWith('/admin/settings') || pathname.startsWith('/admin/sizes') || pathname.startsWith('/admin/colours') || pathname.startsWith('/admin/print-options');
+          const isSettingsActive = pathname.startsWith('/admin/settings') || pathname.startsWith('/admin/sizes') || pathname.startsWith('/admin/colours') || pathname.startsWith('/admin/print-options') || pathname.startsWith('/admin/wall-types');
           
           let effectiveIsActive = isActive;
           if (item.href === '/admin/settings') {

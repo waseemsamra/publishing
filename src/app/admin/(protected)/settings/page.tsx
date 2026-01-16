@@ -6,7 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Ruler, Palette, Printer, Store, CreditCard, Ship } from 'lucide-react';
+import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers } from 'lucide-react';
 
 const settingsLinks = [
     {
@@ -26,6 +26,12 @@ const settingsLinks = [
         title: "Print Options",
         description: "Manage custom print options.",
         icon: Printer,
+    },
+    {
+        href: "/admin/wall-types",
+        title: "Wall Types",
+        description: "Manage cup wall types like single or double.",
+        icon: Layers,
     },
     {
         href: "#",

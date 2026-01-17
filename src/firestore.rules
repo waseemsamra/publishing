@@ -92,34 +92,22 @@ service cloud.firestore {
       return request.resource.data.id == resource.data.id;
     }
     
-    /**
-     * [TEMPORARY] Checks if the user is the designated initial admin.
-     * This should be removed after the first admin is successfully set up.
-     */
-    function isInitialAdmin() {
-        return isSignedIn() && request.auth.token.email == 'waseemsamra@gmail.com';
-    }
-
 
     /**
      * @description Manages user account documents. A user can create their own document,
      * and can only read or write to their own document thereafter. Listing users is forbidden.
-     * For a temporary period, any authenticated user can update another user's document
-     * to grant admin roles. This should be reverted after initial setup.
      * @path /users/{userId}
      * @allow (create) A new user with UID 'user123' creating their own document at /users/user123.
      * @allow (get) An authenticated user with UID 'user123' reading their own document at /users/user123.
      * @deny (list) Any user attempting to list all documents in the /users collection.
      * @deny (get) User 'user456' trying to read /users/user123.
-     * @principle Restricts access to a user's own data tree, with a temporary exception for role management.
+     * @principle Restricts access to a user's own data tree.
      */
     match /users/{userId} {
       allow get: if isSignedIn();
-      // Temporarily allow any signed-in user to list users so grant-admin page can query by email.
-      allow list: if isSignedIn();
-      allow create: if isOwner(userId) && isIdMatchingDocId(userId) || (isInitialAdmin() && request.resource.data.roles.hasAny(['admin']));
-      // Temporarily allow initial admin to update any user doc to grant roles.
-      allow update: if isInitialAdmin() || isAdmin() || isOwner(userId);
+      allow list: if isAdmin();
+      allow create: if isSignedIn();
+      allow update: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
     }
 
@@ -155,6 +143,32 @@ service cloud.firestore {
       allow create: if isAdmin();
       allow update: if isAdmin();
       allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Consolidated rule for all product attribute collections (sizes, colours, etc.).
+     * This data is publicly readable for product filtering but can only be managed by administrators.
+     * @path /{collectionName}/{docId} where collectionName is one of the product attribute collections.
+     * @allow (get, list) Any user, for product filtering.
+     * @allow (write) Any admin user.
+     * @deny (write) All non-admin users.
+     * @principle Public read for functionality, admin-only for management.
+     */
+    match /{collectionName}/{docId} 
+      where collectionName in ['sizes', 'colours', 'printOptions', 'wallTypes', 'thicknesses', 'materialTypes', 'finishTypes', 'adhesives', 'handles', 'shapes'] {
+        allow get, list: if true;
+        allow write: if isAdmin();
+    }
+
+    /**
+     * @description Stores global application settings. Only admins can manage them.
+     * @path /settings/{settingId}
+     * @allow (read, write) Any admin user.
+     * @deny (read, write) All non-admin users.
+     * @principle Admin-only management.
+     */
+    match /settings/{settingId} {
+      allow read, write: if isAdmin();
     }
 
     /**

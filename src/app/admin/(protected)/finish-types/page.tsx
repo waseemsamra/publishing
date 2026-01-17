@@ -50,6 +50,7 @@ export default function FinishTypesPage() {
     const [description, setDescription] = useState('');
 
     const finishTypesQuery = useMemo(() => {
+        if (!db) return null;
         const q = query(collection(db, 'finishTypes'));
         (q as any).__memo = true;
         return q;

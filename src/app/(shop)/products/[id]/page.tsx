@@ -32,6 +32,7 @@ export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
   const { addToCart } = useCart();
   const productRef = useMemo(() => {
+    if (!db) return null;
     if (!params.id) return null;
     const ref = doc(db, 'products', params.id);
     (ref as any).__memo = true;
@@ -41,6 +42,7 @@ export default function ProductDetailPage() {
   const { data: product, isLoading, error } = useDoc<Product>(productRef);
 
   const sizesQuery = useMemo(() => {
+    if (!db) return null;
     if (!product?.sizeIds || product.sizeIds.length === 0) return null;
     const q = query(collection(db, 'sizes'), where(documentId(), 'in', product.sizeIds));
     (q as any).__memo = true;
@@ -49,6 +51,7 @@ export default function ProductDetailPage() {
   const { data: availableSizes } = useCollection<Size>(sizesQuery);
 
   const wallTypesQuery = useMemo(() => {
+    if (!db) return null;
     if (!product?.wallTypeIds || product.wallTypeIds.length === 0) return null;
     const q = query(collection(db, 'wallTypes'), where(documentId(), 'in', product.wallTypeIds));
     (q as any).__memo = true;

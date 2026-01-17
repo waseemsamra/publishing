@@ -63,6 +63,7 @@ export default function CategoriesPage() {
     const [imageHint, setImageHint] = useState('');
 
     const categoriesQuery = useMemo(() => {
+        if (!db) return null;
         const q = query(collection(db, 'categories'));
         (q as any).__memo = true;
         return q;

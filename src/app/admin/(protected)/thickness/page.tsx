@@ -50,6 +50,7 @@ export default function ThicknessesPage() {
     const [description, setDescription] = useState('');
 
     const thicknessesQuery = useMemo(() => {
+        if (!db) return null;
         const q = query(collection(db, 'thicknesses'));
         (q as any).__memo = true;
         return q;

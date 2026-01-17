@@ -24,6 +24,7 @@ function ProductsPageContent() {
   }, [categoryId]);
 
   const productsQuery = useMemo(() => {
+    if (!db) return null;
     let q: Query<DocumentData> = collection(db, 'products');
 
     Object.entries(filters).forEach(([key, values]) => {

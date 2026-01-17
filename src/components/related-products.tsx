@@ -17,6 +17,7 @@ import {
 
 export function RelatedProducts() {
   const productsQuery = useMemo(() => {
+    if (!db) return null;
     const q = query(collection(db, 'products'), limit(8));
     (q as any).__memo = true;
     return q;

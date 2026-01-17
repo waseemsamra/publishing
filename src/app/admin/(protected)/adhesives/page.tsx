@@ -50,6 +50,7 @@ export default function AdhesivesPage() {
     const [description, setDescription] = useState('');
 
     const adhesivesQuery = useMemo(() => {
+        if (!db) return null;
         const q = query(collection(db, 'adhesives'));
         (q as any).__memo = true;
         return q;

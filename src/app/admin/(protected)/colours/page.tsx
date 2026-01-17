@@ -50,6 +50,7 @@ export default function ColoursPage() {
     const [hexCode, setHexCode] = useState('');
 
     const coloursQuery = useMemo(() => {
+        if (!db) return null;
         const q = query(collection(db, 'colours'));
         (q as any).__memo = true;
         return q;

@@ -50,6 +50,7 @@ export default function AdminProductsPage() {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     
     const productsQuery = useMemo(() => {
+        if (!db) return null;
         const q = query(collection(db, 'products'));
         (q as any).__memo = true;
         return q;

@@ -48,6 +48,7 @@ export default function WallTypesPage() {
     const [name, setName] = useState('');
 
     const wallTypesQuery = useMemo(() => {
+        if (!db) return null;
         const q = query(collection(db, 'wallTypes'));
         (q as any).__memo = true;
         return q;

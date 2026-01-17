@@ -50,6 +50,7 @@ export default function HandlesPage() {
     const [description, setDescription] = useState('');
 
     const handlesQuery = useMemo(() => {
+        if (!db) return null;
         const q = query(collection(db, 'handles'));
         (q as any).__memo = true;
         return q;

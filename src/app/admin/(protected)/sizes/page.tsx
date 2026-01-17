@@ -50,6 +50,7 @@ export default function SizesPage() {
     const [shortName, setShortName] = useState('');
 
     const sizesQuery = useMemo(() => {
+        if (!db) return null;
         const q = query(collection(db, 'sizes'));
         (q as any).__memo = true;
         return q;

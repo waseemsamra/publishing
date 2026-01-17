@@ -50,6 +50,7 @@ export default function MaterialTypesPage() {
     const [description, setDescription] = useState('');
 
     const materialsQuery = useMemo(() => {
+        if (!db) return null;
         const q = query(collection(db, 'materialTypes'));
         (q as any).__memo = true;
         return q;

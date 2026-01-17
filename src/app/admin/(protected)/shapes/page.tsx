@@ -50,6 +50,7 @@ export default function ShapesPage() {
     const [description, setDescription] = useState('');
 
     const shapesQuery = useMemo(() => {
+        if (!db) return null;
         const q = query(collection(db, 'shapes'));
         (q as any).__memo = true;
         return q;

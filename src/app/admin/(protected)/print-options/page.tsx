@@ -51,6 +51,7 @@ export default function PrintOptionsPage() {
     const [description, setDescription] = useState('');
 
     const printOptionsQuery = useMemo(() => {
+        if (!db) return null;
         const q = query(collection(db, 'printOptions'));
         (q as any).__memo = true;
         return q;

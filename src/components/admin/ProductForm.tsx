@@ -64,6 +64,7 @@ function OptionsSection({
   formFieldName: keyof ProductFormValues;
 }) {
   const optionsQuery = useMemo(() => {
+    if (!db) return null;
     const q = query(collection(db, collectionName));
     (q as any).__memo = true;
     return q;
@@ -165,6 +166,11 @@ export function ProductForm({ product }: { product?: Product }) {
 
   async function onSubmit(data: ProductFormValues) {
     setIsSubmitting(true);
+    if (!db) {
+        toast({ variant: 'destructive', title: "Error", description: "Database not initialized." });
+        setIsSubmitting(false);
+        return;
+    }
     try {
         const dataToSave = {
             ...data,

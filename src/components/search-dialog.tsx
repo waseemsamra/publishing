@@ -25,6 +25,7 @@ export function SearchDialog() {
 
   const productsQuery = useMemo(() => {
     if (!open) return null;
+    if (!db) return null;
     const q = query(collection(db, 'products'));
     (q as any).__memo = true;
     return q;

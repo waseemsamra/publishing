@@ -33,7 +33,10 @@ export default function StoreDetailsPage() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  const settingsRef = useMemo(() => doc(db, 'settings', 'storeDetails'), []);
+  const settingsRef = useMemo(() => {
+    if (!db) return null;
+    return doc(db, 'settings', 'storeDetails');
+  }, []);
   const { data: storeSettings, isLoading: isLoadingSettings } = useDoc<StoreSettings>(settingsRef);
 
   const form = useForm<StoreSettingsFormValues>({
@@ -76,6 +79,11 @@ export default function StoreDetailsPage() {
 
   const onSubmit = async (data: StoreSettingsFormValues) => {
     setLoading(true);
+    if (!db) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Database not initialized.' });
+        setLoading(false);
+        return;
+    }
     try {
       let logoUrl = storeSettings?.logoUrl || '';
 
@@ -99,7 +107,7 @@ export default function StoreDetailsPage() {
         setIsUploading(false);
       }
 
-      await setDoc(settingsRef, {
+      await setDoc(doc(db, 'settings', 'storeDetails'), {
         ...data,
         id: 'storeDetails',
         logoUrl,

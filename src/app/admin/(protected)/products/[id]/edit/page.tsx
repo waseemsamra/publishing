@@ -12,6 +12,7 @@ import { notFound, useParams } from 'next/navigation';
 export default function EditProductPage() {
   const params = useParams<{ id: string }>();
   const productRef = useMemo(() => {
+    if (!db) return null;
     if (!params.id) return null;
     const ref = doc(db, 'products', params.id);
     (ref as any).__memo = true;

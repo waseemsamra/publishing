@@ -40,6 +40,7 @@ function FilterSection({
     onFilterChange: (value: string) => void;
 }) {
     const optionsQuery = useMemo(() => {
+        if (!db) return null;
         const q = query(collection(db, collectionName));
         (q as any).__memo = true;
         return q;

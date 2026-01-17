@@ -49,14 +49,14 @@ export function FirebaseProvider({ children }: { children: ReactNode }) {
 export const useFirebase = () => useContext(FirebaseContext);
 
 export const useFirebaseApp = () => {
-    const { app } = useFirebase();
-    return app;
+    const { app, loading } = useFirebase();
+    return loading ? null : app;
 }
 export const useFirestore = () => {
-    const { db } = useFirebase();
-    return db;
+    const { db, loading } = useFirebase();
+    return loading ? null : db;
 }
 export const useFirebaseAuth = () => {
-    const { auth } = useFirebase();
-    return auth;
+    const { auth, loading } = useFirebase();
+    return loading ? null : auth;
 }

@@ -15,21 +15,35 @@ function isFirebaseConfigValid(config: FirebaseOptions): boolean {
   return Object.values(config).every(value => Boolean(value));
 }
 
-let app: FirebaseApp | null;
-let auth: Auth | null;
-let db: Firestore | null;
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let db: Firestore | null = null;
 
-if (isFirebaseConfigValid(firebaseConfig)) {
-  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-  auth = getAuth(app);
-  db = getFirestore(app);
+// Initialize Firebase only on the client side where the browser window object is available.
+// This prevents the app from crashing during the server-side build process on platforms like Vercel,
+// where environment variables may not be available at build time.
+if (typeof window !== 'undefined') {
+    if (isFirebaseConfigValid(firebaseConfig)) {
+        try {
+            app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) {
+            console.error("Firebase initialization failed:", e);
+            app = null;
+            auth = null;
+            db = null;
+        }
+    } else {
+        console.error("Firebase configuration is missing or incomplete. Please check your .env.local file.");
+    }
 } else {
-  // This will be true during the build process on Vercel if env vars are not available at build time.
-  // It's important to handle the null case in the rest of the app.
-  console.warn("Firebase configuration is missing or incomplete. This is expected during the build process if environment variables are not set. Firebase services will be unavailable server-side.");
-  app = null;
-  auth = null;
-  db = null;
+    // During server-side rendering or build, services will remain null.
+    // Components using these services must handle the null case.
+    if (!isFirebaseConfigValid(firebaseConfig)) {
+        console.warn("Firebase configuration is missing or incomplete. This is expected during the build process if environment variables are not set. Firebase services will be unavailable server-side.");
+    }
 }
+
 
 export { app, auth, db, firebaseConfig };

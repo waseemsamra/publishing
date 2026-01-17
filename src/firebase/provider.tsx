@@ -7,14 +7,6 @@ import { getFirestore, Firestore } from 'firebase/firestore';
 import { firebaseConfig, isFirebaseConfigValid } from './config';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
-interface FirebaseContextValue {
-  app: FirebaseApp;
-  auth: Auth;
-  db: Firestore;
-}
-
-const FirebaseContext = createContext<FirebaseContextValue | null>(null);
-
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 let db: Firestore | null = null;
@@ -36,27 +28,22 @@ if (typeof window !== 'undefined' && isFirebaseConfigValid(firebaseConfig)) {
 }
 
 export function FirebaseProvider({ children }: { children: ReactNode }) {
-  const contextValue = db && auth && app ? { app, auth, db } : null;
-
+  // This provider's main purpose is now to render the error listener
+  // when firebase is available.
   return (
-    <FirebaseContext.Provider value={contextValue}>
-      {contextValue && <FirebaseErrorListener />}
+    <>
+      {db && <FirebaseErrorListener />}
       {children}
-    </FirebaseContext.Provider>
+    </>
   );
 }
 
-export const useFirebase = () => useContext(FirebaseContext);
-
-export const useFirebaseApp = () => {
-    const context = useFirebase();
-    return context?.app ?? null;
+export const useFirebaseApp = (): FirebaseApp | null => {
+    return app;
 }
-export const useFirestore = () => {
-    const context = useFirebase();
-    return context?.db ?? null;
+export const useFirestore = (): Firestore | null => {
+    return db;
 }
-export const useFirebaseAuth = () => {
-    const context = useFirebase();
-    return context?.auth ?? null;
+export const useFirebaseAuth = (): Auth | null => {
+    return auth;
 }

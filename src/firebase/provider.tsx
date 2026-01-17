@@ -1,49 +1,71 @@
 'use client';
 
-import { createContext, useContext, ReactNode } from 'react';
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { firebaseConfig, isFirebaseConfigValid } from './config';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
-let app: FirebaseApp | null = null;
-let auth: Auth | null = null;
-let db: Firestore | null = null;
-
-if (typeof window !== 'undefined' && isFirebaseConfigValid(firebaseConfig)) {
-  if (!getApps().length) {
-    try {
-      app = initializeApp(firebaseConfig);
-      auth = getAuth(app);
-      db = getFirestore(app);
-    } catch (e) {
-      console.error("Firebase initialization error:", e);
-    }
-  } else {
-    app = getApp();
-    auth = getAuth(app);
-    db = getFirestore(app);
-  }
+interface FirebaseContextType {
+  app: FirebaseApp | null;
+  auth: Auth | null;
+  db: Firestore | null;
 }
 
+const FirebaseContext = createContext<FirebaseContextType>({
+  app: null,
+  auth: null,
+  db: null,
+});
+
 export function FirebaseProvider({ children }: { children: ReactNode }) {
-  // This provider's main purpose is now to render the error listener
-  // when firebase is available.
+  const [firebaseInstances, setFirebaseInstances] = useState<FirebaseContextType>({
+    app: null,
+    auth: null,
+    db: null,
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && isFirebaseConfigValid(firebaseConfig)) {
+      if (!getApps().length) {
+        try {
+          const app = initializeApp(firebaseConfig);
+          const auth = getAuth(app);
+          const db = getFirestore(app);
+          setFirebaseInstances({ app, auth, db });
+        } catch (e) {
+          console.error("Firebase initialization error:", e);
+          setFirebaseInstances({ app: null, auth: null, db: null });
+        }
+      } else {
+        const app = getApps()[0];
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        setFirebaseInstances({ app, auth, db });
+      }
+    }
+  }, []);
+
   return (
-    <>
-      {db && <FirebaseErrorListener />}
+    <FirebaseContext.Provider value={firebaseInstances}>
+      {firebaseInstances.db && <FirebaseErrorListener />}
       {children}
-    </>
+    </FirebaseContext.Provider>
   );
 }
 
 export const useFirebaseApp = (): FirebaseApp | null => {
-    return app;
-}
+  const { app } = useContext(FirebaseContext);
+  return app;
+};
+
 export const useFirestore = (): Firestore | null => {
-    return db;
-}
+  const { db } = useContext(FirebaseContext);
+  return db;
+};
+
 export const useFirebaseAuth = (): Auth | null => {
-    return auth;
-}
+  const { auth } = useContext(FirebaseContext);
+  return auth;
+};

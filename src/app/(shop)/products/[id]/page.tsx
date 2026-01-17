@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useParams, notFound } from 'next/navigation';
 import { useMemo, useState, useEffect } from 'react';
-import type { Product, Size, WallType } from '@/lib/types';
+import type { Product, Size, WallType, Colour } from '@/lib/types';
 import { doc, collection, query, where, documentId } from 'firebase/firestore';
 import { useDoc } from '@/firebase/firestore/use-doc';
 import { useCollection } from '@/firebase/firestore/use-collection';
@@ -59,10 +59,19 @@ export default function ProductDetailPage() {
   }, [product, db]);
   const { data: availableWallTypes } = useCollection<WallType>(wallTypesQuery);
 
+  const coloursQuery = useMemo(() => {
+    if (!db || !product?.colourIds || product.colourIds.length === 0) return null;
+    const q = query(collection(db, 'colours'), where(documentId(), 'in', product.colourIds));
+    (q as any).__memo = true;
+    return q;
+  }, [product, db]);
+  const { data: availableColours } = useCollection<Colour>(coloursQuery);
+
   const [selectedWall, setSelectedWall] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedLid, setSelectedLid] = useState<string | null>('None');
   const [selectedTier, setSelectedTier] = useState<PricingTier>(defaultTier);
+  const [selectedColour, setSelectedColour] = useState<string | null>(null);
 
   const isLoading = authLoading || isLoadingProduct;
 
@@ -73,7 +82,10 @@ export default function ProductDetailPage() {
     if (availableSizes && availableSizes.length > 0 && !selectedSize) {
       setSelectedSize(availableSizes[0].id);
     }
-  }, [availableWallTypes, availableSizes, selectedWall, selectedSize]);
+    if (availableColours && availableColours.length > 0 && !selectedColour) {
+      setSelectedColour(availableColours[0].id);
+    }
+  }, [availableWallTypes, availableSizes, selectedWall, selectedSize, availableColours, selectedColour]);
 
   if (isLoading || !params.id) {
     return (
@@ -180,6 +192,17 @@ export default function ProductDetailPage() {
                       <div className="grid grid-cols-2 gap-2">
                         {availableWallTypes.map((wall) => (
                           <Button key={wall.id} variant={selectedWall === wall.id ? 'default' : 'outline'} onClick={() => setSelectedWall(wall.id)}>{wall.name}</Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {availableColours && availableColours.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-semibold mb-2">Colour</h3>
+                      <div className="grid grid-cols-2 gap-2">
+                        {availableColours.map((colour) => (
+                          <Button key={colour.id} variant={selectedColour === colour.id ? 'default' : 'outline'} onClick={() => setSelectedColour(colour.id)}>{colour.name}</Button>
                         ))}
                       </div>
                     </div>

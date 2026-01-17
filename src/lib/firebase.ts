@@ -19,31 +19,23 @@ let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 let db: Firestore | null = null;
 
-// Initialize Firebase only on the client side where the browser window object is available.
-// This prevents the app from crashing during the server-side build process on platforms like Vercel,
-// where environment variables may not be available at build time.
-if (typeof window !== 'undefined') {
-    if (isFirebaseConfigValid(firebaseConfig)) {
-        try {
-            app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-            auth = getAuth(app);
-            db = getFirestore(app);
-        } catch (e) {
-            console.error("Firebase initialization failed:", e);
-            app = null;
-            auth = null;
-            db = null;
-        }
-    } else {
-        console.error("Firebase configuration is missing or incomplete. Please check your .env.local file.");
+if (isFirebaseConfigValid(firebaseConfig)) {
+    try {
+        app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+        auth = getAuth(app);
+        db = getFirestore(app);
+    } catch (e) {
+        console.error("Firebase initialization failed:", e);
+        // Ensure services are null if initialization fails
+        app = null;
+        auth = null;
+        db = null;
     }
 } else {
-    // During server-side rendering or build, services will remain null.
-    // Components using these services must handle the null case.
-    if (!isFirebaseConfigValid(firebaseConfig)) {
-        console.warn("Firebase configuration is missing or incomplete. This is expected during the build process if environment variables are not set. Firebase services will be unavailable server-side.");
-    }
+    // This will be logged both on the server during build and on the client if the config is missing.
+    // During a Vercel build, this is expected if env vars are not set.
+    // The rest of the app should handle the services being null.
+    console.warn("Firebase configuration is missing or incomplete. Firebase services will be unavailable.");
 }
-
 
 export { app, auth, db, firebaseConfig };

@@ -14,16 +14,20 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import { useAuth } from '@/context/auth-context';
 
 export function RelatedProducts() {
+  const { loading: authLoading } = useAuth();
+  
   const productsQuery = useMemo(() => {
-    if (!db) return null;
+    if (authLoading || !db) return null;
     const q = query(collection(db, 'products'), limit(8));
     (q as any).__memo = true;
     return q;
-  }, []);
+  }, [authLoading]);
 
-  const { data: products, isLoading } = useCollection<Product>(productsQuery);
+  const { data: products, isLoading: isLoadingData } = useCollection<Product>(productsQuery);
+  const isLoading = authLoading || isLoadingData;
 
   if (isLoading) {
     return <Loader2 className="h-8 w-8 animate-spin mx-auto" />;

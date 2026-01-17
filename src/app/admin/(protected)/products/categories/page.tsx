@@ -46,9 +46,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { MoreHorizontal, Edit, Trash2, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/context/auth-context';
 
 const s3BaseUrl = 'https://printinweb.s3.us-east-1.amazonaws.com';
 
@@ -61,15 +62,17 @@ export default function CategoriesPage() {
     const [parentId, setParentId] = useState<string | undefined>(undefined);
     const [imageUrl, setImageUrl] = useState('');
     const [imageHint, setImageHint] = useState('');
+    const { loading: authLoading } = useAuth();
 
     const categoriesQuery = useMemo(() => {
-        if (!db) return null;
+        if (authLoading || !db) return null;
         const q = query(collection(db, 'categories'));
         (q as any).__memo = true;
         return q;
-    }, []);
+    }, [authLoading]);
 
-    const { data: categories, isLoading, error } = useCollection<Category>(categoriesQuery);
+    const { data: categories, isLoading: isLoadingData, error } = useCollection<Category>(categoriesQuery);
+    const isLoading = authLoading || isLoadingData;
 
     const categoryMap = useMemo(() => {
       if (!categories) return new Map();
@@ -220,7 +223,7 @@ export default function CategoriesPage() {
                         <TableBody>
                             {isLoading && (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center">Loading...</TableCell>
+                                    <TableCell colSpan={6} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && error && (
@@ -233,7 +236,7 @@ export default function CategoriesPage() {
                                     <TableCell colSpan={6} className="h-24 text-center">No categories found. Add one to get started.</TableCell>
                                 </TableRow>
                             )}
-                            {categories?.map((category) => (
+                            {!isLoading && categories?.map((category) => (
                                 <TableRow key={category.id}>
                                     <TableCell className="hidden sm:table-cell">
                                         {category.imageUrl ? (

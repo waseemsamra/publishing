@@ -8,18 +8,22 @@ import { useDoc } from '@/firebase/firestore/use-doc';
 import { useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
 import { notFound, useParams } from 'next/navigation';
+import { useAuth } from '@/context/auth-context';
 
 export default function EditProductPage() {
   const params = useParams<{ id: string }>();
+  const { loading: authLoading } = useAuth();
+  
   const productRef = useMemo(() => {
-    if (!db) return null;
+    if (authLoading || !db) return null;
     if (!params.id) return null;
     const ref = doc(db, 'products', params.id);
     (ref as any).__memo = true;
     return ref;
-  }, [params.id]);
+  }, [params.id, authLoading]);
 
-  const { data: product, isLoading, error } = useDoc<Product>(productRef);
+  const { data: product, isLoading: isLoadingData, error } = useDoc<Product>(productRef);
+  const isLoading = authLoading || isLoadingData;
 
   if (isLoading) {
     return (

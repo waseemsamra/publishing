@@ -38,9 +38,10 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { MoreHorizontal, Edit, Trash2, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/context/auth-context';
 
 export default function AdhesivesPage() {
     const { toast } = useToast();
@@ -48,16 +49,19 @@ export default function AdhesivesPage() {
     
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const { loading: authLoading } = useAuth();
 
     const adhesivesQuery = useMemo(() => {
-        if (!db) return null;
+        if (authLoading || !db) return null;
         const q = query(collection(db, 'adhesives'));
         (q as any).__memo = true;
         return q;
-    }, []);
+    }, [authLoading]);
 
-    const { data: adhesives, isLoading, error } = useCollection<Adhesive>(adhesivesQuery);
+    const { data: adhesives, isLoading: isLoadingData, error } = useCollection<Adhesive>(adhesivesQuery);
     
+    const isLoading = authLoading || isLoadingData;
+
     useEffect(() => {
         if (dialogState.open && dialogState.adhesive) {
             setName(dialogState.adhesive.name || '');
@@ -150,7 +154,7 @@ export default function AdhesivesPage() {
                         <TableBody>
                             {isLoading && (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="text-center">Loading...</TableCell>
+                                    <TableCell colSpan={4} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && error && (
@@ -163,7 +167,7 @@ export default function AdhesivesPage() {
                                     <TableCell colSpan={4} className="h-24 text-center">No adhesive options found. Add one to get started.</TableCell>
                                 </TableRow>
                             )}
-                            {adhesives?.map((adhesive) => (
+                            {!isLoading && adhesives?.map((adhesive) => (
                                 <TableRow key={adhesive.id}>
                                     <TableCell className="font-medium">{adhesive.name}</TableCell>
                                     <TableCell>{adhesive.description}</TableCell>
@@ -219,5 +223,3 @@ export default function AdhesivesPage() {
         </div>
     );
 }
-
-  

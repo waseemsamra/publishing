@@ -38,9 +38,10 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { MoreHorizontal, Edit, Trash2, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/context/auth-context';
 
 export default function ThicknessesPage() {
     const { toast } = useToast();
@@ -48,15 +49,17 @@ export default function ThicknessesPage() {
     
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const { loading: authLoading } = useAuth();
 
     const thicknessesQuery = useMemo(() => {
-        if (!db) return null;
+        if (authLoading || !db) return null;
         const q = query(collection(db, 'thicknesses'));
         (q as any).__memo = true;
         return q;
-    }, []);
+    }, [authLoading]);
 
-    const { data: thicknesses, isLoading, error } = useCollection<Thickness>(thicknessesQuery);
+    const { data: thicknesses, isLoading: isLoadingData, error } = useCollection<Thickness>(thicknessesQuery);
+    const isLoading = authLoading || isLoadingData;
     
     useEffect(() => {
         if (dialogState.open && dialogState.thickness) {
@@ -150,7 +153,7 @@ export default function ThicknessesPage() {
                         <TableBody>
                             {isLoading && (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="text-center">Loading...</TableCell>
+                                    <TableCell colSpan={4} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && error && (
@@ -163,7 +166,7 @@ export default function ThicknessesPage() {
                                     <TableCell colSpan={4} className="h-24 text-center">No thickness options found. Add one to get started.</TableCell>
                                 </TableRow>
                             )}
-                            {thicknesses?.map((thickness) => (
+                            {!isLoading && thicknesses?.map((thickness) => (
                                 <TableRow key={thickness.id}>
                                     <TableCell className="font-medium">{thickness.name}</TableCell>
                                     <TableCell>{thickness.description}</TableCell>

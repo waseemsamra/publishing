@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Loader2, UploadCloud } from 'lucide-react';
+import { useAuth } from '@/context/auth-context';
 
 const storeSettingsSchema = z.object({
   storeName: z.string().min(1, 'Store name is required'),
@@ -32,12 +33,15 @@ export default function StoreDetailsPage() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const { loading: authLoading } = useAuth();
 
   const settingsRef = useMemo(() => {
-    if (!db) return null;
+    if (authLoading || !db) return null;
     return doc(db, 'settings', 'storeDetails');
-  }, []);
+  }, [authLoading]);
+
   const { data: storeSettings, isLoading: isLoadingSettings } = useDoc<StoreSettings>(settingsRef);
+  const isLoadingPage = authLoading || isLoadingSettings;
 
   const form = useForm<StoreSettingsFormValues>({
     resolver: zodResolver(storeSettingsSchema),
@@ -131,7 +135,7 @@ export default function StoreDetailsPage() {
     }
   };
 
-  if (isLoadingSettings) {
+  if (isLoadingPage) {
       return (
           <div className="flex items-center justify-center p-8">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />

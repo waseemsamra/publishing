@@ -38,8 +38,9 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { MoreHorizontal, Edit, Trash2, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useAuth } from '@/context/auth-context';
 
 export default function SizesPage() {
     const { toast } = useToast();
@@ -48,15 +49,17 @@ export default function SizesPage() {
     // Form state is now in the main component
     const [name, setName] = useState('');
     const [shortName, setShortName] = useState('');
+    const { loading: authLoading } = useAuth();
 
     const sizesQuery = useMemo(() => {
-        if (!db) return null;
+        if (authLoading || !db) return null;
         const q = query(collection(db, 'sizes'));
         (q as any).__memo = true;
         return q;
-    }, []);
+    }, [authLoading]);
 
-    const { data: sizes, isLoading, error } = useCollection<Size>(sizesQuery);
+    const { data: sizes, isLoading: isLoadingData, error } = useCollection<Size>(sizesQuery);
+    const isLoading = authLoading || isLoadingData;
     
     // Update form state when dialog opens for editing
     useEffect(() => {
@@ -153,7 +156,7 @@ export default function SizesPage() {
                         <TableBody>
                             {isLoading && (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="text-center">Loading...</TableCell>
+                                    <TableCell colSpan={4} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && error && (
@@ -166,7 +169,7 @@ export default function SizesPage() {
                                     <TableCell colSpan={4} className="h-24 text-center">No sizes found. Add one to get started.</TableCell>
                                 </TableRow>
                             )}
-                            {sizes?.map((size) => (
+                            {!isLoading && sizes?.map((size) => (
                                 <TableRow key={size.id}>
                                     <TableCell className="font-medium">{size.name}</TableCell>
                                     <TableCell>{size.shortName}</TableCell>

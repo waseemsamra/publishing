@@ -20,6 +20,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Checkbox } from '@/components/ui/checkbox';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Loader2, Save, ArrowLeft, PlusCircle, Trash2 } from 'lucide-react';
+import { useAuth } from '@/context/auth-context';
 
 const productFormSchema = z.object({
   name: z.string().min(1, 'Product name is required.'),
@@ -63,20 +64,23 @@ function OptionsSection({
   title: string;
   formFieldName: keyof ProductFormValues;
 }) {
+  const { loading: authLoading } = useAuth();
+  
   const optionsQuery = useMemo(() => {
-    if (!db) return null;
+    if (authLoading || !db) return null;
     const q = query(collection(db, collectionName));
     (q as any).__memo = true;
     return q;
-  }, [collectionName]);
+  }, [collectionName, authLoading]);
 
   const { data: options, isLoading } = useCollection<OptionType>(optionsQuery);
+  const isSectionLoading = authLoading || isLoading;
 
   return (
     <AccordionItem value={collectionName}>
       <AccordionTrigger>{title}</AccordionTrigger>
       <AccordionContent>
-        {isLoading ? <Loader2 className="animate-spin" /> : (
+        {isSectionLoading ? <Loader2 className="animate-spin" /> : (
           <FormField
             control={control}
             name={formFieldName}

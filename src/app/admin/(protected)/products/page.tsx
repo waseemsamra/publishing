@@ -43,20 +43,23 @@ import {
 } from '@/components/ui/card';
 import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useAuth } from '@/context/auth-context';
 
 export default function AdminProductsPage() {
     const { toast } = useToast();
     const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const { loading: authLoading } = useAuth();
     
     const productsQuery = useMemo(() => {
-        if (!db) return null;
+        if (authLoading || !db) return null;
         const q = query(collection(db, 'products'));
         (q as any).__memo = true;
         return q;
-    }, []);
+    }, [authLoading]);
 
-    const { data: products, isLoading, error } = useCollection<Product>(productsQuery);
+    const { data: products, isLoading: isLoadingData, error } = useCollection<Product>(productsQuery);
+    const isLoading = authLoading || isLoadingData;
 
     const handleDeleteSelected = async () => {
         if (!db) {
@@ -134,8 +137,7 @@ export default function AdminProductsPage() {
                                      <Checkbox
                                         onCheckedChange={handleSelectAll}
                                         checked={allSelected ? true : someSelected ? 'indeterminate' : false}
-                                        aria-label="Select all"
-                                        disabled={!products || products.length === 0}
+                                        disabled={isLoading || !products || products.length === 0}
                                     />
                                 </TableHead>
                                 <TableHead className="hidden w-[100px] sm:table-cell">Image</TableHead>
@@ -149,7 +151,7 @@ export default function AdminProductsPage() {
                             {isLoading && <TableRow><TableCell colSpan={6} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell></TableRow>}
                             {!isLoading && error && <TableRow><TableCell colSpan={6} className="h-24 text-center text-red-500">{error.message}</TableCell></TableRow>}
                             {!isLoading && products?.length === 0 && <TableRow><TableCell colSpan={6} className="h-24 text-center">No products found. Add one to get started.</TableCell></TableRow>}
-                            {products?.map((product) => (
+                            {!isLoading && products?.map((product) => (
                                 <TableRow key={product.id} data-state={selectedProductIds.includes(product.id) && 'selected'}>
                                     <TableCell>
                                         <Checkbox

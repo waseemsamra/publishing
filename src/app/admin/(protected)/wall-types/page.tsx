@@ -38,23 +38,26 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { MoreHorizontal, Edit, Trash2, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useAuth } from '@/context/auth-context';
 
 export default function WallTypesPage() {
     const { toast } = useToast();
     const [dialogState, setDialogState] = useState<{open: boolean; wallType?: Partial<WallType>}>({ open: false, wallType: undefined });
     
     const [name, setName] = useState('');
+    const { loading: authLoading } = useAuth();
 
     const wallTypesQuery = useMemo(() => {
-        if (!db) return null;
+        if (authLoading || !db) return null;
         const q = query(collection(db, 'wallTypes'));
         (q as any).__memo = true;
         return q;
-    }, []);
+    }, [authLoading]);
 
-    const { data: wallTypes, isLoading, error } = useCollection<WallType>(wallTypesQuery);
+    const { data: wallTypes, isLoading: isLoadingData, error } = useCollection<WallType>(wallTypesQuery);
+    const isLoading = authLoading || isLoadingData;
     
     useEffect(() => {
         if (dialogState.open && dialogState.wallType) {
@@ -146,7 +149,7 @@ export default function WallTypesPage() {
                         <TableBody>
                             {isLoading && (
                                 <TableRow>
-                                    <TableCell colSpan={3} className="text-center">Loading...</TableCell>
+                                    <TableCell colSpan={3} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && error && (
@@ -159,7 +162,7 @@ export default function WallTypesPage() {
                                     <TableCell colSpan={3} className="h-24 text-center">No wall types found. Add one to get started.</TableCell>
                                 </TableRow>
                             )}
-                            {wallTypes?.map((wallType) => (
+                            {!isLoading && wallTypes?.map((wallType) => (
                                 <TableRow key={wallType.id}>
                                     <TableCell className="font-medium">{wallType.name}</TableCell>
                                     <TableCell>{wallType.createdAt ? format(wallType.createdAt.toDate(), 'MMM d, yyyy') : 'N/A'}</TableCell>

@@ -38,9 +38,10 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { MoreHorizontal, Edit, Trash2, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/context/auth-context';
 
 export default function MaterialTypesPage() {
     const { toast } = useToast();
@@ -48,15 +49,17 @@ export default function MaterialTypesPage() {
     
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const { loading: authLoading } = useAuth();
 
     const materialsQuery = useMemo(() => {
-        if (!db) return null;
+        if (authLoading || !db) return null;
         const q = query(collection(db, 'materialTypes'));
         (q as any).__memo = true;
         return q;
-    }, []);
+    }, [authLoading]);
 
-    const { data: materials, isLoading, error } = useCollection<MaterialType>(materialsQuery);
+    const { data: materials, isLoading: isLoadingData, error } = useCollection<MaterialType>(materialsQuery);
+    const isLoading = authLoading || isLoadingData;
     
     useEffect(() => {
         if (dialogState.open && dialogState.material) {
@@ -150,7 +153,7 @@ export default function MaterialTypesPage() {
                         <TableBody>
                             {isLoading && (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="text-center">Loading...</TableCell>
+                                    <TableCell colSpan={4} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && error && (
@@ -163,7 +166,7 @@ export default function MaterialTypesPage() {
                                     <TableCell colSpan={4} className="h-24 text-center">No materials found. Add materials like 'Standard White' or 'Kraft' to get started.</TableCell>
                                 </TableRow>
                             )}
-                            {materials?.map((material) => (
+                            {!isLoading && materials?.map((material) => (
                                 <TableRow key={material.id}>
                                     <TableCell className="font-medium">{material.name}</TableCell>
                                     <TableCell>{material.description}</TableCell>

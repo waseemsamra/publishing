@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import type { Size, Colour, PrintOption, WallType, Thickness, MaterialType, FinishType, Adhesive, Handle, Shape, Category } from '@/lib/types';
+import { useAuth } from '@/context/auth-context';
 
 type OptionCollection = 'categories' | 'sizes' | 'colours' | 'printOptions' | 'wallTypes' | 'thicknesses' | 'materialTypes' | 'finishTypes' | 'adhesives' | 'handles' | 'shapes';
 type OptionType = Category | Size | Colour | PrintOption | WallType | Thickness | MaterialType | FinishType | Adhesive | Handle | Shape;
@@ -39,14 +40,17 @@ function FilterSection({
     selectedValues: string[];
     onFilterChange: (value: string) => void;
 }) {
+    const { loading: authLoading } = useAuth();
+
     const optionsQuery = useMemo(() => {
-        if (!db) return null;
+        if (authLoading || !db) return null;
         const q = query(collection(db, collectionName));
         (q as any).__memo = true;
         return q;
-    }, [collectionName]);
+    }, [collectionName, authLoading]);
 
-    const { data: options, isLoading } = useCollection<OptionType>(optionsQuery);
+    const { data: options, isLoading: isLoadingData } = useCollection<OptionType>(optionsQuery);
+    const isLoading = authLoading || isLoadingData;
 
     return (
         <AccordionItem value={collectionName}>

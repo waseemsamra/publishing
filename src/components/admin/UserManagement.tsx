@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import { 
   MoreVertical, 
@@ -14,7 +14,8 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  PlusCircle
+  PlusCircle,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -136,25 +137,21 @@ function EditUserDialog({ user, onUpdate, children }: { user: User, onUpdate: (i
 
 export default function UserManagement() {
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, loading: authLoading } = useAuth();
   const { toast } = useToast();
 
   const fetchUsers = async () => {
     if (!db) {
-        setLoading(false);
-        toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Firebase is not initialized.",
-        });
+        console.error("Attempted to fetch users but 'db' is not initialized.");
+        setIsLoading(false);
         return;
     }
     try {
-      setLoading(true);
+      setIsLoading(true);
       const usersSnapshot = await getDocs(collection(db, 'users'));
       const usersList = usersSnapshot.docs.map(doc => {
           const data = doc.data();
@@ -176,15 +173,17 @@ export default function UserManagement() {
         description: 'Could not retrieve user data from the server.',
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if(!authLoading) {
+        fetchUsers();
+    }
+  }, [authLoading]);
 
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = useMemo(() => users.filter(user => {
     const searchName = `${user.firstName || ''} ${user.lastName || ''}`;
     const matchesSearch = 
       (user.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -192,7 +191,7 @@ export default function UserManagement() {
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
     return matchesSearch && matchesRole && matchesStatus;
-  });
+  }), [users, searchTerm, roleFilter, statusFilter]);
 
   const handleUpdateUser = async (userId: string, updates: Partial<User>) => {
     if (!db) {
@@ -265,6 +264,8 @@ export default function UserManagement() {
     return `${first}${last}`.toUpperCase();
   };
 
+  const pageLoading = authLoading || isLoading;
+
 
   return (
     <div className="space-y-6">
@@ -326,12 +327,10 @@ export default function UserManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={i}>
-                        <TableCell colSpan={5} className="text-center p-4">Loading...</TableCell>
-                    </TableRow>
-                ))
+              {pageLoading ? (
+                <TableRow>
+                    <TableCell colSpan={5} className="text-center h-24"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell>
+                </TableRow>
               ) : filteredUsers.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center h-24">

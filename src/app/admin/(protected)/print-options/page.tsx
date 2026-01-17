@@ -38,9 +38,10 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { MoreHorizontal, Edit, Trash2, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/context/auth-context';
 
 export default function PrintOptionsPage() {
     const { toast } = useToast();
@@ -49,15 +50,17 @@ export default function PrintOptionsPage() {
     // Form state is now in the main component
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const { loading: authLoading } = useAuth();
 
     const printOptionsQuery = useMemo(() => {
-        if (!db) return null;
+        if (authLoading || !db) return null;
         const q = query(collection(db, 'printOptions'));
         (q as any).__memo = true;
         return q;
-    }, []);
+    }, [authLoading]);
 
-    const { data: printOptions, isLoading, error } = useCollection<PrintOption>(printOptionsQuery);
+    const { data: printOptions, isLoading: isLoadingData, error } = useCollection<PrintOption>(printOptionsQuery);
+    const isLoading = authLoading || isLoadingData;
     
     // Update form state when dialog opens for editing
     useEffect(() => {
@@ -154,7 +157,7 @@ export default function PrintOptionsPage() {
                         <TableBody>
                             {isLoading && (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="text-center">Loading...</TableCell>
+                                    <TableCell colSpan={4} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && error && (
@@ -167,7 +170,7 @@ export default function PrintOptionsPage() {
                                     <TableCell colSpan={4} className="h-24 text-center">No print options found. Add one to get started.</TableCell>
                                 </TableRow>
                             )}
-                            {printOptions?.map((printOption) => (
+                            {!isLoading && printOptions?.map((printOption) => (
                                 <TableRow key={printOption.id}>
                                     <TableCell className="font-medium">{printOption.name}</TableCell>
                                     <TableCell>{printOption.description}</TableCell>

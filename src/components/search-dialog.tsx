@@ -17,21 +17,23 @@ import { collection, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import type { Product } from '@/lib/types';
 import { ProductCard } from './product-card';
+import { useAuth } from '@/context/auth-context';
 
 export function SearchDialog() {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
+  const { loading: authLoading } = useAuth();
 
   const productsQuery = useMemo(() => {
-    if (!open) return null;
-    if (!db) return null;
+    if (!open || authLoading || !db) return null;
     const q = query(collection(db, 'products'));
     (q as any).__memo = true;
     return q;
-  }, [open]);
+  }, [open, authLoading]);
 
-  const { data: allProducts, isLoading } = useCollection<Product>(productsQuery);
+  const { data: allProducts, isLoading: isLoadingData } = useCollection<Product>(productsQuery);
+  const isLoading = authLoading || isLoadingData;
 
   const [defaultProducts, setDefaultProducts] = useState<Product[]>([]);
 

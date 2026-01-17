@@ -13,16 +13,20 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { useAuth } from '@/context/auth-context';
 
 export function ProductsDrawer({ onLinkClick }: { onLinkClick?: () => void }) {
+  const { loading: authLoading } = useAuth();
+
   const categoriesQuery = useMemo(() => {
-    if (!db) return null;
+    if (authLoading || !db) return null;
     const q = query(collection(db, 'categories'));
     (q as any).__memo = true;
     return q;
-  }, []);
+  }, [authLoading]);
 
-  const { data: categories, isLoading, error } = useCollection<Category>(categoriesQuery);
+  const { data: categories, isLoading: isLoadingData, error } = useCollection<Category>(categoriesQuery);
+  const isLoading = authLoading || isLoadingData;
 
   const categoryTree = useMemo(() => {
     if (!categories) return [];

@@ -38,9 +38,10 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { MoreHorizontal, Edit, Trash2, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/context/auth-context';
 
 export default function ShapesPage() {
     const { toast } = useToast();
@@ -48,15 +49,17 @@ export default function ShapesPage() {
     
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const { loading: authLoading } = useAuth();
 
     const shapesQuery = useMemo(() => {
-        if (!db) return null;
+        if (authLoading || !db) return null;
         const q = query(collection(db, 'shapes'));
         (q as any).__memo = true;
         return q;
-    }, []);
+    }, [authLoading]);
 
-    const { data: shapes, isLoading, error } = useCollection<Shape>(shapesQuery);
+    const { data: shapes, isLoading: isLoadingData, error } = useCollection<Shape>(shapesQuery);
+    const isLoading = authLoading || isLoadingData;
     
     useEffect(() => {
         if (dialogState.open && dialogState.shape) {
@@ -150,7 +153,7 @@ export default function ShapesPage() {
                         <TableBody>
                             {isLoading && (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="text-center">Loading...</TableCell>
+                                    <TableCell colSpan={4} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && error && (
@@ -164,7 +167,7 @@ export default function ShapesPage() {
                                     <TableCell colSpan={4} className="h-24 text-center">No shape options found. Add one to get started.</TableCell>
                                 </TableRow>
                             )}
-                            {shapes?.map((shape) => (
+                            {!isLoading && shapes?.map((shape) => (
                                 <TableRow key={shape.id}>
                                     <TableCell className="font-medium">{shape.name}</TableCell>
                                     <TableCell>{shape.description}</TableCell>

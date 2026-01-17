@@ -11,10 +11,12 @@ import { Loader2, LayoutGrid, List } from 'lucide-react';
 import { ProductFilters } from '@/components/product-filters';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/auth-context';
 
 function ProductsPageContent() {
   const [filters, setFilters] = useState<Record<string, string[]>>({});
   const [layout, setLayout] = useState<'grid' | 'list'>('grid');
+  const { loading: authLoading } = useAuth();
   
   const searchParams = useSearchParams();
   const categoryId = searchParams.get('category');
@@ -24,7 +26,7 @@ function ProductsPageContent() {
   }, [categoryId]);
 
   const productsQuery = useMemo(() => {
-    if (!db) return null;
+    if (authLoading || !db) return null;
     let q: Query<DocumentData> = collection(db, 'products');
 
     Object.entries(filters).forEach(([key, values]) => {
@@ -35,9 +37,10 @@ function ProductsPageContent() {
 
     (q as any).__memo = true;
     return q;
-  }, [filters]);
+  }, [filters, authLoading]);
 
-  const { data: products, isLoading, error } = useCollection<Product>(productsQuery);
+  const { data: products, isLoading: isLoadingData, error } = useCollection<Product>(productsQuery);
+  const isLoading = authLoading || isLoadingData;
 
   return (
     <div className="container py-12">

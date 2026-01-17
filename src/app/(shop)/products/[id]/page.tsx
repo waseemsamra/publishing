@@ -22,6 +22,7 @@ import { QuantityPricingTable } from '@/components/quantity-pricing-table';
 import { ProductInfoAccordion } from '@/components/product-info-accordion';
 import { RelatedProducts } from '@/components/related-products';
 import { BrandStories } from '@/components/brand-stories';
+import { useAuth } from '@/context/auth-context';
 
 // Define the tier type locally for this page
 type PricingTier = { qty: number; pricePerUnit: number; save: number; total: number; };
@@ -31,32 +32,34 @@ const defaultTier = { qty: 1000, pricePerUnit: 0.130, save: 0, total: 130.00 };
 export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
   const { addToCart } = useCart();
+  const { loading: authLoading } = useAuth();
+
   const productRef = useMemo(() => {
-    if (!db) return null;
+    if (authLoading || !db) return null;
     if (!params.id) return null;
     const ref = doc(db, 'products', params.id);
     (ref as any).__memo = true;
     return ref;
-  }, [params.id]);
+  }, [params.id, authLoading]);
 
-  const { data: product, isLoading, error } = useDoc<Product>(productRef);
+  const { data: product, isLoading: isLoadingProduct, error } = useDoc<Product>(productRef);
 
   const sizesQuery = useMemo(() => {
-    if (!db) return null;
+    if (authLoading || !db) return null;
     if (!product?.sizeIds || product.sizeIds.length === 0) return null;
     const q = query(collection(db, 'sizes'), where(documentId(), 'in', product.sizeIds));
     (q as any).__memo = true;
     return q;
-  }, [product]);
+  }, [product, authLoading]);
   const { data: availableSizes } = useCollection<Size>(sizesQuery);
 
   const wallTypesQuery = useMemo(() => {
-    if (!db) return null;
+    if (authLoading || !db) return null;
     if (!product?.wallTypeIds || product.wallTypeIds.length === 0) return null;
     const q = query(collection(db, 'wallTypes'), where(documentId(), 'in', product.wallTypeIds));
     (q as any).__memo = true;
     return q;
-  }, [product]);
+  }, [product, authLoading]);
   const { data: availableWallTypes } = useCollection<WallType>(wallTypesQuery);
 
   const [selectedWall, setSelectedWall] = useState<string | null>(null);
@@ -64,6 +67,7 @@ export default function ProductDetailPage() {
   const [selectedLid, setSelectedLid] = useState<string | null>('None');
   const [selectedTier, setSelectedTier] = useState<PricingTier>(defaultTier);
 
+  const isLoading = authLoading || isLoadingProduct;
 
   useEffect(() => {
     if (availableWallTypes && availableWallTypes.length > 0 && !selectedWall) {

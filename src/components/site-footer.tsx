@@ -2,9 +2,10 @@
 
 import { Logo } from "./logo";
 import Link from 'next/link';
-import { Instagram, Facebook, Linkedin } from 'lucide-react';
+import { Instagram, Facebook, Linkedin, Wifi, WifiOff, Loader2 } from 'lucide-react';
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { useFirebase } from "@/firebase/provider";
 
 const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
@@ -17,6 +18,35 @@ const PinterestIcon = (props: React.SVGProps<SVGSVGElement>) => (
         <path d="M12 0C5.373 0 0 5.373 0 12c0 4.885 3.433 9.05 8.13 10.53-.108-.85-.195-2.228.03-3.13.206-.822 1.303-5.52 1.303-5.52s-.33-.66-.33-1.634c0-1.53.888-2.67 1.987-2.67.93 0 1.378.696 1.378 1.528 0 .93-.593 2.322-.9 3.612-.255 1.088.54 1.972 1.603 1.972 1.92 0 3.39-2.033 3.39-4.988 0-2.64-1.88-4.59-4.716-4.59-3.23 0-5.118 2.42-5.118 4.755 0 .91.35 1.89.78 2.43.08.1.09.18.06.28-.06.25-.21.84-.26 1.03-.03.11-.12.14-.24.06-1.02-.65-1.66-2.58-1.66-3.84 0-3.34 2.4-6.3 7.06-6.3 3.73 0 6.32 2.65 6.32 5.96 0 3.74-2.35 6.6-5.63 6.6-1.12 0-2.17-.57-2.52-1.24l-.74 2.84c-.28 1.12-1.04 2.5-1.55 3.29.98.3 2 .46 3.05.46 6.627 0 12-5.373 12-12C24 5.373 18.627 0 12 0z" />
     </svg>
 );
+
+function FirebaseConnectionStatus() {
+  const { db, loading } = useFirebase();
+
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        <span>Connecting...</span>
+      </div>
+    );
+  }
+  
+  if (db) {
+    return (
+      <div className="flex items-center gap-2 text-xs text-green-600">
+        <Wifi className="h-4 w-4" />
+        <span>DB Connected</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 text-xs text-red-600">
+      <WifiOff className="h-4 w-4" />
+      <span>DB Disconnected</span>
+    </div>
+  );
+}
 
 
 export function SiteFooter() {
@@ -88,7 +118,8 @@ export function SiteFooter() {
               <Link href="#" aria-label="LinkedIn"><Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary" /></Link>
            </div>
         </div>
-        <div className="text-sm text-muted-foreground flex gap-4">
+        <div className="text-sm text-muted-foreground flex items-center gap-4">
+          <FirebaseConnectionStatus />
           <span>&copy; HanaPac {new Date().getFullYear()}</span>
           <Link href="#" className="hover:text-primary">T & C's</Link>
           <Link href="#" className="hover:text-primary">Privacy Policy</Link>

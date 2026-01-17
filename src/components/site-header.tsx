@@ -118,11 +118,51 @@ function AuthButton() {
 
 export function SiteHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const navLinks = [
     { href: '#', label: 'Industries', active: true },
     { href: '/products', label: 'All Products' },
   ];
+
+  if (!isClient) {
+     return (
+        <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+             <div className="bg-secondary/50">
+                <div className="container flex h-10 items-center justify-between text-xs">
+                     <div className="h-4 bg-muted rounded-md w-1/3"></div>
+                     <div className="hidden md:flex items-center gap-6">
+                        <div className="h-4 bg-muted rounded-md w-24"></div>
+                        <div className="h-4 bg-muted rounded-md w-24"></div>
+                     </div>
+                </div>
+            </div>
+            <div className="container flex h-20 items-center justify-between gap-4 md:gap-8">
+                <div className="flex items-center gap-6">
+                    <Logo />
+                     <nav className="hidden items-center gap-6 md:flex">
+                        <div className="h-5 w-20 bg-muted rounded-md"></div>
+                        <div className="h-5 w-24 bg-muted rounded-md"></div>
+                     </nav>
+                </div>
+                 <div className="flex-1 flex justify-center lg:justify-center">
+                    <div className="w-full max-w-md lg:w-full">
+                        <div className="h-10 w-full bg-muted rounded-md"></div>
+                    </div>
+                </div>
+                <div className="flex items-center justify-end space-x-1 sm:space-x-2">
+                    <div className="h-10 w-24 bg-muted rounded-md hidden md:block"></div>
+                    <div className="h-10 w-24 bg-muted rounded-md"></div>
+                    <div className="h-10 w-10 bg-muted rounded-full"></div>
+                </div>
+            </div>
+        </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

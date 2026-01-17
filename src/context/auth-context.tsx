@@ -43,8 +43,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+        setLoading(false);
+        return;
+    }
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        if (!db) {
+            setUser({
+              ...firebaseUser,
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              role: 'customer',
+              displayName: firebaseUser.email?.split('@')[0] || 'User',
+              photoURL: firebaseUser.photoURL,
+            });
+            setLoading(false);
+            return;
+        }
         try {
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           
@@ -86,18 +102,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = (email: string, password: string) => {
+    if (!auth) return Promise.reject(new Error("Firebase not initialized"));
     return signInWithEmailAndPassword(auth, email, password);
   };
   
   const signup = (email: string, password: string) => {
+    if (!auth) return Promise.reject(new Error("Firebase not initialized"));
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
   const logout = () => {
+    if (!auth) return Promise.reject(new Error("Firebase not initialized"));
     return signOut(auth);
   };
 
   const resetPassword = (email: string) => {
+    if (!auth) return Promise.reject(new Error("Firebase not initialized"));
     return sendPasswordResetEmail(auth, email);
   };
 

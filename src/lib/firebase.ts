@@ -1,6 +1,6 @@
-import { initializeApp, getApps, getApp, FirebaseOptions } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp, getApps, getApp, FirebaseOptions, FirebaseApp } from 'firebase/app';
+import { getAuth, Auth } from 'firebase/auth';
+import { getFirestore, Firestore } from 'firebase/firestore';
 
 const firebaseConfig: FirebaseOptions = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -15,21 +15,21 @@ function isFirebaseConfigValid(config: FirebaseOptions): boolean {
   return Object.values(config).every(value => Boolean(value));
 }
 
-// Initialize Firebase
-let app;
-if (!isFirebaseConfigValid(firebaseConfig)) {
-  console.warn("Firebase configuration is missing or incomplete. Please check your .env file.");
-  // Provide dummy objects to prevent app crash
-  app = {
-    name: "mock-app",
-    options: {},
-    automaticDataCollectionEnabled: false,
-  };
-} else {
-  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-}
+let app: FirebaseApp | null;
+let auth: Auth | null;
+let db: Firestore | null;
 
-const auth = getAuth(app);
-const db = getFirestore(app);
+if (isFirebaseConfigValid(firebaseConfig)) {
+  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+  auth = getAuth(app);
+  db = getFirestore(app);
+} else {
+  // This will be true during the build process on Vercel if env vars are not available at build time.
+  // It's important to handle the null case in the rest of the app.
+  console.warn("Firebase configuration is missing or incomplete. This is expected during the build process if environment variables are not set. Firebase services will be unavailable server-side.");
+  app = null;
+  auth = null;
+  db = null;
+}
 
 export { app, auth, db, firebaseConfig };

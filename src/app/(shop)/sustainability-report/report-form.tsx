@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { getSustainabilityReport } from './actions';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,8 +17,7 @@ const initialState = {
 };
 
 function SubmitButton() {
-  // The type for useFormStatus is not yet available in react-dom
-  const { pending } = (React as any).useFormStatus();
+  const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending} className="w-full">
       {pending ? 'Generating...' : 'Generate Report'}
@@ -26,8 +26,7 @@ function SubmitButton() {
 }
 
 export function ReportForm() {
-  const [state, formAction] = useActionState(getSustainabilityReport, initialState);
-  const { pending } = (React as any).useFormStatus();
+  const [state, formAction, isPending] = useActionState(getSustainabilityReport, initialState);
 
   return (
     <div className="grid md:grid-cols-2 gap-8">
@@ -64,7 +63,7 @@ export function ReportForm() {
         </form>
       </div>
       <div className="space-y-6">
-        {pending ? (
+        {isPending ? (
            <Card>
               <CardHeader>
                 <Skeleton className="h-6 w-1/2" />

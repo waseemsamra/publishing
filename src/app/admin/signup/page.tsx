@@ -16,7 +16,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
-import { db } from '@/lib/firebase';
+import { useFirestore } from '@/firebase/provider';
 
 export default function AdminSignUpPage() {
   const [name, setName] = useState('');
@@ -25,6 +25,7 @@ export default function AdminSignUpPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { signup } = useAuth();
+  const db = useFirestore();
 
   const handleSignUp = async () => {
     if (!db) {
@@ -41,7 +42,6 @@ export default function AdminSignUpPage() {
 
       if (user) {
         const userDocRef = doc(db, 'users', user.uid);
-        // New users signed up via the admin page are granted admin role.
         const userData = {
           id: user.uid,
           email: user.email,

@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { db } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import type { WallType } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -44,17 +44,18 @@ import { useAuth } from '@/context/auth-context';
 
 export default function WallTypesPage() {
     const { toast } = useToast();
+    const db = useFirestore();
     const [dialogState, setDialogState] = useState<{open: boolean; wallType?: Partial<WallType>}>({ open: false, wallType: undefined });
     
     const [name, setName] = useState('');
     const { loading: authLoading } = useAuth();
 
     const wallTypesQuery = useMemo(() => {
-        if (authLoading || !db) return null;
+        if (!db) return null;
         const q = query(collection(db, 'wallTypes'));
         (q as any).__memo = true;
         return q;
-    }, [authLoading]);
+    }, [db]);
 
     const { data: wallTypes, isLoading: isLoadingData, error } = useCollection<WallType>(wallTypesQuery);
     const isLoading = authLoading || isLoadingData;

@@ -12,9 +12,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, X, Loader2 } from 'lucide-react';
-import { db } from '@/lib/firebase';
 import { collection, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import type { Product } from '@/lib/types';
 import { ProductCard } from './product-card';
 import { useAuth } from '@/context/auth-context';
@@ -24,13 +24,14 @@ export function SearchDialog() {
   const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
   const { loading: authLoading } = useAuth();
+  const db = useFirestore();
 
   const productsQuery = useMemo(() => {
-    if (!open || authLoading || !db) return null;
+    if (!open || !db) return null;
     const q = query(collection(db, 'products'));
     (q as any).__memo = true;
     return q;
-  }, [open, authLoading]);
+  }, [open, db]);
 
   const { data: allProducts, isLoading: isLoadingData } = useCollection<Product>(productsQuery);
   const isLoading = authLoading || isLoadingData;
@@ -39,7 +40,6 @@ export function SearchDialog() {
 
   useEffect(() => {
     if (allProducts && allProducts.length > 0) {
-      // Shuffle the array and take the first 20
       const shuffled = [...allProducts].sort(() => 0.5 - Math.random());
       setDefaultProducts(shuffled.slice(0, 20));
     }
@@ -65,14 +65,9 @@ export function SearchDialog() {
   }, [open]);
 
   const handleProductClick = (e: React.MouseEvent, productId: string) => {
-    // Prevent the Link component's default navigation behavior.
     e.preventDefault();
-
-    // Start the navigation to the new page first.
     router.push(`/products/${productId}`);
     
-    // Then, close the dialog after a short delay. This prevents a race
-    // condition where unmounting the dialog interrupts the router.
     setTimeout(() => {
       setOpen(false);
     }, 100);

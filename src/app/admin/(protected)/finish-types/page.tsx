@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { db } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import type { FinishType } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -45,6 +45,7 @@ import { useAuth } from '@/context/auth-context';
 
 export default function FinishTypesPage() {
     const { toast } = useToast();
+    const db = useFirestore();
     const [dialogState, setDialogState] = useState<{open: boolean; finishType?: Partial<FinishType>}>({ open: false, finishType: undefined });
     
     const [name, setName] = useState('');
@@ -52,11 +53,11 @@ export default function FinishTypesPage() {
     const { loading: authLoading } = useAuth();
 
     const finishTypesQuery = useMemo(() => {
-        if (authLoading || !db) return null;
+        if (!db) return null;
         const q = query(collection(db, 'finishTypes'));
         (q as any).__memo = true;
         return q;
-    }, [authLoading]);
+    }, [db]);
 
     const { data: finishTypes, isLoading: isLoadingData, error } = useCollection<FinishType>(finishTypesQuery);
     const isLoading = authLoading || isLoadingData;

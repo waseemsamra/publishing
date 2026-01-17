@@ -4,10 +4,10 @@ import Image from 'next/image';
 import { useParams, notFound } from 'next/navigation';
 import { useMemo, useState, useEffect } from 'react';
 import type { Product, Size, WallType } from '@/lib/types';
-import { db } from '@/lib/firebase';
 import { doc, collection, query, where, documentId } from 'firebase/firestore';
 import { useDoc } from '@/firebase/firestore/use-doc';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import { Button } from '@/components/ui/button';
 import {
   Carousel,
@@ -24,7 +24,6 @@ import { RelatedProducts } from '@/components/related-products';
 import { BrandStories } from '@/components/brand-stories';
 import { useAuth } from '@/context/auth-context';
 
-// Define the tier type locally for this page
 type PricingTier = { qty: number; pricePerUnit: number; save: number; total: number; };
 const defaultTier = { qty: 1000, pricePerUnit: 0.130, save: 0, total: 130.00 };
 
@@ -32,34 +31,32 @@ const defaultTier = { qty: 1000, pricePerUnit: 0.130, save: 0, total: 130.00 };
 export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
   const { addToCart } = useCart();
+  const db = useFirestore();
   const { loading: authLoading } = useAuth();
 
   const productRef = useMemo(() => {
-    if (authLoading || !db) return null;
-    if (!params.id) return null;
+    if (!db || !params.id) return null;
     const ref = doc(db, 'products', params.id);
     (ref as any).__memo = true;
     return ref;
-  }, [params.id, authLoading]);
+  }, [params.id, db]);
 
   const { data: product, isLoading: isLoadingProduct, error } = useDoc<Product>(productRef);
 
   const sizesQuery = useMemo(() => {
-    if (authLoading || !db) return null;
-    if (!product?.sizeIds || product.sizeIds.length === 0) return null;
+    if (!db || !product?.sizeIds || product.sizeIds.length === 0) return null;
     const q = query(collection(db, 'sizes'), where(documentId(), 'in', product.sizeIds));
     (q as any).__memo = true;
     return q;
-  }, [product, authLoading]);
+  }, [product, db]);
   const { data: availableSizes } = useCollection<Size>(sizesQuery);
 
   const wallTypesQuery = useMemo(() => {
-    if (authLoading || !db) return null;
-    if (!product?.wallTypeIds || product.wallTypeIds.length === 0) return null;
+    if (!db || !product?.wallTypeIds || product.wallTypeIds.length === 0) return null;
     const q = query(collection(db, 'wallTypes'), where(documentId(), 'in', product.wallTypeIds));
     (q as any).__memo = true;
     return q;
-  }, [product, authLoading]);
+  }, [product, db]);
   const { data: availableWallTypes } = useCollection<WallType>(wallTypesQuery);
 
   const [selectedWall, setSelectedWall] = useState<string | null>(null);

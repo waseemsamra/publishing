@@ -55,7 +55,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { db } from '@/lib/firebase';
+import { useFirestore } from '@/firebase/provider';
 import { 
   collection, 
   getDocs, 
@@ -142,6 +142,7 @@ export default function UserManagement() {
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const { user: currentUser, loading: authLoading } = useAuth();
+  const db = useFirestore();
   const { toast } = useToast();
 
   const fetchUsers = async () => {
@@ -158,7 +159,6 @@ export default function UserManagement() {
           return {
             id: doc.id,
             ...data,
-            // Fallback for potentially missing fields
             role: data.roles?.includes('admin') ? 'admin' : 'customer',
             status: data.status || 'active',
             createdAt: data.createdAt?.toDate() || new Date(),
@@ -178,10 +178,10 @@ export default function UserManagement() {
   };
 
   useEffect(() => {
-    if(!authLoading) {
+    if(!authLoading && db) {
         fetchUsers();
     }
-  }, [authLoading]);
+  }, [authLoading, db]);
 
   const filteredUsers = useMemo(() => users.filter(user => {
     const searchName = `${user.firstName || ''} ${user.lastName || ''}`;

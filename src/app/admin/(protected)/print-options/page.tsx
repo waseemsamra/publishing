@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { db } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import type { PrintOption } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -45,24 +45,23 @@ import { useAuth } from '@/context/auth-context';
 
 export default function PrintOptionsPage() {
     const { toast } = useToast();
+    const db = useFirestore();
     const [dialogState, setDialogState] = useState<{open: boolean; printOption?: Partial<PrintOption>}>({ open: false, printOption: undefined });
     
-    // Form state is now in the main component
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const { loading: authLoading } = useAuth();
 
     const printOptionsQuery = useMemo(() => {
-        if (authLoading || !db) return null;
+        if (!db) return null;
         const q = query(collection(db, 'printOptions'));
         (q as any).__memo = true;
         return q;
-    }, [authLoading]);
+    }, [db]);
 
     const { data: printOptions, isLoading: isLoadingData, error } = useCollection<PrintOption>(printOptionsQuery);
     const isLoading = authLoading || isLoadingData;
     
-    // Update form state when dialog opens for editing
     useEffect(() => {
         if (dialogState.open && dialogState.printOption) {
             setName(dialogState.printOption.name || '');
@@ -88,11 +87,9 @@ export default function PrintOptionsPage() {
 
         try {
             if (dialogState.printOption?.id) {
-                // Update
                 await updateDoc(doc(db, 'printOptions', dialogState.printOption.id), data);
                 toast({ title: 'Success', description: 'Print Option updated.' });
             } else {
-                // Add
                 await addDoc(collection(db, 'printOptions'), {
                     ...data,
                     createdAt: serverTimestamp(),

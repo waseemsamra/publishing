@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { db } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import type { Size } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -44,24 +44,23 @@ import { useAuth } from '@/context/auth-context';
 
 export default function SizesPage() {
     const { toast } = useToast();
+    const db = useFirestore();
     const [dialogState, setDialogState] = useState<{open: boolean; size?: Partial<Size>}>({ open: false, size: undefined });
     
-    // Form state is now in the main component
     const [name, setName] = useState('');
     const [shortName, setShortName] = useState('');
     const { loading: authLoading } = useAuth();
 
     const sizesQuery = useMemo(() => {
-        if (authLoading || !db) return null;
+        if (!db) return null;
         const q = query(collection(db, 'sizes'));
         (q as any).__memo = true;
         return q;
-    }, [authLoading]);
+    }, [db]);
 
     const { data: sizes, isLoading: isLoadingData, error } = useCollection<Size>(sizesQuery);
     const isLoading = authLoading || isLoadingData;
     
-    // Update form state when dialog opens for editing
     useEffect(() => {
         if (dialogState.open && dialogState.size) {
             setName(dialogState.size.name || '');
@@ -87,11 +86,9 @@ export default function SizesPage() {
 
         try {
             if (dialogState.size?.id) {
-                // Update
                 await updateDoc(doc(db, 'sizes', dialogState.size.id), data);
                 toast({ title: 'Success', description: 'Size updated.' });
             } else {
-                // Add
                 await addDoc(collection(db, 'sizes'), {
                     ...data,
                     createdAt: serverTimestamp(),

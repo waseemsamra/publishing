@@ -2,9 +2,9 @@
 
 import { useMemo } from 'react';
 import Link from 'next/link';
-import { db } from '@/lib/firebase';
 import { collection, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import type { Category } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 import {
@@ -17,13 +17,14 @@ import { useAuth } from '@/context/auth-context';
 
 export function ProductsDrawer({ onLinkClick }: { onLinkClick?: () => void }) {
   const { loading: authLoading } = useAuth();
+  const db = useFirestore();
 
   const categoriesQuery = useMemo(() => {
-    if (authLoading || !db) return null;
+    if (!db) return null;
     const q = query(collection(db, 'categories'));
     (q as any).__memo = true;
     return q;
-  }, [authLoading]);
+  }, [db]);
 
   const { data: categories, isLoading: isLoadingData, error } = useCollection<Category>(categoriesQuery);
   const isLoading = authLoading || isLoadingData;

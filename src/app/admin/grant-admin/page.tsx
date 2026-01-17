@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { doc, setDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { useFirestore } from '@/firebase/provider';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import AdminLayout from '@/components/layout/AdminLayout';
@@ -21,6 +21,7 @@ function GrantAdminContent() {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { user, logout } = useAuth();
+  const db = useFirestore();
   const router = useRouter();
 
   const handleGrantAdmin = async () => {
@@ -50,7 +51,6 @@ function GrantAdminContent() {
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(' ');
 
-      // Use setDoc with merge to either create or update the document.
       await setDoc(userRef, {
         id: user.uid,
         email: user.email,
@@ -65,7 +65,6 @@ function GrantAdminContent() {
         description: 'Admin role granted. Please log out and log back in for the changes to take effect.',
       });
 
-      // Log the user out so they can log back in with new roles.
       await logout();
       router.push('/admin/login');
 

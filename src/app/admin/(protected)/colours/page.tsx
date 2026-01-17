@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { db } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import type { Colour } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -44,24 +44,23 @@ import { useAuth } from '@/context/auth-context';
 
 export default function ColoursPage() {
     const { toast } = useToast();
+    const db = useFirestore();
     const [dialogState, setDialogState] = useState<{open: boolean; colour?: Partial<Colour>}>({ open: false, colour: undefined });
     
-    // Form state is now in the main component
     const [name, setName] = useState('');
     const [hexCode, setHexCode] = useState('');
     const { loading: authLoading } = useAuth();
 
     const coloursQuery = useMemo(() => {
-        if (authLoading || !db) return null;
+        if (!db) return null;
         const q = query(collection(db, 'colours'));
         (q as any).__memo = true;
         return q;
-    }, [authLoading]);
+    }, [db]);
 
     const { data: colours, isLoading: isLoadingData, error } = useCollection<Colour>(coloursQuery);
     const isLoading = authLoading || isLoadingData;
     
-    // Update form state when dialog opens for editing
     useEffect(() => {
         if (dialogState.open && dialogState.colour) {
             setName(dialogState.colour.name || '');
@@ -87,11 +86,9 @@ export default function ColoursPage() {
 
         try {
             if (dialogState.colour?.id) {
-                // Update
                 await updateDoc(doc(db, 'colours', dialogState.colour.id), data);
                 toast({ title: 'Success', description: 'Colour updated.' });
             } else {
-                // Add
                 await addDoc(collection(db, 'colours'), {
                     ...data,
                     createdAt: serverTimestamp(),

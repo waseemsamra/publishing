@@ -4,9 +4,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { db } from '@/lib/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { useDoc } from '@/firebase/firestore/use-doc';
+import { useFirestore } from '@/firebase/provider';
 import type { StoreSettings } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,7 @@ type StoreSettingsFormValues = z.infer<typeof storeSettingsSchema>;
 
 export default function StoreDetailsPage() {
   const { toast } = useToast();
+  const db = useFirestore();
   const [loading, setLoading] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -36,9 +37,9 @@ export default function StoreDetailsPage() {
   const { loading: authLoading } = useAuth();
 
   const settingsRef = useMemo(() => {
-    if (authLoading || !db) return null;
+    if (!db) return null;
     return doc(db, 'settings', 'storeDetails');
-  }, [authLoading]);
+  }, [db]);
 
   const { data: storeSettings, isLoading: isLoadingSettings } = useDoc<StoreSettings>(settingsRef);
   const isLoadingPage = authLoading || isLoadingSettings;

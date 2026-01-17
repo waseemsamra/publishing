@@ -3,9 +3,9 @@
 import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { db } from '@/lib/firebase';
 import { collection, doc, deleteDoc, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import type { Product } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -47,16 +47,17 @@ import { useAuth } from '@/context/auth-context';
 
 export default function AdminProductsPage() {
     const { toast } = useToast();
+    const db = useFirestore();
     const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const { loading: authLoading } = useAuth();
     
     const productsQuery = useMemo(() => {
-        if (authLoading || !db) return null;
+        if (!db) return null;
         const q = query(collection(db, 'products'));
         (q as any).__memo = true;
         return q;
-    }, [authLoading]);
+    }, [db]);
 
     const { data: products, isLoading: isLoadingData, error } = useCollection<Product>(productsQuery);
     const isLoading = authLoading || isLoadingData;

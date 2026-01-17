@@ -1,7 +1,7 @@
 'use client';
 
 import { ProductForm } from '@/components/admin/ProductForm';
-import { db } from '@/lib/firebase';
+import { useFirestore } from '@/firebase/provider';
 import type { Product } from '@/lib/types';
 import { doc } from 'firebase/firestore';
 import { useDoc } from '@/firebase/firestore/use-doc';
@@ -13,14 +13,14 @@ import { useAuth } from '@/context/auth-context';
 export default function EditProductPage() {
   const params = useParams<{ id: string }>();
   const { loading: authLoading } = useAuth();
+  const db = useFirestore();
   
   const productRef = useMemo(() => {
-    if (authLoading || !db) return null;
-    if (!params.id) return null;
+    if (!db || !params.id) return null;
     const ref = doc(db, 'products', params.id);
     (ref as any).__memo = true;
     return ref;
-  }, [params.id, authLoading]);
+  }, [params.id, db]);
 
   const { data: product, isLoading: isLoadingData, error } = useDoc<Product>(productRef);
   const isLoading = authLoading || isLoadingData;

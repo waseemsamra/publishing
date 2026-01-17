@@ -6,9 +6,9 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Image from 'next/image';
-import { db } from '@/lib/firebase';
 import { collection, doc, addDoc, updateDoc, serverTimestamp, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import { useToast } from '@/hooks/use-toast';
 
 import type { Product, Category, Size, Colour, PrintOption, WallType, Thickness, MaterialType, FinishType, Adhesive, Handle, Shape } from '@/lib/types';
@@ -65,13 +65,14 @@ function OptionsSection({
   formFieldName: keyof ProductFormValues;
 }) {
   const { loading: authLoading } = useAuth();
+  const db = useFirestore();
   
   const optionsQuery = useMemo(() => {
-    if (authLoading || !db) return null;
+    if (!db) return null;
     const q = query(collection(db, collectionName));
     (q as any).__memo = true;
     return q;
-  }, [collectionName, authLoading]);
+  }, [collectionName, db]);
 
   const { data: options, isLoading } = useCollection<OptionType>(optionsQuery);
   const isSectionLoading = authLoading || isLoading;
@@ -131,6 +132,7 @@ const s3BaseUrl = 'https://printinweb.s3.us-east-1.amazonaws.com';
 export function ProductForm({ product }: { product?: Product }) {
   const router = useRouter();
   const { toast } = useToast();
+  const db = useFirestore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<ProductFormValues>({

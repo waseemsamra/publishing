@@ -2,9 +2,9 @@
 
 import { useState, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { db } from '@/lib/firebase';
 import { collection, query, where, Query, DocumentData } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import type { Product } from '@/lib/types';
 import { ProductCard } from '@/components/product-card';
 import { Loader2, LayoutGrid, List } from 'lucide-react';
@@ -17,6 +17,7 @@ function ProductsPageContent() {
   const [filters, setFilters] = useState<Record<string, string[]>>({});
   const [layout, setLayout] = useState<'grid' | 'list'>('grid');
   const { loading: authLoading } = useAuth();
+  const db = useFirestore();
   
   const searchParams = useSearchParams();
   const categoryId = searchParams.get('category');
@@ -26,7 +27,7 @@ function ProductsPageContent() {
   }, [categoryId]);
 
   const productsQuery = useMemo(() => {
-    if (authLoading || !db) return null;
+    if (!db) return null;
     let q: Query<DocumentData> = collection(db, 'products');
 
     Object.entries(filters).forEach(([key, values]) => {
@@ -37,7 +38,7 @@ function ProductsPageContent() {
 
     (q as any).__memo = true;
     return q;
-  }, [filters, authLoading]);
+  }, [filters, db]);
 
   const { data: products, isLoading: isLoadingData, error } = useCollection<Product>(productsQuery);
   const isLoading = authLoading || isLoadingData;

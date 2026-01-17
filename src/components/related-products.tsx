@@ -1,9 +1,9 @@
 'use client';
 
 import { useMemo } from 'react';
-import { db } from '@/lib/firebase';
 import { collection, query, limit } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import type { Product } from '@/lib/types';
 import { ProductCard } from '@/components/product-card';
 import { Loader2 } from 'lucide-react';
@@ -18,13 +18,14 @@ import { useAuth } from '@/context/auth-context';
 
 export function RelatedProducts() {
   const { loading: authLoading } = useAuth();
+  const db = useFirestore();
   
   const productsQuery = useMemo(() => {
-    if (authLoading || !db) return null;
+    if (!db) return null;
     const q = query(collection(db, 'products'), limit(8));
     (q as any).__memo = true;
     return q;
-  }, [authLoading]);
+  }, [db]);
 
   const { data: products, isLoading: isLoadingData } = useCollection<Product>(productsQuery);
   const isLoading = authLoading || isLoadingData;

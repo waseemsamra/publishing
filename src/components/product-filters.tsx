@@ -1,9 +1,9 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
-import { db } from '@/lib/firebase';
 import { collection, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -41,13 +41,14 @@ function FilterSection({
     onFilterChange: (value: string) => void;
 }) {
     const { loading: authLoading } = useAuth();
+    const db = useFirestore();
 
     const optionsQuery = useMemo(() => {
-        if (authLoading || !db) return null;
+        if (!db) return null;
         const q = query(collection(db, collectionName));
         (q as any).__memo = true;
         return q;
-    }, [collectionName, authLoading]);
+    }, [collectionName, db]);
 
     const { data: options, isLoading: isLoadingData } = useCollection<OptionType>(optionsQuery);
     const isLoading = authLoading || isLoadingData;

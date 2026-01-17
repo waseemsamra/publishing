@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { db } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
 import type { Handle } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -45,6 +45,7 @@ import { useAuth } from '@/context/auth-context';
 
 export default function HandlesPage() {
     const { toast } = useToast();
+    const db = useFirestore();
     const [dialogState, setDialogState] = useState<{open: boolean; handle?: Partial<Handle>}>({ open: false, handle: undefined });
     
     const [name, setName] = useState('');
@@ -52,11 +53,11 @@ export default function HandlesPage() {
     const { loading: authLoading } = useAuth();
 
     const handlesQuery = useMemo(() => {
-        if (authLoading || !db) return null;
+        if (!db) return null;
         const q = query(collection(db, 'handles'));
         (q as any).__memo = true;
         return q;
-    }, [authLoading]);
+    }, [db]);
 
     const { data: handles, isLoading: isLoadingData, error } = useCollection<Handle>(handlesQuery);
     const isLoading = authLoading || isLoadingData;

@@ -10,7 +10,7 @@ import {
   createUserWithEmailAndPassword,
 } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+import { useFirebase, useFirebaseAuth, useFirestore } from '@/firebase/provider';
 
 interface AuthUser extends User {
   role?: string;
@@ -40,13 +40,22 @@ export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { loading: firebaseLoading } = useFirebase();
+  const auth = useFirebaseAuth();
+  const db = useFirestore();
+  const [userLoading, setUserLoading] = useState(true);
 
   useEffect(() => {
-    if (!auth) {
-        setLoading(false);
-        return;
+    if (firebaseLoading) {
+      return; 
     }
+
+    if (!auth) {
+      setUser(null);
+      setUserLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         if (!db) {
@@ -58,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               displayName: firebaseUser.email?.split('@')[0] || 'User',
               photoURL: firebaseUser.photoURL,
             });
-            setLoading(false);
+            setUserLoading(false);
             return;
         }
         try {
@@ -95,11 +104,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setUser(null);
       }
-      setLoading(false);
+      setUserLoading(false);
     });
 
     return unsubscribe;
-  }, []);
+  }, [firebaseLoading, auth, db]);
 
   const login = (email: string, password: string) => {
     if (!auth) return Promise.reject(new Error("Firebase not initialized"));
@@ -120,6 +129,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!auth) return Promise.reject(new Error("Firebase not initialized"));
     return sendPasswordResetEmail(auth, email);
   };
+  
+  const loading = firebaseLoading || userLoading;
 
   return (
     <AuthContext.Provider value={{ user, loading, login, signup, logout, resetPassword }}>

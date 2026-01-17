@@ -31,8 +31,8 @@ export function SiteFooter() {
                       <div>
                         <h4 className="font-headline font-semibold mb-4">Company</h4>
                         <ul className="space-y-2">
-                          <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">noissue</Link></li>
-                          <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">noissue+</Link></li>
+                          <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">HanaPac</Link></li>
+                          <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">HanaPac+</Link></li>
                           <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">The blog</Link></li>
                           <li><Link href="/sustainability-report" className="text-sm text-muted-foreground hover:text-primary">Sustainability</Link></li>
                           <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Help center</Link></li>
@@ -70,7 +70,7 @@ export function SiteFooter() {
                       <Input type="email" placeholder="hello@thisismyemail.com" className="bg-white" />
                       <Button type="submit" style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }}>Subscribe</Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">By subscribing you will receive marketing from noissue. See Privacy Policy</p>
+                  <p className="text-xs text-muted-foreground mt-2">By subscribing you will receive marketing from HanaPac. See Privacy Policy</p>
                 </div>
             </div>
           </div>
@@ -89,7 +89,7 @@ export function SiteFooter() {
            </div>
         </div>
         <div className="text-sm text-muted-foreground flex gap-4">
-          <span>&copy; noissue {new Date().getFullYear()}</span>
+          <span>&copy; HanaPac {new Date().getFullYear()}</span>
           <Link href="#" className="hover:text-primary">T & C's</Link>
           <Link href="#" className="hover:text-primary">Privacy Policy</Link>
         </div>

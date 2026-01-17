@@ -207,37 +207,37 @@ export const orders: Order[] = [
 export const brandStories: BrandStory[] = [
     {
         id: 'bs-1',
-        title: 'Longform x noissue',
+        title: 'Longform x HanaPac',
         description: 'New Zealand-based clothing brand Longform approaches packaging as they do their designs—slowly...',
         image: imageMap['brand-story-1'],
     },
     {
         id: 'bs-2',
-        title: 'The Understudy x noissue',
+        title: 'The Understudy x HanaPac',
         description: 'The theater-themed café and bookstore The Understudy tells of a vibrant community fueled by...',
         image: imageMap['brand-story-2'],
     },
     {
         id: 'bs-3',
-        title: 'The Lunch Lady x noissue',
+        title: 'The Lunch Lady x HanaPac',
         description: 'Read our chat with Vancouver’s iconic Vietnamese diner, The Lunch Lady—a local favorite known for its vibrant...',
         image: imageMap['brand-story-3'],
     },
     {
         id: 'bs-4',
-        title: 'The Hillmont x noissue',
+        title: 'The Hillmont x HanaPac',
         description: 'Downtown Auburn’s The Hillmont takes the classic American dining experience and hospitality to the next...',
         image: imageMap['brand-story-4'],
     },
     {
         id: 'bs-5',
-        title: 'Foremost Coffee x noissue',
+        title: 'Foremost Coffee x HanaPac',
         description: 'But first (and foremost), coffee: Melbourne coffee bar, Foremost Coffee, takes hospitality to the next...',
         image: imageMap['brand-story-5'],
     },
     {
         id: 'bs-6',
-        title: 'Fresh Harvest x noissue',
+        title: 'Fresh Harvest x HanaPac',
         description: 'Read all about Georgia-based online grocery service Fresh Harvest’s use of reusable and compostable packagin...',
         image: imageMap['brand-story-6'],
     }

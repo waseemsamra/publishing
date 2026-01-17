@@ -10,7 +10,7 @@ import {
   createUserWithEmailAndPassword,
 } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { useFirebase, useFirebaseAuth, useFirestore } from '@/firebase/provider';
+import { useFirebaseAuth, useFirestore } from '@/firebase/provider';
 
 interface AuthUser extends User {
   role?: string;
@@ -40,20 +40,15 @@ export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const { loading: firebaseLoading } = useFirebase();
+  const [loading, setLoading] = useState(true);
   const auth = useFirebaseAuth();
   const db = useFirestore();
-  const [userLoading, setUserLoading] = useState(true);
 
   useEffect(() => {
-    if (firebaseLoading) {
-      return; 
-    }
-
     if (!auth) {
-      setUser(null);
-      setUserLoading(false);
-      return;
+        setUser(null);
+        setLoading(false);
+        return;
     }
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -67,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               displayName: firebaseUser.email?.split('@')[0] || 'User',
               photoURL: firebaseUser.photoURL,
             });
-            setUserLoading(false);
+            setLoading(false);
             return;
         }
         try {
@@ -104,11 +99,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setUser(null);
       }
-      setUserLoading(false);
+      setLoading(false);
     });
 
     return unsubscribe;
-  }, [firebaseLoading, auth, db]);
+  }, [auth, db]);
 
   const login = (email: string, password: string) => {
     if (!auth) return Promise.reject(new Error("Firebase not initialized"));
@@ -130,8 +125,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return sendPasswordResetEmail(auth, email);
   };
   
-  const loading = firebaseLoading || userLoading;
-
   return (
     <AuthContext.Provider value={{ user, loading, login, signup, logout, resetPassword }}>
       {children}

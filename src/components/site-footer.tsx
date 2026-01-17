@@ -2,10 +2,10 @@
 
 import { Logo } from "./logo";
 import Link from 'next/link';
-import { Instagram, Facebook, Linkedin, Wifi, WifiOff, Loader2 } from 'lucide-react';
+import { Instagram, Facebook, Linkedin, Wifi, WifiOff } from 'lucide-react';
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { useFirebase } from "@/firebase/provider";
+import { useFirestore } from "@/firebase/provider";
 
 const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
@@ -20,16 +20,7 @@ const PinterestIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 function FirebaseConnectionStatus() {
-  const { db, loading } = useFirebase();
-
-  if (loading) {
-    return (
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        <span>Connecting...</span>
-      </div>
-    );
-  }
+  const db = useFirestore();
   
   if (db) {
     return (

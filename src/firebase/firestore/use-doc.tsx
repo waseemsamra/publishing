@@ -10,7 +10,6 @@ import {
 } from 'firebase/firestore';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
-import { useFirestore } from '@/firebase/provider';
 
 
 type WithId<T> = T & { id: string };
@@ -31,14 +30,8 @@ export function useDoc<T = any>(
   const [data, setData] = useState<StateDataType>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<FirestoreError | Error | null>(null);
-  const db = useFirestore();
 
   useEffect(() => {
-    if (!db) {
-        setIsLoading(false);
-        return;
-    }
-
     if (!memoizedDocRef) {
       setData(null);
       setIsLoading(false);
@@ -75,7 +68,7 @@ export function useDoc<T = any>(
     );
 
     return () => unsubscribe();
-  }, [memoizedDocRef, db]); 
+  }, [memoizedDocRef]); 
 
   return { data, isLoading, error };
 }

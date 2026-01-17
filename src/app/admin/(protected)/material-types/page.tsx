@@ -66,6 +66,10 @@ export default function MaterialTypesPage() {
     }, [dialogState.open, dialogState.material]);
 
     const handleSaveMaterial = async () => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         if (!name.trim()) {
             toast({
                 variant: 'destructive',
@@ -96,6 +100,10 @@ export default function MaterialTypesPage() {
     };
 
     const handleDeleteMaterial = async (id: string) => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         try {
             await deleteDoc(doc(db, 'materialTypes', id));
             toast({ title: 'Success', description: 'Material deleted.' });

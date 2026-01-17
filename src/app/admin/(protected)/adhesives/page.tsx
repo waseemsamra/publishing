@@ -66,6 +66,10 @@ export default function AdhesivesPage() {
     }, [dialogState.open, dialogState.adhesive]);
 
     const handleSaveAdhesive = async () => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         if (!name.trim()) {
             toast({
                 variant: 'destructive',
@@ -96,6 +100,10 @@ export default function AdhesivesPage() {
     };
 
     const handleDeleteAdhesive = async (id: string) => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         try {
             await deleteDoc(doc(db, 'adhesives', id));
             toast({ title: 'Success', description: 'Adhesive deleted.' });

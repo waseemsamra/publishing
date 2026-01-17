@@ -68,6 +68,10 @@ export default function PrintOptionsPage() {
     }, [dialogState.open, dialogState.printOption]);
 
     const handleSavePrintOption = async () => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         if (!name.trim()) {
             toast({
                 variant: 'destructive',
@@ -100,6 +104,10 @@ export default function PrintOptionsPage() {
     };
 
     const handleDeletePrintOption = async (id: string) => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         try {
             await deleteDoc(doc(db, 'printOptions', id));
             toast({ title: 'Success', description: 'Print Option deleted.' });

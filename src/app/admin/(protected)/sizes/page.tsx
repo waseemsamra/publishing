@@ -67,6 +67,10 @@ export default function SizesPage() {
     }, [dialogState.open, dialogState.size]);
 
     const handleSaveSize = async () => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         if (!name.trim() || !shortName.trim()) {
             toast({
                 variant: 'destructive',
@@ -99,6 +103,10 @@ export default function SizesPage() {
     };
 
     const handleDeleteSize = async (id: string) => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         try {
             await deleteDoc(doc(db, 'sizes', id));
             toast({ title: 'Success', description: 'Size deleted.' });

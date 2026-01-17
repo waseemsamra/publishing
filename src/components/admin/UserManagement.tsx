@@ -143,11 +143,16 @@ export default function UserManagement() {
   const { user: currentUser } = useAuth();
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   const fetchUsers = async () => {
+    if (!db) {
+        setLoading(false);
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Firebase is not initialized.",
+        });
+        return;
+    }
     try {
       setLoading(true);
       const usersSnapshot = await getDocs(collection(db, 'users'));
@@ -175,6 +180,10 @@ export default function UserManagement() {
     }
   };
 
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   const filteredUsers = users.filter(user => {
     const searchName = `${user.firstName || ''} ${user.lastName || ''}`;
     const matchesSearch = 
@@ -186,6 +195,14 @@ export default function UserManagement() {
   });
 
   const handleUpdateUser = async (userId: string, updates: Partial<User>) => {
+    if (!db) {
+      toast({
+        variant: 'destructive',
+        title: 'Update Failed',
+        description: 'Database not connected.',
+      });
+      return;
+    }
     try {
       const newRoles = updates.role === 'admin' ? ['admin', 'customer'] : ['customer'];
       await updateDoc(doc(db, 'users', userId), {
@@ -216,6 +233,14 @@ export default function UserManagement() {
             description: 'You cannot delete your own account.',
         });
         return;
+    }
+    if (!db) {
+      toast({
+        variant: 'destructive',
+        title: 'Deletion Failed',
+        description: 'Database not connected.',
+      });
+      return;
     }
      try {
       await deleteDoc(doc(db, 'users', userId));

@@ -92,6 +92,10 @@ export default function CategoriesPage() {
     }, [dialogState.open, dialogState.category]);
 
     const handleSaveCategory = async () => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         if (!name.trim()) {
             toast({
                 variant: 'destructive',
@@ -148,6 +152,10 @@ export default function CategoriesPage() {
     };
 
     const handleDeleteCategory = async (id: string) => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         const isParent = categories?.some(c => c.parentId === id);
         if (isParent) {
             toast({

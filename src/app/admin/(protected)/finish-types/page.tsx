@@ -66,6 +66,10 @@ export default function FinishTypesPage() {
     }, [dialogState.open, dialogState.finishType]);
 
     const handleSaveFinishType = async () => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         if (!name.trim()) {
             toast({
                 variant: 'destructive',
@@ -96,6 +100,10 @@ export default function FinishTypesPage() {
     };
 
     const handleDeleteFinishType = async (id: string) => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         try {
             await deleteDoc(doc(db, 'finishTypes', id));
             toast({ title: 'Success', description: 'Finish Type deleted.' });

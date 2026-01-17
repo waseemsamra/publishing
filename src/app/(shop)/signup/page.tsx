@@ -27,6 +27,14 @@ export default function SignUpPage() {
   const { signup } = useAuth();
 
   const handleSignUp = async () => {
+    if (!db) {
+      toast({
+        variant: 'destructive',
+        title: 'Database Error',
+        description: 'Firebase is not configured. Please check your setup.',
+      });
+      return;
+    }
     try {
       const userCredential = await signup(email, password);
       const user = userCredential.user;

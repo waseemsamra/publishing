@@ -33,6 +33,16 @@ function GrantAdminContent() {
       return;
     }
 
+    if (!db) {
+      toast({
+        variant: 'destructive',
+        title: 'Database Error',
+        description: 'Firebase is not configured. Please check your setup.',
+      });
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       const userRef = doc(db, 'users', user.uid);

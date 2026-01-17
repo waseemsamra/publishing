@@ -67,6 +67,10 @@ export default function ColoursPage() {
     }, [dialogState.open, dialogState.colour]);
 
     const handleSaveColour = async () => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         if (!name.trim() || !hexCode.trim()) {
             toast({
                 variant: 'destructive',
@@ -99,6 +103,10 @@ export default function ColoursPage() {
     };
 
     const handleDeleteColour = async (id: string) => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         try {
             await deleteDoc(doc(db, 'colours', id));
             toast({ title: 'Success', description: 'Colour deleted.' });

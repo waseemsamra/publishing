@@ -66,6 +66,10 @@ export default function ShapesPage() {
     }, [dialogState.open, dialogState.shape]);
 
     const handleSaveShape = async () => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         if (!name.trim()) {
             toast({
                 variant: 'destructive',
@@ -96,6 +100,10 @@ export default function ShapesPage() {
     };
 
     const handleDeleteShape = async (id: string) => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         try {
             await deleteDoc(doc(db, 'shapes', id));
             toast({ title: 'Success', description: 'Shape deleted.' });

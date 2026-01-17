@@ -59,6 +59,10 @@ export default function AdminProductsPage() {
     const { data: products, isLoading, error } = useCollection<Product>(productsQuery);
 
     const handleDeleteSelected = async () => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         try {
             const deletePromises = selectedProductIds.map(id => deleteDoc(doc(db, 'products', id)));
             await Promise.all(deletePromises);

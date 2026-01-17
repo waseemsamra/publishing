@@ -66,6 +66,10 @@ export default function ThicknessesPage() {
     }, [dialogState.open, dialogState.thickness]);
 
     const handleSaveThickness = async () => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         if (!name.trim()) {
             toast({
                 variant: 'destructive',
@@ -96,6 +100,10 @@ export default function ThicknessesPage() {
     };
 
     const handleDeleteThickness = async (id: string) => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         try {
             await deleteDoc(doc(db, 'thicknesses', id));
             toast({ title: 'Success', description: 'Thickness deleted.' });

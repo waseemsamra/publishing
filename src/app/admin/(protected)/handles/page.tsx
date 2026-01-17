@@ -66,6 +66,10 @@ export default function HandlesPage() {
     }, [dialogState.open, dialogState.handle]);
 
     const handleSaveHandle = async () => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         if (!name.trim()) {
             toast({
                 variant: 'destructive',
@@ -96,6 +100,10 @@ export default function HandlesPage() {
     };
 
     const handleDeleteHandle = async (id: string) => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
         try {
             await deleteDoc(doc(db, 'handles', id));
             toast({ title: 'Success', description: 'Handle deleted.' });

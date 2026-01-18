@@ -1,2 +1,2 @@
-// This file is a placeholder to resolve a build conflict and should be ignored.
-export const fix = true;
+// This file is intentionally not a page to resolve a route conflict.
+export const placeholder = true;

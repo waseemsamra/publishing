@@ -47,7 +47,7 @@ const TrendingNowCard = ({ imageId, title }: { imageId: string, title: string })
 
 const HeroPanel = ({ title, subtitle, links, imageSrc, imageHint, imageAlt, href }: { title: string; subtitle?: string; links: {text: string, href: string}[]; imageSrc: string; imageHint: string; imageAlt: string; href: string; }) => {
   return (
-    <div className="relative group w-full h-[50vh] md:h-[70vh] bg-cover bg-center flex items-end text-white">
+    <div className="relative isolate group w-full h-[50vh] md:h-[70vh] bg-cover bg-center flex items-end text-white">
       <Image src={imageSrc} alt={imageAlt} fill className="object-cover w-full h-full -z-10" data-ai-hint={imageHint}/>
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
       <div className="relative z-10 p-6 md:p-12 w-full">

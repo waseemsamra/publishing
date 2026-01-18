@@ -1,4 +1,3 @@
-// This file is a placeholder to resolve a routing conflict.
-// The primary page for this route is located in the (protected) group.
-// This file must not export a default component.
-export const __placeholder = true;
+// This file's default export is null, which prevents Next.js from treating it as a page.
+// This resolves the "parallel pages" build error caused by a conflicting page in the (protected) route group.
+export default null;

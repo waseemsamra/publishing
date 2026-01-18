@@ -144,18 +144,32 @@ service cloud.firestore {
       allow update: if isAdmin();
       allow delete: if isAdmin();
     }
+    
+    /**
+     * @description Stores content for the homepage hero carousel.
+     * Publicly readable, write access restricted to administrators.
+     * @path /heroSlides/{heroSlideId}
+     * @allow (get, list) Any user, for viewing homepage content.
+     * @allow (write) Any admin user.
+     * @deny (write) All non-admin users.
+     * @principle Public read for functionality, admin-only for management.
+     */
+    match /heroSlides/{heroSlideId} {
+        allow get, list: if true;
+        allow create, update, delete: if isAdmin();
+    }
 
     /**
-     * @description Consolidated rule for all product attribute and content collections.
-     * This data is publicly readable for product filtering and site content, but can only be managed by administrators.
+     * @description Consolidated rule for all product attribute collections.
+     * This data is publicly readable for product filtering, but can only be managed by administrators.
      * @path /{collectionName}/{docId} where collectionName is one of the designated public collections.
-     * @allow (get, list) Any user, for product filtering or viewing content.
+     * @allow (get, list) Any user, for product filtering.
      * @allow (write) Any admin user.
      * @deny (write) All non-admin users.
      * @principle Public read for functionality, admin-only for management.
      */
     match /{collectionName}/{docId} 
-      where collectionName in ['sizes', 'colours', 'printOptions', 'wallTypes', 'thicknesses', 'materialTypes', 'finishTypes', 'adhesives', 'handles', 'shapes', 'heroSlides'] {
+      where collectionName in ['sizes', 'colours', 'printOptions', 'wallTypes', 'thicknesses', 'materialTypes', 'finishTypes', 'adhesives', 'handles', 'shapes'] {
         allow get, list: if true;
         allow write: if isAdmin();
     }

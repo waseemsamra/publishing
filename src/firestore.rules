@@ -63,12 +63,9 @@ service cloud.firestore {
       return request.resource.data.id == resource.data.id;
     }
     
-
     /**
-     * @description Manages user account documents. A user can read their own document,
-     * and admins can read any. Listing is admin-only.
+     * @description Manages user account documents. Users can read their own document, and admins can read any.
      * @path /users/{userId}
-     * @principle User data is private, but readable by admins for management.
      */
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
@@ -95,19 +92,20 @@ service cloud.firestore {
       allow get, list: if true;
       allow create, update, delete: if isAdmin();
     }
+    
+    // Explicitly make all product attribute and content collections publicly readable
+    match /sizes/{docId} { allow get, list: if true; allow write: if isAdmin(); }
+    match /colours/{docId} { allow get, list: if true; allow write: if isAdmin(); }
+    match /printOptions/{docId} { allow get, list: if true; allow write: if isAdmin(); }
+    match /wallTypes/{docId} { allow get, list: if true; allow write: if isAdmin(); }
+    match /thicknesses/{docId} { allow get, list: if true; allow write: if isAdmin(); }
+    match /materialTypes/{docId} { allow get, list: if true; allow write: if isAdmin(); }
+    match /finishTypes/{docId} { allow get, list: if true; allow write: if isAdmin(); }
+    match /adhesives/{docId} { allow get, list: if true; allow write: if isAdmin(); }
+    match /handles/{docId} { allow get, list: if true; allow write: if isAdmin(); }
+    match /shapes/{docId} { allow get, list: if true; allow write: if isAdmin(); }
+    match /heroSlides/{docId} { allow get, list: if true; allow write: if isAdmin(); }
 
-    /**
-     * @description Consolidated rule for all product attribute and content collections.
-     * This data is publicly readable for product filtering and site content,
-     * but can only be managed by administrators.
-     * @path /{collectionName}/{docId}
-     * @principle Public read for functionality, admin-only for management.
-     */
-    match /{collectionName}/{docId} 
-      where collectionName in ['sizes', 'colours', 'printOptions', 'wallTypes', 'thicknesses', 'materialTypes', 'finishTypes', 'adhesives', 'handles', 'shapes', 'heroSlides'] {
-        allow get, list: if true;
-        allow write: if isAdmin();
-    }
 
     /**
      * @description Stores global application settings. Only admins can read or manage them.

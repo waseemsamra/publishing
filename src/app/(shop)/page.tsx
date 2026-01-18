@@ -51,7 +51,7 @@ const HeroPanel = ({ title, subtitle, links, imageSrc, imageHint, imageAlt, href
       <Image src={imageSrc} alt={imageAlt} fill className="object-cover w-full h-full -z-10" data-ai-hint={imageHint}/>
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
       <div className="relative z-10 p-6 md:p-12 w-full">
-        <h2 className="font-headline text-3xl md:text-4xl font-bold">{title}</h2>
+        <h2 className="font-headline text-4xl md:text-5xl font-bold">{title}</h2>
         {subtitle && <p className="mt-2 text-md text-white/90 max-w-lg">{subtitle}</p>}
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
           {links.map((link) => (

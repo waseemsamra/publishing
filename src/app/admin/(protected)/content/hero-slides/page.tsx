@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy, writeBatch } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirestore } from '@/firebase/provider';
 import type { HeroSlide } from '@/lib/types';
@@ -15,12 +15,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Label } from '@/components/ui/label';
-import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2, UploadCloud, Link as LinkIcon, GripVertical, Copy } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2, UploadCloud, Link as LinkIcon, Copy, ArrowUp, ArrowDown } from 'lucide-react';
 import { format } from 'date-fns';
 
 const s3BaseUrl = 'https://printinweb.s3.us-east-1.amazonaws.com';
@@ -74,9 +74,7 @@ export default function AdminHeroSlidesPage() {
     const imageUrlPath = form.watch('imageUrl');
 
     useEffect(() => {
-        // If a local file is being staged, don't override its preview
         if (logoFile) return;
-
         if (imageUrlPath) {
             const url = imageUrlPath.startsWith('http') ? imageUrlPath : `${s3BaseUrl}${imageUrlPath}`;
             setLogoPreview(url);
@@ -84,7 +82,6 @@ export default function AdminHeroSlidesPage() {
             setLogoPreview(null);
         }
     }, [imageUrlPath, logoFile]);
-
 
     useEffect(() => {
         if (dialogState.open && dialogState.slide) {
@@ -97,7 +94,7 @@ export default function AdminHeroSlidesPage() {
                 links: dialogState.slide.links || []
             });
             setLogoPreview(dialogState.slide.imageUrl || null);
-            setLogoFile(null); // Clear any staged file
+            setLogoFile(null);
         } else {
             form.reset({ title: '', subtitle: '', imageUrl: '', imageHint: '', order: slides?.length || 0, links: [] });
             setLogoPreview(null);
@@ -170,23 +167,46 @@ export default function AdminHeroSlidesPage() {
             return;
         }
         try {
-            // Omitting id, createdAt, and updatedAt from the cloned object
             const { id, createdAt, updatedAt, ...clonedData } = slideToClone;
-
             const newSlideData = {
                 ...clonedData,
                 title: `${clonedData.title} (Copy)`,
-                order: slides ? slides.length : 0, // Place clone at the end
+                order: slides ? slides.length : 0,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp(),
             };
-
             await addDoc(collection(db, 'heroSlides'), newSlideData);
-
             toast({ title: 'Success', description: `"${slideToClone.title}" has been cloned.` });
         } catch (e: any) {
             console.error('Error cloning slide:', e);
             toast({ variant: 'destructive', title: 'Clone Error', description: e.message });
+        }
+    };
+
+    const handleReorder = async (currentIndex: number, direction: 'up' | 'down') => {
+        if (!db || !slides) return;
+        if ((direction === 'up' && currentIndex === 0) || (direction === 'down' && currentIndex === slides.length - 1)) {
+            return;
+        }
+
+        const slideToMove = slides[currentIndex];
+        const otherIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+        const slideToSwapWith = slides[otherIndex];
+
+        try {
+            const batch = writeBatch(db);
+
+            const slideToMoveRef = doc(db, 'heroSlides', slideToMove.id);
+            batch.update(slideToMoveRef, { order: slideToSwapWith.order });
+
+            const slideToSwapWithRef = doc(db, 'heroSlides', slideToSwapWith.id);
+            batch.update(slideToSwapWithRef, { order: slideToMove.order });
+
+            await batch.commit();
+            toast({ title: 'Success', description: 'Slide reordered.' });
+        } catch (e: any) {
+            console.error('Error reordering slides:', e);
+            toast({ variant: 'destructive', title: 'Reorder Error', description: e.message });
         }
     };
     
@@ -212,7 +232,7 @@ export default function AdminHeroSlidesPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-8 px-2"></TableHead>
+                                <TableHead className="w-12">#</TableHead>
                                 <TableHead className="hidden w-[100px] sm:table-cell">Image</TableHead>
                                 <TableHead>Title</TableHead>
                                 <TableHead>Order</TableHead>
@@ -224,11 +244,9 @@ export default function AdminHeroSlidesPage() {
                             {isLoading ? <TableRow><TableCell colSpan={6} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell></TableRow>
                             : error ? <TableRow><TableCell colSpan={6} className="text-center text-red-500">{error.message}</TableCell></TableRow>
                             : slides?.length === 0 ? <TableRow><TableCell colSpan={6} className="h-24 text-center">No slides found. Add one to get started.</TableCell></TableRow>
-                            : slides?.map((slide) => (
+                            : slides?.map((slide, index) => (
                                 <TableRow key={slide.id}>
-                                    <TableCell className="px-2 cursor-grab">
-                                        <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                    </TableCell>
+                                    <TableCell className="font-medium">{index + 1}</TableCell>
                                     <TableCell className="hidden sm:table-cell">
                                         {slide.imageUrl && <Image alt={slide.title} className="aspect-square rounded-md object-cover" height="64" src={slide.imageUrl} width="64" unoptimized />}
                                     </TableCell>
@@ -239,6 +257,13 @@ export default function AdminHeroSlidesPage() {
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onSelect={() => handleReorder(index, 'up')} disabled={index === 0}>
+                                                    <ArrowUp className="mr-2 h-4 w-4" /><span>Move Up</span>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onSelect={() => handleReorder(index, 'down')} disabled={index === slides.length - 1}>
+                                                    <ArrowDown className="mr-2 h-4 w-4" /><span>Move Down</span>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
                                                 <DropdownMenuItem onSelect={() => setDialogState({ open: true, slide })}><Edit className="mr-2 h-4 w-4" /><span>Edit</span></DropdownMenuItem>
                                                 <DropdownMenuItem onSelect={() => handleCloneSlide(slide)}>
                                                     <Copy className="mr-2 h-4 w-4" />
@@ -298,7 +323,6 @@ export default function AdminHeroSlidesPage() {
                                 <Label>Links</Label>
                                 {fields.map((field, index) => (
                                     <div key={field.id} className="flex items-center gap-2 p-3 border rounded-lg">
-                                        <GripVertical className="h-5 w-5 text-muted-foreground" />
                                         <div className="flex-1 grid grid-cols-2 gap-2">
                                             <FormField control={form.control} name={`links.${index}.text`} render={({ field }) => (
                                                 <FormItem><FormControl><Input {...field} placeholder="Link Text" /></FormControl><FormMessage /></FormItem>

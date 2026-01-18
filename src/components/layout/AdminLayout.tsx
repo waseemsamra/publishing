@@ -56,9 +56,9 @@ const navItems = [
   },
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/admin/content', label: 'Content', icon: FileText },
   { href: '/admin/calendar', label: 'Calendar', icon: Calendar },
   { href: '/admin/grant-admin', label: 'Grant Admin', icon: UserCog, isPublic: true }, // Allow public access
+  { href: '/admin/content', label: 'CMS', icon: FileText },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 

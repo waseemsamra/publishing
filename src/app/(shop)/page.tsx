@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { LowMinimumMustHaves } from '@/components/low-minimum-must-haves';
 import { BrandStories } from '@/components/brand-stories';
@@ -10,6 +10,11 @@ import { PackagingAlliance } from '@/components/packaging-alliance';
 import { PackagingPartner } from '@/components/packaging-partner';
 import { PackagingForBrands } from '@/components/packaging-for-brands';
 import { SignupBanner } from '@/components/signup-banner';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirestore } from '@/firebase/provider';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
+import { useMemo } from 'react';
+import type { HeroSlide } from '@/lib/types';
 
 const TrendingNowCard = ({ imageId, title }: { imageId: string, title: string }) => {
   const image = PlaceHolderImages.find(p => p.id === imageId);
@@ -32,17 +37,18 @@ const TrendingNowCard = ({ imageId, title }: { imageId: string, title: string })
   );
 };
 
-const HeroPanel = ({ title, links, imageSrc, imageHint, imageAlt, href }: { title: string; links: string[]; imageSrc: string; imageHint: string; imageAlt: string; href: string; }) => {
+const HeroPanel = ({ title, subtitle, links, imageSrc, imageHint, imageAlt, href }: { title: string; subtitle?: string; links: {text: string, href: string}[]; imageSrc: string; imageHint: string; imageAlt: string; href: string; }) => {
   return (
     <div className="relative group w-full h-[70vh] bg-cover bg-center flex items-end text-white">
-      <Image src={imageSrc} alt={imageAlt} layout="fill" objectFit="cover" className="-z-10" data-ai-hint={imageHint}/>
+      <Image src={imageSrc} alt={imageAlt} fill className="object-cover w-full h-full -z-10" data-ai-hint={imageHint}/>
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
       <div className="relative z-10 p-8 md:p-12 w-full">
         <h2 className="font-headline text-4xl md:text-5xl font-bold">{title}</h2>
+        {subtitle && <p className="mt-2 text-lg text-white/90 max-w-lg">{subtitle}</p>}
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
           {links.map((link) => (
-            <Link key={link} href="#" className="text-sm font-semibold hover:underline">
-              {link}
+            <Link key={link.text} href={link.href} className="text-sm font-semibold hover:underline">
+              {link.text}
             </Link>
           ))}
         </div>
@@ -56,31 +62,70 @@ const HeroPanel = ({ title, links, imageSrc, imageHint, imageAlt, href }: { titl
 
 
 function TwoPanelHero() {
-    const takeoutBagImage = PlaceHolderImages.find(p => p.id === 'hero-takeout-bag');
-    const paperBowlsImage = PlaceHolderImages.find(p => p.id === 'hero-paper-bowls');
+    const db = useFirestore();
+    const heroSlidesQuery = useMemo(() => {
+        if (!db) return null;
+        const q = query(collection(db, 'heroSlides'), orderBy('order', 'asc'), limit(2));
+        (q as any).__memo = true;
+        return q;
+    }, [db]);
 
-    if (!takeoutBagImage || !paperBowlsImage) {
-        return null; // Or a loading/error state
+    const { data: slides, isLoading } = useCollection<HeroSlide>(heroSlidesQuery);
+
+    if (isLoading) {
+        return (
+            <section className="grid grid-cols-1 md:grid-cols-2 h-[70vh] bg-muted">
+                <div className="w-full h-full flex items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+                 <div className="w-full h-full flex items-center justify-center border-l border-border">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+            </section>
+        );
+    }
+    
+    if (!slides || slides.length === 0) {
+        return (
+             <section className="grid grid-cols-1 md:grid-cols-2 h-[70vh]">
+                <div className="w-full h-full bg-muted flex items-center justify-center text-center p-8 col-span-2">
+                    <p className="text-muted-foreground">Could not load hero slides. Please add at least one slide in the admin panel.</p>
+                </div>
+            </section>
+        );
     }
 
+    const firstSlide = slides[0];
+    const secondSlide = slides.length > 1 ? slides[1] : null;
+    
     return (
         <section className="grid grid-cols-1 md:grid-cols-2">
-            <HeroPanel 
-                title="Takeout Bags"
-                links={["Takeout Bags", "SOS Bags", "Bakery Bags"]}
-                imageSrc={takeoutBagImage.imageUrl}
-                imageHint={takeoutBagImage.imageHint}
-                imageAlt={takeoutBagImage.description}
-                href="#"
-            />
-            <HeroPanel 
-                title="Paper Bowls"
-                links={["Round Bowls", "Rectangle Bowls", "Soup Bowls"]}
-                imageSrc={paperBowlsImage.imageUrl}
-                imageHint={paperBowlsImage.imageHint}
-                imageAlt={paperBowlsImage.description}
-                href="#"
-            />
+            {firstSlide && (
+              <HeroPanel 
+                  title={firstSlide.title}
+                  subtitle={firstSlide.subtitle}
+                  links={firstSlide.links || []}
+                  imageSrc={firstSlide.imageUrl}
+                  imageHint={firstSlide.imageHint}
+                  imageAlt={firstSlide.title}
+                  href={firstSlide.links?.[0]?.href || '#'}
+              />
+            )}
+            {secondSlide ? (
+                <HeroPanel 
+                    title={secondSlide.title}
+                    subtitle={secondSlide.subtitle}
+                    links={secondSlide.links || []}
+                    imageSrc={secondSlide.imageUrl}
+                    imageHint={secondSlide.imageHint}
+                    imageAlt={secondSlide.title}
+                    href={secondSlide.links?.[0]?.href || '#'}
+                />
+            ) : (
+                <div className="w-full h-[70vh] bg-muted flex items-center justify-center text-center p-8">
+                    <p className="text-muted-foreground">Add a second slide in the admin panel to display it here.</p>
+                </div>
+            )}
         </section>
     )
 }

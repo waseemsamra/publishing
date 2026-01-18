@@ -46,7 +46,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2 } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2, UploadCloud } from 'lucide-react';
 import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/context/auth-context';
@@ -63,6 +63,8 @@ export default function CategoriesPage() {
     const [parentId, setParentId] = useState<string | undefined>(undefined);
     const [imageUrl, setImageUrl] = useState('');
     const [imageHint, setImageHint] = useState('');
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
     const { loading: authLoading } = useAuth();
 
     const categoriesQuery = useMemo(() => {
@@ -81,9 +83,14 @@ export default function CategoriesPage() {
     }, [categories]);
 
     const previewUrl = useMemo(() => {
-        if (!imageUrl) return null;
-        return imageUrl.startsWith('http') ? imageUrl : `${s3BaseUrl}${imageUrl}`;
-    }, [imageUrl]);
+        if (imageFile) {
+            return URL.createObjectURL(imageFile);
+        }
+        if (imageUrl) {
+            return imageUrl.startsWith('http') ? imageUrl : `${s3BaseUrl}${imageUrl}`;
+        }
+        return null;
+    }, [imageFile, imageUrl]);
     
     useEffect(() => {
         if (dialogState.open && dialogState.category) {
@@ -92,8 +99,16 @@ export default function CategoriesPage() {
             setParentId(dialogState.category.parentId);
             setImageUrl(dialogState.category.imageUrl?.replace(s3BaseUrl, '') || '');
             setImageHint(dialogState.category.imageHint || '');
+            setImageFile(null);
         }
     }, [dialogState.open, dialogState.category]);
+
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setImageFile(file);
+        }
+    };
 
     const handleSaveCategory = async () => {
         if (!db) {
@@ -109,9 +124,21 @@ export default function CategoriesPage() {
             return;
         }
         
-        const finalImageUrl = imageUrl ? (imageUrl.startsWith('http') ? imageUrl : `${s3BaseUrl}${imageUrl}`) : '';
+        let finalImageUrl = imageUrl ? (imageUrl.startsWith('http') ? imageUrl : `${s3BaseUrl}${imageUrl}`) : '';
 
         try {
+            setIsUploading(true);
+            if (imageFile) {
+                const formData = new FormData();
+                formData.append("file", imageFile);
+                const response = await fetch('/image', { method: 'POST', body: formData });
+                if (!response.ok) {
+                    throw new Error(`Image upload failed: ${response.statusText}`);
+                }
+                const result = await response.json();
+                finalImageUrl = result.url;
+            }
+
             if (dialogState.category?.id) { // UPDATE
                 if (dialogState.category.id === parentId) {
                     toast({
@@ -119,6 +146,7 @@ export default function CategoriesPage() {
                         title: 'Validation Error',
                         description: 'A category cannot be its own parent.',
                     });
+                    setIsUploading(false);
                     return;
                 }
                 
@@ -152,6 +180,8 @@ export default function CategoriesPage() {
         } catch (e: any) {
             console.error(e);
             toast({ variant: 'destructive', title: 'Error', description: e.message });
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -186,6 +216,7 @@ export default function CategoriesPage() {
             setParentId(undefined);
             setImageUrl('');
             setImageHint('');
+            setImageFile(null);
         } else {
             setDialogState(prev => ({ ...prev, open }));
         }
@@ -289,7 +320,7 @@ export default function CategoriesPage() {
                             {dialogState.category?.id ? `Update the details for ${dialogState.category.name}.` : 'Enter the details for the new category.'}
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
+                    <div className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
                         <div className="space-y-2">
                             <Label htmlFor="name">Name</Label>
                             <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Clothing" />
@@ -313,25 +344,24 @@ export default function CategoriesPage() {
                             </Select>
                         </div>
                          <div className="space-y-2">
+                            <Label>Category Image</Label>
+                            <div className="mt-2 flex items-center gap-6">
+                                {previewUrl ? <Image src={previewUrl} alt="Category preview" width={80} height={80} className="rounded-lg object-contain h-20 w-20 bg-muted border p-1" unoptimized />
+                                : <div className="h-20 w-20 flex items-center justify-center rounded-lg bg-muted text-muted-foreground border"><UploadCloud className="h-8 w-8" /></div>}
+                                <div className='flex flex-col gap-2'>
+                                    <Input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                                    <Button type="button" variant="outline" onClick={() => document.getElementById('image-upload')?.click()} disabled={isUploading}>
+                                        {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                        {imageFile ? 'Change Image' : 'Upload Image'}
+                                    </Button>
+                                    <p className="text-xs text-muted-foreground">Or provide a path below.</p>
+                                </div>
+                            </div>
+                        </div>
+                         <div className="space-y-2">
                             <Label htmlFor="imageUrl">Image Path</Label>
                             <Input id="imageUrl" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="e.g., /categories/apparel.jpg" />
                         </div>
-
-                        {previewUrl && (
-                            <div className="space-y-2">
-                                <Label>Image Preview</Label>
-                                <div className="mt-2 aspect-square w-24 relative rounded-md border overflow-hidden">
-                                    <Image
-                                        src={previewUrl}
-                                        alt="Category image preview"
-                                        fill
-                                        className="object-cover"
-                                        unoptimized
-                                    />
-                                </div>
-                            </div>
-                        )}
-                        
                         <div className="space-y-2">
                             <Label htmlFor="imageHint">AI Image Hint</Label>
                             <Input id="imageHint" value={imageHint} onChange={(e) => setImageHint(e.target.value)} placeholder="e.g., summer shirts" />
@@ -339,7 +369,10 @@ export default function CategoriesPage() {
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => handleOpenChange(false)}>Cancel</Button>
-                        <Button onClick={handleSaveCategory}>Save</Button>
+                        <Button onClick={handleSaveCategory} disabled={isUploading}>
+                            {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Save
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

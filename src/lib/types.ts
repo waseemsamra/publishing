@@ -163,3 +163,16 @@ export interface Category {
   createdAt?: any;
 }
   
+export interface HeroSlide {
+  id: string;
+  title: string;
+  subtitle: string;
+  links: { text: string; href: string }[];
+  imageUrl: string;
+  imageHint: string;
+  order: number;
+  createdAt?: any;
+  updatedAt?: any;
+}
+
+    

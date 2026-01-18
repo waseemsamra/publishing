@@ -203,6 +203,56 @@
         "name"
       ]
     },
+     "HeroSlide": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "HeroSlide",
+      "type": "object",
+      "description": "Represents a single slide in the homepage hero carousel.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the hero slide."
+        },
+        "title": {
+          "type": "string",
+          "description": "The main headline of the slide."
+        },
+        "subtitle": {
+          "type": "string",
+          "description": "The subtitle or descriptive text for the slide."
+        },
+        "links": {
+          "type": "array",
+          "description": "An array of link objects for the slide.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": { "type": "string" },
+              "href": { "type": "string" }
+            },
+            "required": ["text", "href"]
+          }
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the background image for the slide.",
+          "format": "uri"
+        },
+        "imageHint": {
+          "type": "string",
+          "description": "A hint for AI image generation tools."
+        },
+        "order": {
+          "type": "number",
+          "description": "The display order of the slide."
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "imageUrl"
+      ]
+    },
     "MaterialType": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "MaterialType",
@@ -903,6 +953,22 @@
           ]
         }
       },
+       {
+        "path": "/heroSlides/{heroSlideId}",
+        "definition": {
+          "entityName": "HeroSlide",
+          "schema": {
+            "$ref": "#/backend/entities/HeroSlide"
+          },
+          "description": "Stores content for the homepage hero carousel. Publicly readable, write access restricted to administrators.",
+          "params": [
+            {
+              "name": "heroSlideId",
+              "description": "The unique identifier for the hero slide."
+            }
+          ]
+        }
+      },
       {
         "path": "/settings/{settingId}",
         "definition": {
@@ -1051,4 +1117,6 @@
     "reasoning": "The Firestore structure is designed to be secure, scalable, and easily debuggable, following the core design principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and QAPs (Rules are not Filters).  \n\nAuthorization Independence is achieved through denormalization.  For example, if access to a cart requires knowing the user's ID, that ID is directly embedded within the cart document or its subcollections (cartItems). This eliminates the need for `get()` calls in security rules, allowing atomic operations (transactions/batches) to work correctly and simplifying debugging. Collaborative data (if any) uses the Membership Map pattern.  \n\nStructural Segregation is applied by separating data with different security requirements into distinct collections.  For example, user accounts are stored separately from products, and each user's shopping cart and orders are stored under their user ID.\n\nAccess Modeling follows consistent patterns:  User-owned data uses path-based ownership (`/users/{userId}/shoppingCarts/{shoppingCartId}`). Global roles are implemented using existence checks on dedicated collections (e.g., `/roles_admin/{uid}`).\n\nData Clarity and Predictability are ensured by using explicit state modeling (if applicable), predictable schemas, and consistent naming conventions.  All collections and documents use semantic names.  Wildcards are descriptive (e.g., `{userId}` instead of `{id}`).\n\nThis structure facilitates simple, robust, and easily debuggable security rules, supporting secure `list` operations and maintaining the integrity of ownership, timestamps, and denormalized data."
   }
 }
+    
+
     

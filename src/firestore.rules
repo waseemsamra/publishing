@@ -146,6 +146,19 @@ service cloud.firestore {
     }
 
     /**
+     * @description Stores content for the homepage hero carousel.
+     * This data is publicly readable for the homepage. All write operations are restricted to administrators.
+     * @path /heroSlides/{heroSlideId}
+     * @allow (get, list) Any user, signed in or not, reading hero slide data.
+     * @allow (write) Only admin users.
+     * @principle Public read access, admin-only writes.
+     */
+    match /heroSlides/{heroSlideId} {
+        allow get, list: if true;
+        allow write: if isAdmin();
+    }
+
+    /**
      * @description Consolidated rule for all product attribute collections (sizes, colours, etc.).
      * This data is publicly readable for product filtering but can only be managed by administrators.
      * @path /{collectionName}/{docId} where collectionName is one of the product attribute collections.
@@ -265,3 +278,5 @@ service cloud.firestore {
     }
   }
 }
+
+    

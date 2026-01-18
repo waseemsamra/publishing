@@ -20,7 +20,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Label } from '@/components/ui/label';
-import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2, UploadCloud, Link as LinkIcon, GripVertical } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2, UploadCloud, Link as LinkIcon, GripVertical, Copy } from 'lucide-react';
 import { format } from 'date-fns';
 
 const s3BaseUrl = 'https://printinweb.s3.us-east-1.amazonaws.com';
@@ -147,6 +147,32 @@ export default function AdminHeroSlidesPage() {
             toast({ variant: 'destructive', title: 'Error', description: e.message });
         }
     };
+
+    const handleCloneSlide = async (slideToClone: HeroSlide) => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
+        try {
+            // Omitting id, createdAt, and updatedAt from the cloned object
+            const { id, createdAt, updatedAt, ...clonedData } = slideToClone;
+
+            const newSlideData = {
+                ...clonedData,
+                title: `${clonedData.title} (Copy)`,
+                order: slides ? slides.length : 0, // Place clone at the end
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+            };
+
+            await addDoc(collection(db, 'heroSlides'), newSlideData);
+
+            toast({ title: 'Success', description: `"${slideToClone.title}" has been cloned.` });
+        } catch (e: any) {
+            console.error('Error cloning slide:', e);
+            toast({ variant: 'destructive', title: 'Clone Error', description: e.message });
+        }
+    };
     
     const handleOpenChange = (open: boolean) => setDialogState(prev => ({ ...prev, open }));
 
@@ -194,6 +220,10 @@ export default function AdminHeroSlidesPage() {
                                             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem onSelect={() => setDialogState({ open: true, slide })}><Edit className="mr-2 h-4 w-4" /><span>Edit</span></DropdownMenuItem>
+                                                <DropdownMenuItem onSelect={() => handleCloneSlide(slide)}>
+                                                    <Copy className="mr-2 h-4 w-4" />
+                                                    <span>Clone</span>
+                                                </DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => handleDeleteSlide(slide.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50"><Trash2 className="mr-2 h-4 w-4" /><span>Delete</span></DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -277,5 +307,3 @@ export default function AdminHeroSlidesPage() {
         </div>
     );
 }
-
-    

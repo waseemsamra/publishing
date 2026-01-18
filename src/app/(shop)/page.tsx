@@ -123,7 +123,7 @@ function HeroCarousel() {
                 <CarouselContent>
                     {slidePairs.map((pair, index) => (
                         <CarouselItem key={index}>
-                            <div className="grid grid-cols-1 md:grid-cols-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-px md:bg-white">
                                 {pair.map((slide) => (
                                     <HeroPanel 
                                         key={slide.id}

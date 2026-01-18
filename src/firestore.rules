@@ -146,35 +146,22 @@ service cloud.firestore {
     }
 
     /**
-     * @description Stores content for the homepage hero carousel.
-     * This data is publicly readable for the homepage. All write operations are restricted to administrators.
-     * @path /heroSlides/{heroSlideId}
-     * @allow (get, list) Any user, signed in or not, reading hero slide data.
-     * @allow (write) Only admin users.
-     * @principle Public read access, admin-only writes.
-     */
-    match /heroSlides/{heroSlideId} {
-        allow get, list: if true;
-        allow write: if isAdmin();
-    }
-
-    /**
-     * @description Consolidated rule for all product attribute collections (sizes, colours, etc.).
-     * This data is publicly readable for product filtering but can only be managed by administrators.
-     * @path /{collectionName}/{docId} where collectionName is one of the product attribute collections.
-     * @allow (get, list) Any user, for product filtering.
+     * @description Consolidated rule for all product attribute and content collections.
+     * This data is publicly readable for product filtering and site content, but can only be managed by administrators.
+     * @path /{collectionName}/{docId} where collectionName is one of the designated public collections.
+     * @allow (get, list) Any user, for product filtering or viewing content.
      * @allow (write) Any admin user.
      * @deny (write) All non-admin users.
      * @principle Public read for functionality, admin-only for management.
      */
     match /{collectionName}/{docId} 
-      where collectionName in ['sizes', 'colours', 'printOptions', 'wallTypes', 'thicknesses', 'materialTypes', 'finishTypes', 'adhesives', 'handles', 'shapes'] {
+      where collectionName in ['sizes', 'colours', 'printOptions', 'wallTypes', 'thicknesses', 'materialTypes', 'finishTypes', 'adhesives', 'handles', 'shapes', 'heroSlides'] {
         allow get, list: if true;
         allow write: if isAdmin();
     }
 
     /**
-     * @description Stores global application settings. Only admins can manage them.
+     * @description Stores global application settings. Only admins can read or manage them.
      * @path /settings/{settingId}
      * @allow (read, write) Any admin user.
      * @deny (read, write) All non-admin users.
@@ -278,5 +265,3 @@ service cloud.firestore {
     }
   }
 }
-
-    

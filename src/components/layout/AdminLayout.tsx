@@ -58,7 +58,12 @@ const navItems = [
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/admin/calendar', label: 'Calendar', icon: Calendar },
   { href: '/admin/grant-admin', label: 'Grant Admin', icon: UserCog, isPublic: true }, // Allow public access
-  { href: '/admin/content', label: 'CMS', icon: FileText },
+  {
+    id: 'content',
+    label: 'CMS',
+    icon: FileText,
+    subItems: [{ href: '/admin/content/hero-slides', label: 'Hero Slides' }],
+  },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -81,7 +86,7 @@ function SidebarContent({ pathname, onLinkClick, isAdmin }: { pathname: string, 
           const Icon = item.icon;
 
           if (item.subItems) {
-            const isSectionActive = pathname.startsWith('/admin/products');
+            const isSectionActive = item.id ? pathname.startsWith(`/admin/${item.id}`) : false;
             return (
               <Collapsible key={item.id} defaultOpen={isSectionActive} className="space-y-1">
                 <CollapsibleTrigger asChild>

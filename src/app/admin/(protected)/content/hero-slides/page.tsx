@@ -71,6 +71,21 @@ export default function AdminHeroSlidesPage() {
     const { data: slides, isLoading: isLoadingData, error } = useCollection<HeroSlide>(slidesQuery);
     const isLoading = authLoading || isLoadingData;
     
+    const imageUrlPath = form.watch('imageUrl');
+
+    useEffect(() => {
+        // If a local file is being staged, don't override its preview
+        if (logoFile) return;
+
+        if (imageUrlPath) {
+            const url = imageUrlPath.startsWith('http') ? imageUrlPath : `${s3BaseUrl}${imageUrlPath}`;
+            setLogoPreview(url);
+        } else {
+            setLogoPreview(null);
+        }
+    }, [imageUrlPath, logoFile]);
+
+
     useEffect(() => {
         if (dialogState.open && dialogState.slide) {
             form.reset({
@@ -82,6 +97,7 @@ export default function AdminHeroSlidesPage() {
                 links: dialogState.slide.links || []
             });
             setLogoPreview(dialogState.slide.imageUrl || null);
+            setLogoFile(null); // Clear any staged file
         } else {
             form.reset({ title: '', subtitle: '', imageUrl: '', imageHint: '', order: slides?.length || 0, links: [] });
             setLogoPreview(null);
@@ -255,7 +271,7 @@ export default function AdminHeroSlidesPage() {
                              <FormItem>
                                 <FormLabel>Background Image</FormLabel>
                                 <div className="mt-2 flex items-center gap-6">
-                                    {logoPreview ? <Image src={logoPreview} alt="Logo preview" width={80} height={80} className="rounded-lg object-contain h-20 w-20 bg-muted border p-1" />
+                                    {logoPreview ? <Image src={logoPreview} alt="Logo preview" width={80} height={80} className="rounded-lg object-contain h-20 w-20 bg-muted border p-1" unoptimized />
                                     : <div className="h-20 w-20 flex items-center justify-center rounded-lg bg-muted text-muted-foreground border"><UploadCloud className="h-8 w-8" /></div>}
                                     <div className='flex flex-col gap-2'>
                                         <Input id="logo-upload" type="file" accept="image/*" onChange={handleLogoChange} className="hidden" />

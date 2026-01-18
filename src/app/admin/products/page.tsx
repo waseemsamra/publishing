@@ -1,3 +1,4 @@
-// This file is intentionally left non-functional to resolve a build error.
-// The correct page is in the /admin/(protected)/products directory.
-export const placeholder = true;
+/*
+  This file is intentionally left empty to resolve a build error caused by duplicate routing.
+  The correct, functional page for this route is located in the /admin/(protected)/products/ directory.
+*/

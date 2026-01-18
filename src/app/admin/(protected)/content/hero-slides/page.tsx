@@ -212,6 +212,7 @@ export default function AdminHeroSlidesPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead className="w-8 px-2"></TableHead>
                                 <TableHead className="hidden w-[100px] sm:table-cell">Image</TableHead>
                                 <TableHead>Title</TableHead>
                                 <TableHead>Order</TableHead>
@@ -220,11 +221,14 @@ export default function AdminHeroSlidesPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {isLoading ? <TableRow><TableCell colSpan={5} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell></TableRow>
-                            : error ? <TableRow><TableCell colSpan={5} className="text-center text-red-500">{error.message}</TableCell></TableRow>
-                            : slides?.length === 0 ? <TableRow><TableCell colSpan={5} className="h-24 text-center">No slides found. Add one to get started.</TableCell></TableRow>
+                            {isLoading ? <TableRow><TableCell colSpan={6} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell></TableRow>
+                            : error ? <TableRow><TableCell colSpan={6} className="text-center text-red-500">{error.message}</TableCell></TableRow>
+                            : slides?.length === 0 ? <TableRow><TableCell colSpan={6} className="h-24 text-center">No slides found. Add one to get started.</TableCell></TableRow>
                             : slides?.map((slide) => (
                                 <TableRow key={slide.id}>
+                                    <TableCell className="px-2 cursor-grab">
+                                        <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                    </TableCell>
                                     <TableCell className="hidden sm:table-cell">
                                         {slide.imageUrl && <Image alt={slide.title} className="aspect-square rounded-md object-cover" height="64" src={slide.imageUrl} width="64" unoptimized />}
                                     </TableCell>

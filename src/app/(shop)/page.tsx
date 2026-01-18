@@ -1,22 +1,8 @@
-
-
 'use client';
 
-import { useMemo } from 'react';
-import { collection, query, orderBy } from 'firebase/firestore';
-import { useCollection } from '@/firebase/firestore/use-collection';
-import { useFirestore } from '@/firebase/provider';
-import type { HeroSlide } from '@/lib/types';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { LowMinimumMustHaves } from '@/components/low-minimum-must-haves';
 import { BrandStories } from '@/components/brand-stories';
@@ -46,82 +32,64 @@ const TrendingNowCard = ({ imageId, title }: { imageId: string, title: string })
   );
 };
 
-
-function HeroCarousel() {
-  const db = useFirestore();
-  const slidesQuery = useMemo(() => {
-    if (!db) return null;
-    const q = query(collection(db, 'heroSlides'), orderBy('order', 'asc'));
-    (q as any).__memo = true;
-    return q;
-  }, [db]);
-  
-  const { data: slides, isLoading } = useCollection<HeroSlide>(slidesQuery);
-
-  if (isLoading) {
-    return (
-      <section className="h-[60vh] flex items-center justify-center bg-muted">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </section>
-    );
-  }
-
-  if (!slides || slides.length === 0) {
-    return (
-       <section className="h-[60vh] flex items-center justify-center bg-muted text-center p-8">
-        <div>
-          <h2 className="font-headline text-2xl font-bold">Hero Slides Not Configured</h2>
-          <p className="text-muted-foreground mt-2">
-            Please go to the <Link href="/admin/content/hero-slides" className="underline text-primary">admin panel</Link> to add slides to the hero carousel.
-          </p>
-        </div>
-      </section>
-    );
-  }
-
+const HeroPanel = ({ title, links, imageSrc, imageHint, imageAlt, href }: { title: string; links: string[]; imageSrc: string; imageHint: string; imageAlt: string; href: string; }) => {
   return (
-    <section>
-      <Carousel className="w-full" opts={{ loop: true }}>
-        <CarouselContent>
-          {slides.map(slide => (
-            <CarouselItem key={slide.id}>
-              <div className="relative h-[60vh] bg-secondary/50 flex items-end p-8 md:p-12">
-                {slide.imageUrl && <Image
-                  src={slide.imageUrl}
-                  alt={slide.title}
-                  fill
-                  priority
-                  className="object-cover"
-                  data-ai-hint={slide.imageHint}
-                />}
-                <div className="relative z-10 text-white w-full">
-                  <h1 className="font-headline text-4xl md:text-5xl font-bold">{slide.title}</h1>
-                  {slide.subtitle && <p className="mt-2 text-lg max-w-xl">{slide.subtitle}</p>}
-                  <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
-                    {slide.links?.map((link, index) => (
-                      <Link key={index} href={link.href} className="text-sm font-semibold hover:underline">
-                        {link.text}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-              </div>
-            </CarouselItem>
+    <div className="relative group w-full h-[70vh] bg-cover bg-center flex items-end text-white">
+      <Image src={imageSrc} alt={imageAlt} layout="fill" objectFit="cover" className="-z-10" data-ai-hint={imageHint}/>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+      <div className="relative z-10 p-8 md:p-12 w-full">
+        <h2 className="font-headline text-4xl md:text-5xl font-bold">{title}</h2>
+        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+          {links.map((link) => (
+            <Link key={link} href="#" className="text-sm font-semibold hover:underline">
+              {link}
+            </Link>
           ))}
-        </CarouselContent>
-        <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 hidden md:flex" />
-        <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex" />
-      </Carousel>
-    </section>
+        </div>
+        <Link href={href} className="absolute bottom-8 right-8 md:bottom-12 md:right-12 flex items-center gap-2 text-sm font-semibold hover:underline">
+          Shop now <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+    </div>
   );
+};
+
+
+function TwoPanelHero() {
+    const takeoutBagImage = PlaceHolderImages.find(p => p.id === 'hero-takeout-bag');
+    const paperBowlsImage = PlaceHolderImages.find(p => p.id === 'hero-paper-bowls');
+
+    if (!takeoutBagImage || !paperBowlsImage) {
+        return null; // Or a loading/error state
+    }
+
+    return (
+        <section className="grid grid-cols-1 md:grid-cols-2">
+            <HeroPanel 
+                title="Takeout Bags"
+                links={["Takeout Bags", "SOS Bags", "Bakery Bags"]}
+                imageSrc={takeoutBagImage.imageUrl}
+                imageHint={takeoutBagImage.imageHint}
+                imageAlt={takeoutBagImage.description}
+                href="#"
+            />
+            <HeroPanel 
+                title="Paper Bowls"
+                links={["Round Bowls", "Rectangle Bowls", "Soup Bowls"]}
+                imageSrc={paperBowlsImage.imageUrl}
+                imageHint={paperBowlsImage.imageHint}
+                imageAlt={paperBowlsImage.description}
+                href="#"
+            />
+        </section>
+    )
 }
 
 
 export default function HomePage() {
   return (
     <>
-      <HeroCarousel />
+      <TwoPanelHero />
       
       <LowMinimumMustHaves />
 
@@ -149,5 +117,3 @@ export default function HomePage() {
     </>
   );
 }
-
-    

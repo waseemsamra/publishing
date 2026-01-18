@@ -185,6 +185,18 @@
       "description": "A kraft paper envelope with a HanaPac packaging alliance sticker on it",
       "imageUrl": "https://images.unsplash.com/photo-1663729219757-c619e3aeb72f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx0aXNzdWUlMjBwYXBlcnxlbnwwfHx8fDE3Njg0Mjk4Mzd8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "packaging alliance"
+    },
+    {
+      "id": "hero-takeout-bag",
+      "description": "A branded paper bag for takeout on a red diner booth",
+      "imageUrl": "https://printinweb.s3.us-east-1.amazonaws.com/images/patsys-bag.png",
+      "imageHint": "takeout bag"
+    },
+    {
+      "id": "hero-paper-bowls",
+      "description": "A stack of branded red paper bowls being held",
+      "imageUrl": "https://printinweb.s3.us-east-1.amazonaws.com/images/patsys-bowls.png",
+      "imageHint": "paper bowls"
     }
   ]
 }

@@ -9,10 +9,9 @@
  *
  * Key Security Decisions:
  * - User Isolation: All paths under `/users/{userId}` are strictly controlled, allowing access only to the
- *   authenticated user whose UID matches `{userId}`. Listing all users is explicitly disallowed.
- * - Public Data Read-Only: The `/products` and `/categories` collections are readable by anyone, including
- *   unauthenticated users, to support browsing the marketplace. However, all write operations are currently
- *   disabled pending the implementation of a specific administrative role system.
+ *   authenticated user whose UID matches `{userId}`. Listing all users is explicitly disallowed except for admins.
+ * - Public Data Read-Only: Collections for products, categories, and product attributes are publicly readable
+ *   to support browsing and filtering. All write operations are restricted to administrators.
  * - Backend-Managed Orders: Users can read their own orders and order items, but cannot create, update, or
  *   delete them. This assumes that order creation is a trusted backend process (e.g., a Cloud Function)
  *   triggered after a successful payment, preventing clients from creating fraudulent orders.
@@ -32,79 +31,47 @@ service cloud.firestore {
     // Helper Functions
     // ----------------
 
-    /**
-     * Checks if a user is authenticated.
-     */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /**
-     * Checks if the currently authenticated user's UID matches the provided userId.
-     * This is the primary function for enforcing data ownership.
-     */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    /**
-     * Checks for ownership on an existing document. Used for safe updates and deletes.
-     */
     function isExistingOwner(userId) {
       return isOwner(userId) && resource != null;
     }
     
-    /**
-     * Checks if the requesting user has the 'admin' role in their own user document.
-     */
     function isAdmin() {
       return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.hasAny(['admin']);
     }
 
-    /**
-     * Validates that the `userAccountId` field in a new document matches the user's UID.
-     * Enforces relational integrity on create.
-     */
     function hasValidUserIdOnCreate(userId) {
       return request.resource.data.userAccountId == userId;
     }
 
-    /**
-     * Ensures the `userAccountId` field cannot be changed after a document is created.
-     * Enforces immutability of the ownership link on update.
-     */
     function isUserIdImmutable() {
       return request.resource.data.userAccountId == resource.data.userAccountId;
     }
 
-    /**
-     * Ensures the document's `id` field matches the document's ID in the path.
-     * Enforces consistency between the path and the data payload on create.
-     */
     function isIdMatchingDocId(docId) {
       return request.resource.data.id == docId;
     }
     
-    /**
-     * Ensures the document's `id` field cannot be changed after creation.
-     */
     function isIdImmutable() {
       return request.resource.data.id == resource.data.id;
     }
     
 
     /**
-     * @description Manages user account documents. A user can create their own document,
-     * and can only read or write to their own document thereafter. Listing users is forbidden.
+     * @description Manages user account documents. A user can read their own document,
+     * and admins can read any. Listing is admin-only.
      * @path /users/{userId}
-     * @allow (create) A new user with UID 'user123' creating their own document at /users/user123.
-     * @allow (get) An authenticated user with UID 'user123' reading their own document at /users/user123.
-     * @deny (list) Any user attempting to list all documents in the /users collection.
-     * @deny (get) User 'user456' trying to read /users/user123.
-     * @principle Restricts access to a user's own data tree.
+     * @principle User data is private, but readable by admins for management.
      */
     match /users/{userId} {
-      allow get: if isSignedIn();
+      allow get: if isOwner(userId) || isAdmin();
       allow list: if isAdmin();
       allow create: if isSignedIn();
       allow update: if isOwner(userId) || isAdmin();
@@ -112,64 +79,32 @@ service cloud.firestore {
     }
 
     /**
-     * @description Stores product information. This data is publicly readable by anyone
-     * to allow browsing the marketplace. All write operations are disabled pending
-     * the implementation of an admin role system.
+     * @description Stores product information. Publicly readable.
      * @path /products/{productId}
-     * @allow (get, list) Any user, signed in or not, reading product data.
-     * @deny (create, update, delete) Any user attempting to modify product data.
-     * @principle Public read access, with writes locked down for security.
      */
     match /products/{productId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
     }
 
     /**
-     * @description Stores product category information. This data is publicly readable
-     * by anyone. All write operations are disabled pending the implementation
-     * of an admin role system.
+     * @description Stores product category information. Publicly readable.
      * @path /categories/{categoryId}
-     * @allow (get, list) Any user, signed in or not, reading category data.
-     * @deny (create, update, delete) Any user attempting to modify category data.
-     * @principle Public read access, with writes locked down for security.
      */
     match /categories/{categoryId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
-    }
-    
-    /**
-     * @description Stores content for the homepage hero carousel.
-     * Publicly readable, write access restricted to administrators.
-     * @path /heroSlides/{heroSlideId}
-     * @allow (get, list) Any user, for viewing homepage content.
-     * @allow (write) Any admin user.
-     * @deny (write) All non-admin users.
-     * @principle Public read for functionality, admin-only for management.
-     */
-    match /heroSlides/{heroSlideId} {
-        allow get, list: if true;
-        allow create, update, delete: if isAdmin();
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
     }
 
     /**
-     * @description Consolidated rule for all product attribute collections.
-     * This data is publicly readable for product filtering, but can only be managed by administrators.
-     * @path /{collectionName}/{docId} where collectionName is one of the designated public collections.
-     * @allow (get, list) Any user, for product filtering.
-     * @allow (write) Any admin user.
-     * @deny (write) All non-admin users.
+     * @description Consolidated rule for all product attribute and content collections.
+     * This data is publicly readable for product filtering and site content,
+     * but can only be managed by administrators.
+     * @path /{collectionName}/{docId}
      * @principle Public read for functionality, admin-only for management.
      */
     match /{collectionName}/{docId} 
-      where collectionName in ['sizes', 'colours', 'printOptions', 'wallTypes', 'thicknesses', 'materialTypes', 'finishTypes', 'adhesives', 'handles', 'shapes'] {
+      where collectionName in ['sizes', 'colours', 'printOptions', 'wallTypes', 'thicknesses', 'materialTypes', 'finishTypes', 'adhesives', 'handles', 'shapes', 'heroSlides'] {
         allow get, list: if true;
         allow write: if isAdmin();
     }
@@ -177,9 +112,6 @@ service cloud.firestore {
     /**
      * @description Stores global application settings. Only admins can read or manage them.
      * @path /settings/{settingId}
-     * @allow (read, write) Any admin user.
-     * @deny (read, write) All non-admin users.
-     * @principle Admin-only management.
      */
     match /settings/{settingId} {
       allow read, write: if isAdmin();
@@ -188,94 +120,56 @@ service cloud.firestore {
     /**
      * @description Stores a user's shopping cart. Only the owning user can access it.
      * @path /users/{userId}/shoppingCarts/{shoppingCartId}
-     * @allow (create) User 'user123' creating their own shopping cart.
-     * @deny (get) User 'user456' trying to read a cart belonging to 'user123'.
-     * @principle Enforces document ownership and validates relational integrity.
      */
     match /users/{userId}/shoppingCarts/{shoppingCartId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
+      allow get, list: if isOwner(userId);
       allow create: if isOwner(userId) && hasValidUserIdOnCreate(userId);
       allow update: if isExistingOwner(userId) && isUserIdImmutable();
       allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Stores items within a user's shopping cart. Only the owning user can access them.
+     * @description Stores items within a user's shopping cart.
      * @path /users/{userId}/shoppingCarts/{shoppingCartId}/cartItems/{cartItemId}
-     * @allow (create) User 'user123' adding an item to their own cart.
-     * @deny (update) User 'user456' trying to modify an item in 'user123's cart.
-     * @principle Restricts access to a user's own data tree.
      */
     match /users/{userId}/shoppingCarts/{shoppingCartId}/cartItems/{cartItemId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
+      allow read, list, create, update, delete: if isOwner(userId);
     }
 
     /**
-     * @description Stores user order history. Users can only read their own orders.
-     * Writes are disabled, assuming orders are created by a trusted backend process.
+     * @description Stores user order history. Users can read their own. Admins can manage.
      * @path /users/{userId}/orders/{orderId}
-     * @allow (get, list) User 'user123' reading their own order history.
-     * @deny (create) Any user trying to create an order document directly.
-     * @deny (get) User 'user456' trying to read orders belonging to 'user123'.
-     * @principle Read-only access for users to their own historical data.
      */
     match /users/{userId}/orders/{orderId} {
-      allow get: if isOwner(userId) || isAdmin();
-      allow list: if isOwner(userId) || isAdmin();
-      allow create: if false; // Should be handled by backend functions
-      allow update: if isAdmin(); // Admins can update order status
+      allow get, list: if isOwner(userId) || isAdmin();
+      allow create: if false; // Backend only
+      allow update: if isAdmin();
       allow delete: if false;
     }
 
     /**
-     * @description Stores items within an order. Users can only read items from their own orders.
-     * Writes are disabled as order items are considered immutable once created by the backend.
+     * @description Stores items within an order. Read-only for user and admin.
      * @path /users/{userId}/orders/{orderId}/orderItems/{orderItemId}
-     * @allow (get, list) User 'user123' reading items in their own order.
-     * @deny (update) Any user trying to modify an item in a placed order.
-     * @principle Read-only access for users to their own historical data.
      */
     match /users/{userId}/orders/{orderId}/orderItems/{orderItemId} {
-       allow get: if isOwner(userId) || isAdmin();
-      allow list: if isOwner(userId) || isAdmin();
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+       allow get, list: if isOwner(userId) || isAdmin();
+       allow create, update, delete: if false;
     }
 
     /**
-     * @description Stores a user's saved shipping addresses. Only the owning user can access them.
+     * @description Stores a user's saved shipping addresses. Owner-only access.
      * @path /users/{userId}/shippingAddresses/{shippingAddressId}
-     * @allow (create) User 'user123' adding a new shipping address for themselves.
-     * @deny (delete) User 'user456' trying to delete an address belonging to 'user123'.
-     * @principle Restricts access to a user's own data tree.
      */
     match /users/{userId}/shippingAddresses/{shippingAddressId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
+      allow get, list, create, update, delete: if isOwner(userId);
     }
 
     /**
-     * @description Stores a user's saved billing addresses. Only the owning user can access them.
+     * @description Stores a user's saved billing addresses. Owner-only access.
      * @path /users/{userId}/billingAddresses/{billingAddressId}
-     * @allow (create) User 'user123' adding a new billing address for themselves.
-     * @deny (get) User 'user456' trying to read an address belonging to 'user123'.
-     * @principle Restricts access to a user's own data tree.
      */
     match /users/{userId}/billingAddresses/{billingAddressId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isOwner(userId);
+      allow get, list, create, update, delete: if isOwner(userId);
     }
   }
 }

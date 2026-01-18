@@ -41,9 +41,10 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2 } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2, Search } from 'lucide-react';
 import { format } from 'date-fns';
 import { useAuth } from '@/context/auth-context';
+import { Input } from '@/components/ui/input';
 
 export default function AdminProductsPage() {
     const { toast } = useToast();
@@ -51,6 +52,7 @@ export default function AdminProductsPage() {
     const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const { loading: authLoading } = useAuth();
+    const [searchTerm, setSearchTerm] = useState('');
     
     const productsQuery = useMemo(() => {
         if (!db) return null;
@@ -61,6 +63,14 @@ export default function AdminProductsPage() {
 
     const { data: products, isLoading: isLoadingData, error } = useCollection<Product>(productsQuery);
     const isLoading = authLoading || isLoadingData;
+
+    const filteredProducts = useMemo(() => {
+        if (!products) return [];
+        if (!searchTerm) return products;
+        return products.filter(product => 
+            product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [products, searchTerm]);
 
     const handleDeleteSelected = async () => {
         if (!db) {
@@ -88,7 +98,7 @@ export default function AdminProductsPage() {
     
     const handleSelectAll = (checked: boolean | 'indeterminate') => {
         if (checked === true) {
-            setSelectedProductIds(products?.map(p => p.id) || []);
+            setSelectedProductIds(filteredProducts?.map(p => p.id) || []);
         } else {
             setSelectedProductIds([]);
         }
@@ -102,8 +112,8 @@ export default function AdminProductsPage() {
         }
     };
 
-    const allSelected = (products?.length ?? 0) > 0 && selectedProductIds.length === products?.length;
-    const someSelected = selectedProductIds.length > 0 && selectedProductIds.length < (products?.length ?? 0);
+    const allSelected = (filteredProducts?.length ?? 0) > 0 && selectedProductIds.length === filteredProducts?.length;
+    const someSelected = selectedProductIds.length > 0 && selectedProductIds.length < (filteredProducts?.length ?? 0);
 
     return (
         <div className="space-y-6">
@@ -127,8 +137,21 @@ export default function AdminProductsPage() {
             </div>
             <Card>
                 <CardHeader>
-                    <CardTitle>All Products</CardTitle>
-                    <CardDescription>A list of all products in your store.</CardDescription>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <CardTitle>All Products</CardTitle>
+                            <CardDescription>A list of all products in your store.</CardDescription>
+                        </div>
+                        <div className="relative w-full max-w-sm">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                                placeholder="Search products..."
+                                className="pl-9"
+                                value={searchTerm}
+                                onChange={e => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -138,7 +161,7 @@ export default function AdminProductsPage() {
                                      <Checkbox
                                         onCheckedChange={handleSelectAll}
                                         checked={allSelected ? true : someSelected ? 'indeterminate' : false}
-                                        disabled={isLoading || !products || products.length === 0}
+                                        disabled={isLoading || !filteredProducts || filteredProducts.length === 0}
                                     />
                                 </TableHead>
                                 <TableHead className="hidden w-[100px] sm:table-cell">Image</TableHead>
@@ -151,8 +174,8 @@ export default function AdminProductsPage() {
                         <TableBody>
                             {isLoading && <TableRow><TableCell colSpan={6} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell></TableRow>}
                             {!isLoading && error && <TableRow><TableCell colSpan={6} className="h-24 text-center text-red-500">{error.message}</TableCell></TableRow>}
-                            {!isLoading && products?.length === 0 && <TableRow><TableCell colSpan={6} className="h-24 text-center">No products found. Add one to get started.</TableCell></TableRow>}
-                            {!isLoading && products?.map((product) => (
+                            {!isLoading && filteredProducts?.length === 0 && <TableRow><TableCell colSpan={6} className="h-24 text-center">No products found.</TableCell></TableRow>}
+                            {!isLoading && filteredProducts?.map((product) => (
                                 <TableRow key={product.id} data-state={selectedProductIds.includes(product.id) && 'selected'}>
                                     <TableCell>
                                         <Checkbox

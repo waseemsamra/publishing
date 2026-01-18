@@ -46,7 +46,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2, UploadCloud } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2, UploadCloud, Search } from 'lucide-react';
 import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/context/auth-context';
@@ -66,6 +66,7 @@ export default function CategoriesPage() {
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const { loading: authLoading } = useAuth();
+    const [searchTerm, setSearchTerm] = useState('');
 
     const categoriesQuery = useMemo(() => {
         if (!db) return null;
@@ -76,6 +77,14 @@ export default function CategoriesPage() {
 
     const { data: categories, isLoading: isLoadingData, error } = useCollection<Category>(categoriesQuery);
     const isLoading = authLoading || isLoadingData;
+
+    const filteredCategories = useMemo(() => {
+        if (!categories) return [];
+        if (!searchTerm) return categories;
+        return categories.filter(category =>
+            category.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [categories, searchTerm]);
 
     const categoryMap = useMemo(() => {
       if (!categories) return new Map();
@@ -237,8 +246,21 @@ export default function CategoriesPage() {
             </div>
             <Card>
                 <CardHeader>
-                    <CardTitle>All Categories</CardTitle>
-                    <CardDescription>A list of all available categories.</CardDescription>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <CardTitle>All Categories</CardTitle>
+                            <CardDescription>A list of all available categories.</CardDescription>
+                        </div>
+                        <div className="relative w-full max-w-sm">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                                placeholder="Search categories..."
+                                className="pl-9"
+                                value={searchTerm}
+                                onChange={e => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -263,12 +285,12 @@ export default function CategoriesPage() {
                                     <TableCell colSpan={6} className="text-center text-red-500">{error.message}</TableCell>
                                 </TableRow>
                             )}
-                            {!isLoading && categories?.length === 0 && (
+                            {!isLoading && filteredCategories?.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-24 text-center">No categories found. Add one to get started.</TableCell>
+                                    <TableCell colSpan={6} className="h-24 text-center">No categories found.</TableCell>
                                 </TableRow>
                             )}
-                            {!isLoading && categories?.map((category) => (
+                            {!isLoading && filteredCategories?.map((category) => (
                                 <TableRow key={category.id}>
                                     <TableCell className="hidden sm:table-cell">
                                         {category.imageUrl ? (

@@ -1,35 +1,6 @@
-/**
- * Core Philosophy: This ruleset enforces a strict user-ownership model for all user-generated content,
- * ensuring that a user can only access their own data. Publicly accessible data, such as product
- * listings and categories, is read-only for all users to prevent unauthorized modification.
- *
- * Data Structure: The data is organized into top-level collections for public data (`products`, `categories`)
- * and a primary `users` collection. All private, user-specific data (shopping carts, orders, addresses)
- * is nested within a user's document under `/users/{userId}`, creating a clear and secure data boundary.
- *
- * Key Security Decisions:
- * - User Isolation: All paths under `/users/{userId}` are strictly controlled, allowing access only to the
- *   authenticated user whose UID matches `{userId}`. Listing all users is explicitly disallowed except for admins.
- * - Public Data Read-Only: Collections for products, categories, and product attributes are publicly readable
- *   to support browsing and filtering. All write operations are restricted to administrators.
- * - Backend-Managed Orders: Users can read their own orders and order items, but cannot create, update, or
- *   delete them. This assumes that order creation is a trusted backend process (e.g., a Cloud Function)
- *   triggered after a successful payment, preventing clients from creating fraudulent orders.
- *
- * Denormalization for Authorization: The ruleset relies on path-based security. For documents within a user's
- * data tree (e.g., ShoppingCart, Order), rules validate that any internal `userAccountId` field matches the
- * `{userId}` in the path upon creation and remains immutable, ensuring relational integrity without costly lookups.
- *
- * Structural Segregation: Private user data (like `/users/{userId}/shoppingCarts`) is structurally separated
- * from public data (`/products`), which provides a simple and performant way to enforce different access levels
- * for read and list operations.
- */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Helper Functions
-    // ----------------
 
     function isSignedIn() {
       return request.auth != null;
@@ -38,136 +9,65 @@ service cloud.firestore {
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
-
-    function isExistingOwner(userId) {
-      return isOwner(userId) && resource != null;
-    }
     
     function isAdmin() {
       return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.hasAny(['admin']);
     }
 
-    function hasValidUserIdOnCreate(userId) {
-      return request.resource.data.userAccountId == userId;
+    // --- PUBLIC COLLECTIONS ---
+    // All collections in this section are readable by anyone, but only writable by admins.
+    match /products/{docId}       { allow get, list: true; allow write: if isAdmin(); }
+    match /categories/{docId}    { allow get, list: true; allow write: if isAdmin(); }
+    match /sizes/{docId}             { allow get, list: true; allow write: if isAdmin(); }
+    match /colours/{docId}         { allow get, list: true; allow write: if isAdmin(); }
+    match /printOptions/{docId}    { allow get, list: true; allow write: if isAdmin(); }
+    match /wallTypes/{docId}       { allow get, list: true; allow write: if isAdmin(); }
+    match /thicknesses/{docId}  { allow get, list: true; allow write: if isAdmin(); }
+    match /materialTypes/{docId}     { allow get, list: true; allow write: if isAdmin(); }
+    match /finishTypes/{docId}       { allow get, list: true; allow write: if isAdmin(); }
+    match /adhesives/{docId}     { allow get, list: true; allow write: if isAdmin(); }
+    match /handles/{docId}         { allow get, list: true; allow write: if isAdmin(); }
+    match /shapes/{docId}           { allow get, list: true; allow write: if isAdmin(); }
+    match /heroSlides/{docId}      { allow get, list: true; allow write: if isAdmin(); }
+
+    // --- ADMIN-ONLY COLLECTIONS ---
+    match /settings/{settingId} {
+      allow read, write: if isAdmin();
     }
 
-    function isUserIdImmutable() {
-      return request.resource.data.userAccountId == resource.data.userAccountId;
-    }
-
-    function isIdMatchingDocId(docId) {
-      return request.resource.data.id == docId;
-    }
-    
-    function isIdImmutable() {
-      return request.resource.data.id == resource.data.id;
-    }
-    
-    /**
-     * @description Manages user account documents. Users can read their own document, and admins can read any.
-     * @path /users/{userId}
-     */
+    // --- USER DATA ---
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
       allow list: if isAdmin();
       allow create: if isSignedIn();
       allow update: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
-    }
 
-    /**
-     * @description Stores product information. Publicly readable.
-     * @path /products/{productId}
-     */
-    match /products/{productId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
-    }
+      match /shoppingCarts/{cartId} {
+        allow read, write: if isOwner(userId);
+        match /cartItems/{itemId} {
+          allow read, write: if isOwner(userId);
+        }
+      }
 
-    /**
-     * @description Stores product category information. Publicly readable.
-     * @path /categories/{categoryId}
-     */
-    match /categories/{categoryId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
-    }
-    
-    // Explicitly make all product attribute and content collections publicly readable
-    match /sizes/{docId} { allow get, list: if true; allow write: if isAdmin(); }
-    match /colours/{docId} { allow get, list: if true; allow write: if isAdmin(); }
-    match /printOptions/{docId} { allow get, list: if true; allow write: if isAdmin(); }
-    match /wallTypes/{docId} { allow get, list: if true; allow write: if isAdmin(); }
-    match /thicknesses/{docId} { allow get, list: if true; allow write: if isAdmin(); }
-    match /materialTypes/{docId} { allow get, list: if true; allow write: if isAdmin(); }
-    match /finishTypes/{docId} { allow get, list: if true; allow write: if isAdmin(); }
-    match /adhesives/{docId} { allow get, list: if true; allow write: if isAdmin(); }
-    match /handles/{docId} { allow get, list: if true; allow write: if isAdmin(); }
-    match /shapes/{docId} { allow get, list: if true; allow write: if isAdmin(); }
-    match /heroSlides/{docId} { allow get, list: if true; allow write: if isAdmin(); }
+      match /orders/{orderId} {
+        allow get, list: if isOwner(userId) || isAdmin();
+        allow create: if false; // Backend only
+        allow update: if isAdmin();
+        allow delete: if false;
+        match /orderItems/{itemId} {
+          allow get, list: if isOwner(userId) || isAdmin();
+          allow create, update, delete: if false;
+        }
+      }
 
+      match /shippingAddresses/{addressId} {
+        allow read, write: if isOwner(userId);
+      }
 
-    /**
-     * @description Stores global application settings. Only admins can read or manage them.
-     * @path /settings/{settingId}
-     */
-    match /settings/{settingId} {
-      allow read, write: if isAdmin();
-    }
-
-    /**
-     * @description Stores a user's shopping cart. Only the owning user can access it.
-     * @path /users/{userId}/shoppingCarts/{shoppingCartId}
-     */
-    match /users/{userId}/shoppingCarts/{shoppingCartId} {
-      allow get, list: if isOwner(userId);
-      allow create: if isOwner(userId) && hasValidUserIdOnCreate(userId);
-      allow update: if isExistingOwner(userId) && isUserIdImmutable();
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Stores items within a user's shopping cart.
-     * @path /users/{userId}/shoppingCarts/{shoppingCartId}/cartItems/{cartItemId}
-     */
-    match /users/{userId}/shoppingCarts/{shoppingCartId}/cartItems/{cartItemId} {
-      allow read, list, create, update, delete: if isOwner(userId);
-    }
-
-    /**
-     * @description Stores user order history. Users can read their own. Admins can manage.
-     * @path /users/{userId}/orders/{orderId}
-     */
-    match /users/{userId}/orders/{orderId} {
-      allow get, list: if isOwner(userId) || isAdmin();
-      allow create: if false; // Backend only
-      allow update: if isAdmin();
-      allow delete: if false;
-    }
-
-    /**
-     * @description Stores items within an order. Read-only for user and admin.
-     * @path /users/{userId}/orders/{orderId}/orderItems/{orderItemId}
-     */
-    match /users/{userId}/orders/{orderId}/orderItems/{orderItemId} {
-       allow get, list: if isOwner(userId) || isAdmin();
-       allow create, update, delete: if false;
-    }
-
-    /**
-     * @description Stores a user's saved shipping addresses. Owner-only access.
-     * @path /users/{userId}/shippingAddresses/{shippingAddressId}
-     */
-    match /users/{userId}/shippingAddresses/{shippingAddressId} {
-      allow get, list, create, update, delete: if isOwner(userId);
-    }
-
-    /**
-     * @description Stores a user's saved billing addresses. Owner-only access.
-     * @path /users/{userId}/billingAddresses/{billingAddressId}
-     */
-    match /users/{userId}/billingAddresses/{billingAddressId} {
-      allow get, list, create, update, delete: if isOwner(userId);
+      match /billingAddresses/{addressId} {
+        allow read, write: if isOwner(userId);
+      }
     }
   }
 }

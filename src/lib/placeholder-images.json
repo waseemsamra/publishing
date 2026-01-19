@@ -197,6 +197,12 @@
       "description": "A stack of branded red paper bowls being held",
       "imageUrl": "https://printinweb.s3.us-east-1.amazonaws.com/images/patsys-bowls.png",
       "imageHint": "paper bowls"
+    },
+    {
+      "id": "hero-food-packaging",
+      "description": "Various types of food packaging like boxes and containers",
+      "imageUrl": "https://images.unsplash.com/photo-1627992258833-255d61483040?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmb29kJTIwcGFja2FnaW5nfGVufDB8fHx8MTc3MDA2NTM0Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "food packaging"
     }
   ]
 }

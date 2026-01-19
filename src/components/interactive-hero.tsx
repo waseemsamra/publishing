@@ -9,6 +9,7 @@ import { useFirestore } from '@/firebase/provider';
 import { collection, query } from 'firebase/firestore';
 import type { Category } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 // Define HeroGridItem here as it's removed from types.ts
 interface HeroGridItem {
@@ -20,6 +21,8 @@ interface HeroGridItem {
     displayImageUrl: string;
     imageHint: string;
 }
+
+const foodPackagingPlaceholder = PlaceHolderImages.find(p => p.id === 'hero-food-packaging');
 
 export function InteractiveHero() {
   const db = useFirestore();
@@ -38,15 +41,25 @@ export function InteractiveHero() {
     
     const topLevelCategories = allCategories.filter(cat => !cat.parentId);
 
-    return topLevelCategories.slice(0, 12).map((cat): HeroGridItem => ({
-        id: cat.id,
-        title: cat.name,
-        displayText: `${cat.name} Packaging`,
-        displaySubtitle: "HanaPac Customized Packaging",
-        backgroundImageUrl: cat.imageUrl || `https://picsum.photos/seed/${cat.id}/400/400`,
-        displayImageUrl: cat.imageUrl || `https://picsum.photos/seed/${cat.id}/800/800`,
-        imageHint: cat.imageHint || cat.name.toLowerCase()
-    }));
+    return topLevelCategories.slice(0, 12).map((cat): HeroGridItem => {
+        let backgroundImageUrl = cat.imageUrl || `https://picsum.photos/seed/${cat.id}/400/400`;
+        let displayImageUrl = cat.imageUrl || `https://picsum.photos/seed/${cat.id}/800/800`;
+
+        if (cat.name === 'Food Packaging' && !cat.imageUrl && foodPackagingPlaceholder) {
+            backgroundImageUrl = foodPackagingPlaceholder.imageUrl;
+            displayImageUrl = foodPackagingPlaceholder.imageUrl;
+        }
+        
+        return {
+            id: cat.id,
+            title: cat.name,
+            displayText: `${cat.name} Packaging`,
+            displaySubtitle: "HanaPac Customized Packaging",
+            backgroundImageUrl,
+            displayImageUrl,
+            imageHint: cat.imageHint || cat.name.toLowerCase()
+        };
+    });
   }, [allCategories]);
 
   const [activeItem, setActiveItem] = useState<HeroGridItem | null>(null);
@@ -98,7 +111,7 @@ export function InteractiveHero() {
             </div>
 
             {/* Right Grid Panel */}
-            <div className="grid grid-cols-4 grid-rows-3 bg-border">
+            <div className="grid grid-cols-3 grid-rows-4 bg-border">
             {heroGridItems.map((item) => (
                 <Link
                 href={`/products?category=${item.id}`}

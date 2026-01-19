@@ -42,6 +42,8 @@ export function InteractiveHero() {
     }
 
     const topLevelCategories = allCategories.filter((cat) => !cat.parentId);
+    
+    topLevelCategories.sort((a, b) => a.name.localeCompare(b.name));
 
     const foodPackagingCategory = topLevelCategories.find(
       (cat) => cat.name.toLowerCase() === 'food packaging'
@@ -71,9 +73,17 @@ export function InteractiveHero() {
     setActiveHoverItem(null);
   };
 
-  if (!isMounted || isLoading) {
+  if (!isMounted) {
     return (
-      <section className="bg-muted flex items-center justify-center" style={{minHeight: 'clamp(600px, 90vh, 1050px)'}}>
+      <section className="bg-muted flex items-center justify-center" style={{minHeight: 'clamp(600px, 90vh, 950px)'}}>
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </section>
+    );
+  }
+  
+  if (isLoading) {
+    return (
+      <section className="bg-muted flex items-center justify-center" style={{minHeight: 'clamp(600px, 90vh, 950px)'}}>
         <Loader2 className="h-8 w-8 animate-spin" />
       </section>
     );
@@ -81,7 +91,7 @@ export function InteractiveHero() {
 
   if (!displayItem) {
     return (
-      <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{minHeight: 'clamp(600px, 90vh, 1050px)'}}>
+      <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{minHeight: 'clamp(600px, 90vh, 950px)'}}>
         <h3 className="font-headline text-2xl font-bold">
           No Categories Found
         </h3>
@@ -94,14 +104,14 @@ export function InteractiveHero() {
 
   return (
     <section>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-border overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-px bg-border overflow-hidden">
         {/* Left Display Panel */}
         <div
           onMouseLeave={handleMouseLeave}
-          className="relative isolate flex flex-col items-start justify-end p-8 text-white aspect-[4/3] lg:aspect-auto"
-          style={{minHeight: 'clamp(600px, 90vh, 1050px)'}}
+          className="relative isolate flex flex-col items-start justify-end p-8 text-white lg:col-span-2"
+          style={{minHeight: 'clamp(600px, 90vh, 950px)'}}
         >
-          {displayItem.imageUrl ? (
+          {displayItem.imageUrl && (
             <Image
               src={displayItem.imageUrl}
               alt={displayItem.name}
@@ -111,8 +121,6 @@ export function InteractiveHero() {
               data-ai-hint={displayItem.imageHint}
               unoptimized
             />
-          ) : (
-            <div className="absolute inset-0 -z-10 bg-muted"></div>
           )}
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent -z-10"></div>
@@ -131,20 +139,20 @@ export function InteractiveHero() {
         </div>
 
         {/* Right Panel */}
-        <div>
+        <div className="lg:col-span-3">
           {/* Desktop Grid View */}
-          <div className="hidden lg:grid grid-cols-4 grid-rows-3 bg-border" style={{height: 'clamp(600px, 90vh, 1050px)'}}>
+          <div className="hidden lg:grid grid-cols-4 h-full gap-px bg-border">
             {gridItems.map((item) => (
               <Link
                 href={`/products?category=${item.id}`}
                 key={item.id}
                 onMouseEnter={() => handleItemHover(item)}
                 className={cn(
-                  'relative isolate flex items-center justify-center p-4 text-center text-white aspect-square transition-all duration-200 group',
+                  'relative isolate flex items-center justify-center p-4 text-center text-white transition-all duration-200 group',
                   'focus:z-10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset'
                 )}
               >
-                {item.imageUrl ? (
+                {item.imageUrl && (
                   <Image
                     src={item.imageUrl}
                     alt={item.name}
@@ -153,8 +161,6 @@ export function InteractiveHero() {
                     data-ai-hint={item.imageHint}
                     unoptimized
                   />
-                ) : (
-                  <div className="absolute inset-0 -z-10 bg-muted"></div>
                 )}
                 <div
                   className={cn(
@@ -187,7 +193,7 @@ export function InteractiveHero() {
                         'focus:z-10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset'
                       )}
                     >
-                      {item.imageUrl ? (
+                      {item.imageUrl && (
                         <Image
                           src={item.imageUrl}
                           alt={item.name}
@@ -196,8 +202,6 @@ export function InteractiveHero() {
                           data-ai-hint={item.imageHint}
                           unoptimized
                         />
-                      ) : (
-                         <div className="absolute inset-0 -z-10 bg-muted"></div>
                       )}
                       <div
                         className={cn(

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -19,8 +19,13 @@ import {
 import { Button } from '@/components/ui/button';
 
 export function InteractiveHero() {
+  const [isMounted, setIsMounted] = useState(false);
   const db = useFirestore();
   const [activeHoverItem, setActiveHoverItem] = useState<Category | null>(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const categoriesQuery = useMemo(() => {
     if (!db) return null;
@@ -66,9 +71,9 @@ export function InteractiveHero() {
     setActiveHoverItem(null);
   };
 
-  if (isLoading) {
+  if (!isMounted || isLoading) {
     return (
-      <section className="bg-muted flex items-center justify-center" style={{minHeight: 'clamp(600px, 90vh, 850px)'}}>
+      <section className="bg-muted flex items-center justify-center" style={{minHeight: 'clamp(600px, 90vh, 1050px)'}}>
         <Loader2 className="h-8 w-8 animate-spin" />
       </section>
     );
@@ -76,7 +81,7 @@ export function InteractiveHero() {
 
   if (!displayItem) {
     return (
-      <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{minHeight: 'clamp(600px, 90vh, 850px)'}}>
+      <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{minHeight: 'clamp(600px, 90vh, 1050px)'}}>
         <h3 className="font-headline text-2xl font-bold">
           No Categories Found
         </h3>
@@ -94,7 +99,7 @@ export function InteractiveHero() {
         <div
           onMouseLeave={handleMouseLeave}
           className="relative isolate flex flex-col items-start justify-end p-8 text-white aspect-[4/3] lg:aspect-auto"
-          style={{minHeight: 'clamp(600px, 90vh, 850px)'}}
+          style={{minHeight: 'clamp(600px, 90vh, 1050px)'}}
         >
           {displayItem.imageUrl ? (
             <Image
@@ -128,7 +133,7 @@ export function InteractiveHero() {
         {/* Right Panel */}
         <div>
           {/* Desktop Grid View */}
-          <div className="hidden lg:grid grid-cols-4 grid-rows-3 bg-border" style={{height: 'clamp(600px, 90vh, 850px)'}}>
+          <div className="hidden lg:grid grid-cols-4 grid-rows-3 bg-border" style={{height: 'clamp(600px, 90vh, 1050px)'}}>
             {gridItems.map((item) => (
               <Link
                 href={`/products?category=${item.id}`}

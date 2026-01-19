@@ -35,6 +35,7 @@ const fallbackColors = [
 
 export function InteractiveHero() {
   const db = useFirestore();
+  const [activeHoverItem, setActiveHoverItem] = useState<Category | null>(null);
 
   const categoriesQuery = useMemo(() => {
     if (!db) return null;
@@ -44,7 +45,6 @@ export function InteractiveHero() {
   }, [db]);
 
   const { data: allCategories, isLoading } = useCollection<Category>(categoriesQuery);
-  const [activeHoverItem, setActiveHoverItem] = useState<Category | null>(null);
 
   const { featuredItem, gridItems, allItemsForCarousel } = useMemo(() => {
     if (!allCategories) {
@@ -73,11 +73,16 @@ export function InteractiveHero() {
   const colorIndex = useMemo(() => {
     if (!displayItem || !allItemsForCarousel?.length) return 0;
     const idx = allItemsForCarousel.findIndex((c: Category) => c.id === displayItem.id);
-    return (idx > -1 ? idx : 0) % fallbackColors.length;
+    // Ensure index is always valid and within bounds of fallbackColors
+    return (idx !== -1 ? idx : 0) % fallbackColors.length;
   }, [displayItem, allItemsForCarousel]);
 
 
   const handleItemHover = (item: Category) => {
+    setActiveHoverItem(item);
+  };
+  
+  const handleItemTap = (item: Category) => {
     setActiveHoverItem(item);
   };
 
@@ -87,7 +92,7 @@ export function InteractiveHero() {
 
   if (isLoading) {
     return (
-      <section className="bg-muted flex items-center justify-center" style={{height: 'clamp(400px, 50vh, 480px)'}}>
+      <section className="bg-muted flex items-center justify-center" style={{height: 'clamp(350px, 45vh, 420px)'}}>
         <Loader2 className="h-8 w-8 animate-spin" />
       </section>
     );
@@ -95,7 +100,7 @@ export function InteractiveHero() {
 
   if (!displayItem) {
     return (
-      <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{height: 'clamp(400px, 50vh, 480px)'}}>
+      <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{height: 'clamp(350px, 45vh, 420px)'}}>
         <h3 className="font-headline text-2xl font-bold">
           No Categories Found
         </h3>
@@ -113,7 +118,7 @@ export function InteractiveHero() {
         <div
           onMouseLeave={handleMouseLeave}
           className="relative isolate flex flex-col items-start justify-end p-8 text-white aspect-[4/3] lg:aspect-auto"
-          style={{minHeight: 'clamp(400px, 50vh, 480px)'}}
+          style={{minHeight: 'clamp(350px, 45vh, 420px)'}}
         >
           {displayItem.imageUrl ? (
             <Image
@@ -139,7 +144,7 @@ export function InteractiveHero() {
           <div className="relative z-10">
             <p className="text-white/80">HanaPac Customized Packaging</p>
             <h2 className="font-headline text-5xl font-bold text-white mt-2">
-              {displayItem.name} Packaging
+              {displayItem.name}
             </h2>
             <Button asChild className="mt-4">
               <Link href={`/products?category=${displayItem.id}`}>
@@ -152,7 +157,7 @@ export function InteractiveHero() {
         {/* Right Panel */}
         <div>
           {/* Desktop Grid View */}
-          <div className="hidden lg:grid grid-cols-4 grid-rows-3 bg-border" style={{height: 'clamp(400px, 50vh, 480px)'}}>
+          <div className="hidden lg:grid grid-cols-4 grid-rows-3 bg-border" style={{height: 'clamp(350px, 45vh, 420px)'}}>
             {gridItems.map((item) => (
               <Link
                 href={`/products?category=${item.id}`}
@@ -207,8 +212,8 @@ export function InteractiveHero() {
                     <div
                       role="button"
                       tabIndex={0}
-                      onClick={() => handleItemHover(item)}
-                      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleItemHover(item)}
+                      onClick={() => handleItemTap(item)}
+                      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleItemTap(item)}
                       className={cn(
                         'relative isolate flex items-center justify-center p-4 text-center text-white aspect-square transition-all duration-200 group rounded-lg overflow-hidden',
                         'focus:z-10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset'

@@ -29,7 +29,7 @@ service cloud.firestore {
     match /handles/{docId}         { allow get, list: true; allow write: if isAdmin(); }
     match /shapes/{docId}           { allow get, list: true; allow write: if isAdmin(); }
     match /heroSlides/{docId}      { allow get, list: true; allow write: if isAdmin(); }
-    match /trendingItems/{docId}   { allow get, list: true; allow write: if isAdmin(); }
+    match /trendingItems/{docId}   { allow read: true; allow write: if isSignedIn(); }
 
     // --- ADMIN-ONLY COLLECTIONS ---
     match /settings/{settingId} {

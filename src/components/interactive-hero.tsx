@@ -71,9 +71,10 @@ export function InteractiveHero() {
   const displayItem = activeHoverItem || featuredItem;
 
   const colorIndex = useMemo(() => {
-    if (!displayItem || !allItemsForCarousel?.length) return 0;
+    if (!displayItem || !allItemsForCarousel || allItemsForCarousel.length === 0) {
+      return 0;
+    }
     const idx = allItemsForCarousel.findIndex((c: Category) => c.id === displayItem.id);
-    // Ensure index is always valid and within bounds of fallbackColors
     return (idx !== -1 ? idx : 0) % fallbackColors.length;
   }, [displayItem, allItemsForCarousel]);
 
@@ -92,7 +93,7 @@ export function InteractiveHero() {
 
   if (isLoading) {
     return (
-      <section className="bg-muted flex items-center justify-center" style={{height: 'clamp(350px, 45vh, 420px)'}}>
+      <section className="bg-muted flex items-center justify-center" style={{height: 'clamp(460px, 58vh, 550px)'}}>
         <Loader2 className="h-8 w-8 animate-spin" />
       </section>
     );
@@ -100,7 +101,7 @@ export function InteractiveHero() {
 
   if (!displayItem) {
     return (
-      <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{height: 'clamp(350px, 45vh, 420px)'}}>
+      <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{height: 'clamp(460px, 58vh, 550px)'}}>
         <h3 className="font-headline text-2xl font-bold">
           No Categories Found
         </h3>
@@ -118,7 +119,7 @@ export function InteractiveHero() {
         <div
           onMouseLeave={handleMouseLeave}
           className="relative isolate flex flex-col items-start justify-end p-8 text-white aspect-[4/3] lg:aspect-auto"
-          style={{minHeight: 'clamp(350px, 45vh, 420px)'}}
+          style={{minHeight: 'clamp(460px, 58vh, 550px)'}}
         >
           {displayItem.imageUrl ? (
             <Image
@@ -157,7 +158,7 @@ export function InteractiveHero() {
         {/* Right Panel */}
         <div>
           {/* Desktop Grid View */}
-          <div className="hidden lg:grid grid-cols-4 grid-rows-3 bg-border" style={{height: 'clamp(350px, 45vh, 420px)'}}>
+          <div className="hidden lg:grid grid-cols-4 grid-rows-3 bg-border" style={{height: 'clamp(460px, 58vh, 550px)'}}>
             {gridItems.map((item) => (
               <Link
                 href={`/products?category=${item.id}`}

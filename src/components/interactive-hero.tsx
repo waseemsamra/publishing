@@ -54,7 +54,7 @@ export function InteractiveHero() {
     
     return {
       featuredItem: initialFeaturedItem,
-      gridItems: remainingItems,
+      gridItems: remainingItems.slice(0, 4),
       allItemsForCarousel: topLevelCategories,
     };
   }, [allCategories]);
@@ -141,7 +141,7 @@ export function InteractiveHero() {
         {/* Right Panel */}
         <div className="lg:col-span-1 bg-background flex items-center justify-center">
           {/* Desktop Grid View */}
-          <div className="hidden lg:grid grid-cols-5 w-full gap-px bg-border p-px">
+          <div className="hidden lg:grid grid-cols-2 w-full gap-px bg-border p-px">
             {gridItems.map((item) => (
               <Link
                 href={`/products?category=${item.id}`}

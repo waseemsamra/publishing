@@ -39,16 +39,13 @@ export function InteractiveHero() {
     const topLevelCategories = allCategories.filter(cat => !cat.parentId);
 
     return topLevelCategories.slice(0, 12).map((cat): HeroGridItem => {
-        const backgroundImageUrl = cat.imageUrl || `https://picsum.photos/seed/${cat.id}/400/400`;
-        const displayImageUrl = cat.imageUrl || `https://picsum.photos/seed/${cat.id}/800/800`;
-        
         return {
             id: cat.id,
             title: cat.name,
             displayText: `${cat.name} Packaging`,
             displaySubtitle: "HanaPac Customized Packaging",
-            backgroundImageUrl,
-            displayImageUrl,
+            backgroundImageUrl: cat.imageUrl || '',
+            displayImageUrl: cat.imageUrl || '',
             imageHint: cat.imageHint || cat.name.toLowerCase()
         };
     });
@@ -82,19 +79,21 @@ export function InteractiveHero() {
   const currentActiveItem = activeItem || heroGridItems[0];
 
   return (
-    <section>
+    <section className="bg-background">
          <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-border overflow-hidden">
             {/* Left Display Panel */}
             <div className="relative isolate flex flex-col items-center justify-center p-8 text-white min-h-[400px] lg:min-h-0">
-            <Image
-                src={currentActiveItem.displayImageUrl}
-                alt={currentActiveItem.displayText}
-                fill
-                className="object-cover -z-10 transition-all duration-500 ease-in-out"
-                key={currentActiveItem.id}
-                data-ai-hint={currentActiveItem.imageHint}
-                unoptimized
-            />
+            {currentActiveItem.displayImageUrl && (
+                <Image
+                    src={currentActiveItem.displayImageUrl}
+                    alt={currentActiveItem.displayText}
+                    fill
+                    className="object-cover -z-10 transition-all duration-500 ease-in-out"
+                    key={currentActiveItem.id}
+                    data-ai-hint={currentActiveItem.imageHint}
+                    unoptimized
+                />
+            )}
             <div className="absolute inset-0 bg-primary/80 -z-10"></div>
             <div className="text-center relative">
                 <p className="text-primary-foreground/80">{currentActiveItem.displaySubtitle}</p>
@@ -103,7 +102,7 @@ export function InteractiveHero() {
             </div>
 
             {/* Right Grid Panel */}
-            <div className="grid grid-cols-4 grid-rows-3 bg-border">
+            <div className="grid grid-cols-3 grid-rows-4 bg-border">
             {heroGridItems.map((item) => (
                 <Link
                 href={`/products?category=${item.id}`}
@@ -114,14 +113,16 @@ export function InteractiveHero() {
                     "focus:z-10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset"
                 )}
                 >
-                <Image
-                    src={item.backgroundImageUrl}
-                    alt={item.title}
-                    fill
-                    className="object-cover -z-10 group-hover:scale-105 transition-transform duration-300"
-                    data-ai-hint={item.imageHint}
-                    unoptimized
-                  />
+                {item.backgroundImageUrl && (
+                    <Image
+                        src={item.backgroundImageUrl}
+                        alt={item.title}
+                        fill
+                        className="object-cover -z-10 group-hover:scale-105 transition-transform duration-300"
+                        data-ai-hint={item.imageHint}
+                        unoptimized
+                    />
+                )}
                 <div className={cn(
                     "absolute inset-0 bg-green-800/70 group-hover:bg-green-800/50 transition-colors -z-10",
                     activeItem?.id === item.id && "bg-green-800/30"

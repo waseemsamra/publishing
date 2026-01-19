@@ -16,6 +16,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import { Button } from '@/components/ui/button';
 
 const fallbackColors = [
   'bg-sky-700',
@@ -52,17 +53,18 @@ export function InteractiveHero() {
     if (allCategories) {
       const topLevelCategories = allCategories.filter((cat) => !cat.parentId);
 
+      // Find 'Food Packaging' and set it as the featured item
       const foodPackagingCategory = topLevelCategories.find(
         (cat) => cat.name.toLowerCase() === 'food packaging'
       );
 
-      const initial = foodPackagingCategory || topLevelCategories[0] || null;
-      
-      setFeaturedItem(initial);
+      // If 'Food Packaging' is not found, use the first top-level category as a fallback
+      const initialFeatured = foodPackagingCategory || topLevelCategories[0] || null;
+      setFeaturedItem(initialFeatured);
 
-      if (initial) {
-        const otherItems = topLevelCategories.filter((cat) => cat.id !== initial.id);
-        setGridItems(otherItems.slice(0, 12));
+      // Set grid items to be all top-level categories *except* the featured one
+      if (initialFeatured) {
+        setGridItems(topLevelCategories.filter(cat => cat.id !== initialFeatured.id).slice(0, 12));
       } else {
         setGridItems(topLevelCategories.slice(0, 12));
       }
@@ -76,13 +78,13 @@ export function InteractiveHero() {
   const handleMouseLeave = () => {
     setActiveHoverItem(null);
   };
-
+  
   const displayItem = activeHoverItem || featuredItem;
-
+  
   const allItemsForCarousel = useMemo(() => {
-      if (!featuredItem) return gridItems;
-      return [featuredItem, ...gridItems];
-  }, [featuredItem, gridItems]);
+      if (!allCategories) return [];
+      return allCategories.filter(cat => !cat.parentId);
+  }, [allCategories]);
   
   if (isLoading) {
     return (
@@ -92,7 +94,7 @@ export function InteractiveHero() {
     );
   }
 
-  if (!featuredItem && gridItems.length === 0) {
+  if (!displayItem && gridItems.length === 0) {
     return (
       <section className="bg-muted h-[480px] flex flex-col items-center justify-center text-center p-4">
         <h3 className="font-headline text-2xl font-bold">
@@ -112,7 +114,7 @@ export function InteractiveHero() {
         {/* Left Display Panel */}
         <div
           onMouseLeave={handleMouseLeave}
-          className="relative isolate flex flex-col items-center justify-center p-8 text-white min-h-[400px] lg:min-h-0"
+          className="relative isolate flex flex-col items-start justify-end p-8 text-white min-h-[400px] lg:min-h-0 aspect-[4/3] lg:aspect-auto"
         >
           {displayItem?.imageUrl ? (
             <Image
@@ -136,13 +138,20 @@ export function InteractiveHero() {
             ></div>
           )}
 
-          <div className="absolute inset-0 bg-black/30 -z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent -z-10"></div>
 
-          <div className="text-center relative">
+          <div className="relative z-10">
             <p className="text-white/80">HanaPac Customized Packaging</p>
             <h2 className="font-headline text-5xl font-bold text-white mt-2">
               {displayItem?.name} Packaging
             </h2>
+            {displayItem && (
+              <Button asChild className="mt-4">
+                <Link href={`/products?category=${displayItem.id}`}>
+                  Shop Now
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
 
@@ -150,13 +159,13 @@ export function InteractiveHero() {
         <div>
           {/* Desktop Grid View */}
           <div className="hidden lg:grid grid-cols-4 grid-rows-3 bg-border aspect-[4/3] lg:aspect-auto">
-            {gridItems.map((item, index) => (
+            {gridItems.map((item) => (
               <Link
                 href={`/products?category=${item.id}`}
                 key={item.id}
                 onMouseEnter={() => handleItemHover(item)}
                 className={cn(
-                  'relative isolate flex items-center justify-center p-4 text-center text-white aspect-[4/3] transition-all duration-200 group',
+                  'relative isolate flex items-center justify-center p-4 text-center text-white aspect-square transition-all duration-200 group',
                   'focus:z-10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset'
                 )}
               >
@@ -201,8 +210,11 @@ export function InteractiveHero() {
               <CarouselContent>
                 {allItemsForCarousel.map((item) => (
                   <CarouselItem key={item.id} className="basis-1/2 sm:basis-1/3">
-                    <Link
-                      href={`/products?category=${item.id}`}
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => handleItemHover(item)}
+                      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleItemHover(item)}
                       className={cn(
                         'relative isolate flex items-center justify-center p-4 text-center text-white aspect-square transition-all duration-200 group rounded-lg overflow-hidden',
                         'focus:z-10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset'
@@ -234,7 +246,7 @@ export function InteractiveHero() {
                         )}
                       ></div>
                       <h3 className="font-semibold text-lg">{item.name}</h3>
-                    </Link>
+                    </div>
                   </CarouselItem>
                 ))}
               </CarouselContent>

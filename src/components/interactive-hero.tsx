@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -45,29 +45,26 @@ export function InteractiveHero() {
 
   const { data: allCategories, isLoading } = useCollection<Category>(categoriesQuery);
 
-  const [featuredItem, setFeaturedItem] = useState<Category | null>(null);
-  const [gridItems, setGridItems] = useState<Category[]>([]);
   const [activeHoverItem, setActiveHoverItem] = useState<Category | null>(null);
 
-  useEffect(() => {
-    if (allCategories) {
-      const topLevelCategories = allCategories.filter((cat) => !cat.parentId);
-
-      const foodPackagingCategory = topLevelCategories.find(
-        (cat) => cat.name.toLowerCase() === 'food packaging'
-      );
-
-      const initialFeatured = foodPackagingCategory || topLevelCategories[0] || null;
-      setFeaturedItem(initialFeatured);
-
-      if (initialFeatured) {
-        setGridItems(topLevelCategories.filter(cat => cat.id !== initialFeatured.id).slice(0, 12));
-      } else {
-        setGridItems(topLevelCategories.slice(0, 12));
-      }
-    }
+  const topLevelCategories = useMemo(() => {
+    if (!allCategories) return [];
+    return allCategories.filter((cat) => !cat.parentId);
   }, [allCategories]);
 
+  const featuredItem = useMemo(() => {
+    if (topLevelCategories.length === 0) return null;
+    const foodPackagingCategory = topLevelCategories.find(
+      (cat) => cat.name.toLowerCase() === 'food packaging'
+    );
+    return foodPackagingCategory || topLevelCategories[0];
+  }, [topLevelCategories]);
+
+  const gridItems = useMemo(() => {
+    if (!featuredItem) return topLevelCategories.slice(0, 12);
+    return topLevelCategories.filter(cat => cat.id !== featuredItem.id).slice(0, 12);
+  }, [topLevelCategories, featuredItem]);
+  
   const handleItemHover = (item: Category) => {
     setActiveHoverItem(item);
   };
@@ -78,14 +75,11 @@ export function InteractiveHero() {
   
   const displayItem = activeHoverItem || featuredItem;
   
-  const allItemsForCarousel = useMemo(() => {
-      if (!allCategories) return [];
-      return allCategories.filter(cat => !cat.parentId);
-  }, [allCategories]);
+  const allItemsForCarousel = topLevelCategories;
   
   if (isLoading) {
     return (
-      <section className="bg-muted h-[480px] flex items-center justify-center">
+      <section className="bg-muted flex items-center justify-center" style={{height: 'clamp(400px, 50vh, 480px)'}}>
         <Loader2 className="h-8 w-8 animate-spin" />
       </section>
     );
@@ -93,7 +87,7 @@ export function InteractiveHero() {
 
   if (!displayItem) {
     return (
-      <section className="bg-muted h-[480px] flex flex-col items-center justify-center text-center p-4">
+      <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{height: 'clamp(400px, 50vh, 480px)'}}>
         <h3 className="font-headline text-2xl font-bold">
           No Categories Found
         </h3>
@@ -104,14 +98,14 @@ export function InteractiveHero() {
     );
   }
 
-
   return (
     <section>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-border overflow-hidden">
         {/* Left Display Panel */}
         <div
           onMouseLeave={handleMouseLeave}
-          className="relative isolate flex flex-col items-start justify-end p-8 text-white min-h-[400px] lg:min-h-0 aspect-[4/3] lg:aspect-auto"
+          className="relative isolate flex flex-col items-start justify-end p-8 text-white aspect-[4/3] lg:aspect-auto"
+          style={{minHeight: 'clamp(400px, 50vh, 480px)'}}
         >
           {displayItem.imageUrl ? (
             <Image
@@ -153,7 +147,7 @@ export function InteractiveHero() {
         {/* Right Panel */}
         <div>
           {/* Desktop Grid View */}
-          <div className="hidden lg:grid grid-cols-4 grid-rows-3 bg-border aspect-[4/3] lg:aspect-auto">
+          <div className="hidden lg:grid grid-cols-4 grid-rows-3 bg-border" style={{height: 'clamp(400px, 50vh, 480px)'}}>
             {gridItems.map((item) => (
               <Link
                 href={`/products?category=${item.id}`}

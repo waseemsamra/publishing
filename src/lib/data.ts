@@ -1,5 +1,5 @@
 import { PlaceHolderImages } from './placeholder-images';
-import type { Product, User, Order, MustHaveProduct, BrandStory } from './types';
+import type { Product, User, Order, MustHaveProduct, BrandStory, HeroGridItem } from './types';
 
 const imageMap = PlaceHolderImages.reduce(
   (acc, img) => {
@@ -90,6 +90,117 @@ export const products: Product[] = [
     sustainabilityImpact: 'Replaces single-use dryer sheets and chemical fabric softeners. Saves energy by shortening dryer cycles.',
     images: [imageMap['product-8']],
   },
+];
+
+export const heroGridItems: HeroGridItem[] = [
+    {
+      id: 'food',
+      title: 'Food Products',
+      displayText: 'Food Packaging',
+      displaySubtitle: 'noissue Customized Packaging',
+      backgroundImageUrl: imageMap['hero-grid-food'].imageUrl,
+      displayImageUrl: imageMap['hero-display-default'].imageUrl,
+      imageHint: 'food packaging'
+    },
+    {
+      id: 'bakery',
+      title: 'Bakery Essentials',
+      displayText: 'Bakery Packaging',
+      displaySubtitle: 'For Fresh & Delicious Goods',
+      backgroundImageUrl: imageMap['hero-grid-bakery'].imageUrl,
+      displayImageUrl: imageMap['hero-grid-bakery'].imageUrl,
+      imageHint: 'bakery essentials'
+    },
+    {
+      id: 'print',
+      title: 'Print On Demand',
+      displayText: 'On-Demand Prints',
+      displaySubtitle: 'Packaging That Speaks Volumes',
+      backgroundImageUrl: imageMap['hero-grid-print'].imageUrl,
+      displayImageUrl: imageMap['hero-grid-print'].imageUrl,
+      imageHint: 'print on demand'
+    },
+    {
+      id: 'arts',
+      title: 'Arts & Stationery',
+      displayText: 'Creative Packaging',
+      displaySubtitle: 'For the Modern Artist',
+      backgroundImageUrl: imageMap['hero-grid-arts'].imageUrl,
+      displayImageUrl: imageMap['hero-grid-arts'].imageUrl,
+      imageHint: 'arts stationery'
+    },
+    {
+      id: 'kitchen',
+      title: 'Kitchen Essentials',
+      displayText: 'Kitchenware Packaging',
+      displaySubtitle: 'Packed with Care',
+      backgroundImageUrl: imageMap['hero-grid-kitchen'].imageUrl,
+      displayImageUrl: imageMap['hero-grid-kitchen'].imageUrl,
+      imageHint: 'kitchen essentials'
+    },
+    {
+      id: 'apparel',
+      title: 'Apparel & Uniforms',
+      displayText: 'Apparel Packaging',
+      displaySubtitle: 'Dress to Impress',
+      backgroundImageUrl: imageMap['hero-grid-apparel'].imageUrl,
+      displayImageUrl: imageMap['hero-grid-apparel'].imageUrl,
+      imageHint: 'apparel uniforms'
+    },
+    {
+      id: 'stitch',
+      title: 'Stitch Crafts',
+      displayText: 'Craft Packaging',
+      displaySubtitle: 'For Every Creation',
+      backgroundImageUrl: imageMap['hero-grid-stitch'].imageUrl,
+      displayImageUrl: imageMap['hero-grid-stitch'].imageUrl,
+      imageHint: 'stitch crafts'
+    },
+    {
+      id: 'perfume',
+      title: 'Perfume & Fragrance',
+      displayText: 'Fragrance Packaging',
+      displaySubtitle: 'Elegance in a Box',
+      backgroundImageUrl: imageMap['hero-grid-perfume'].imageUrl,
+      displayImageUrl: imageMap['hero-grid-perfume'].imageUrl,
+      imageHint: 'perfume fragrance'
+    },
+    {
+      id: 'health',
+      title: 'Health & Nutrition',
+      displayText: 'Wellness Packaging',
+      displaySubtitle: 'Healthy Choices, Healthy Planet',
+      backgroundImageUrl: imageMap['hero-grid-health'].imageUrl,
+      displayImageUrl: imageMap['hero-grid-health'].imageUrl,
+      imageHint: 'health nutrition'
+    },
+    {
+      id: 'more',
+      title: 'More Packaging',
+      displayText: 'Versatile Packaging',
+      displaySubtitle: 'Solutions for Everything',
+      backgroundImageUrl: imageMap['hero-grid-more'].imageUrl,
+      displayImageUrl: imageMap['hero-grid-more'].imageUrl,
+      imageHint: 'more packaging'
+    },
+    {
+      id: 'beauty',
+      title: 'Beauty & Cosmetics',
+      displayText: 'Cosmetic Packaging',
+      displaySubtitle: 'Unbox Your Beauty',
+      backgroundImageUrl: imageMap['hero-grid-beauty'].imageUrl,
+      displayImageUrl: imageMap['hero-grid-beauty'].imageUrl,
+      imageHint: 'beauty cosmetics'
+    },
+    {
+      id: 'pets',
+      title: 'Pets Products',
+      displayText: 'Pet Packaging',
+      displaySubtitle: 'For Your Furry Friends',
+      backgroundImageUrl: imageMap['hero-grid-pets'].imageUrl,
+      displayImageUrl: imageMap['hero-grid-pets'].imageUrl,
+      imageHint: 'pets products'
+    }
 ];
 
 export const mustHaveProducts: MustHaveProduct[] = [
@@ -200,7 +311,7 @@ export const orders: Order[] = [
     { id: 'ord_1', customerName: 'Alice Johnson', date: '2024-05-01', total: 44.98, status: 'Delivered', itemCount: 2 },
     { id: 'ord_2', customerName: 'Bob Williams', date: '2024-05-03', total: 12.99, status: 'Shipped', itemCount: 1 },
     { id: 'ord_3', customerName: 'Charlie Brown', date: '2024-05-04', total: 68.98, status: 'Processing', itemCount: 2 },
-    { id: 'ord_4', customerName: 'Alice Johnson', date: '2024-05-05', total: 15.99, status: 'Delivered', itemCount: 1 },
+    { id: 'ord_4', name: 'Alice Johnson', date: '2024-05-05', total: 15.99, status: 'Delivered', itemCount: 1 },
     { id: 'ord_5', customerName: 'Diana Miller', date: '2024-05-06', total: 18.99, status: 'Cancelled', itemCount: 1 },
 ];
 
@@ -242,3 +353,4 @@ export const brandStories: BrandStory[] = [
         image: imageMap['brand-story-6'],
     }
 ];
+```

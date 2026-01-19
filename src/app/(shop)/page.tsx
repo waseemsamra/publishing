@@ -22,6 +22,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
+import { InteractiveHero } from '@/components/interactive-hero';
 
 const TrendingNowCard = ({ item }: { item: TrendingItem }) => {
   return (
@@ -193,7 +194,7 @@ function TrendingNowSection() {
 export default function HomePage() {
   return (
     <>
-      <HeroCarousel />
+      <InteractiveHero />
       
       <LowMinimumMustHaves />
 
@@ -216,5 +217,3 @@ export default function HomePage() {
     </>
   );
 }
-
-    

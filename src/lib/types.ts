@@ -185,5 +185,14 @@ export interface TrendingItem {
   updatedAt?: any;
 }
     
-
+export interface HeroGridItem {
+  id: string;
+  title: string;
+  displayText: string;
+  displaySubtitle: string;
+  backgroundImageUrl: string;
+  displayImageUrl: string;
+  imageHint: string;
+}
     
+```

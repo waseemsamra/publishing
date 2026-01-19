@@ -197,6 +197,20 @@
       "description": "A stack of branded red paper bowls being held",
       "imageUrl": "https://printinweb.s3.us-east-1.amazonaws.com/images/patsys-bowls.png",
       "imageHint": "paper bowls"
-    }
+    },
+    { "id": "hero-display-default", "description": "Colorful food packaging", "imageUrl": "https://picsum.photos/seed/hdisplay1/800/800", "imageHint": "food packaging" },
+    { "id": "hero-grid-bakery", "description": "Freshly baked bread", "imageUrl": "https://picsum.photos/seed/hgrid1/400/400", "imageHint": "bakery essentials" },
+    { "id": "hero-grid-print", "description": "Printing press in action", "imageUrl": "https://picsum.photos/seed/hgrid2/400/400", "imageHint": "print on demand" },
+    { "id": "hero-grid-arts", "description": "Art supplies and stationery", "imageUrl": "https://picsum.photos/seed/hgrid3/400/400", "imageHint": "arts stationery" },
+    { "id": "hero-grid-kitchen", "description": "Modern kitchen utensils", "imageUrl": "https://picsum.photos/seed/hgrid4/400/400", "imageHint": "kitchen essentials" },
+    { "id": "hero-grid-apparel", "description": "Folded colorful t-shirts", "imageUrl": "https://picsum.photos/seed/hgrid5/400/400", "imageHint": "apparel uniforms" },
+    { "id": "hero-grid-stitch", "description": "Colorful threads and needles", "imageUrl": "https://picsum.photos/seed/hgrid6/400/400", "imageHint": "stitch crafts" },
+    { "id": "hero-grid-food", "description": "Fresh market produce", "imageUrl": "https://picsum.photos/seed/hgrid7/400/400", "imageHint": "food products" },
+    { "id": "hero-grid-perfume", "description": "Elegant perfume bottles", "imageUrl": "https://picsum.photos/seed/hgrid8/400/400", "imageHint": "perfume fragrance" },
+    { "id": "hero-grid-health", "description": "Vitamins and supplements", "imageUrl": "https://picsum.photos/seed/hgrid9/400/400", "imageHint": "health nutrition" },
+    { "id": "hero-grid-more", "description": "Assortment of packages", "imageUrl": "https://picsum.photos/seed/hgrid10/400/400", "imageHint": "more packaging" },
+    { "id": "hero-grid-beauty", "description": "Cosmetic products display", "imageUrl": "https://picsum.photos/seed/hgrid11/400/400", "imageHint": "beauty cosmetics" },
+    { "id": "hero-grid-pets", "description": "Pet food and toys", "imageUrl": "https://picsum.photos/seed/hgrid12/400/400", "imageHint": "pets products" }
   ]
 }
+```

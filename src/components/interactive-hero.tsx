@@ -53,16 +53,13 @@ export function InteractiveHero() {
     if (allCategories) {
       const topLevelCategories = allCategories.filter((cat) => !cat.parentId);
 
-      // Find 'Food Packaging' and set it as the featured item
       const foodPackagingCategory = topLevelCategories.find(
         (cat) => cat.name.toLowerCase() === 'food packaging'
       );
 
-      // If 'Food Packaging' is not found, use the first top-level category as a fallback
       const initialFeatured = foodPackagingCategory || topLevelCategories[0] || null;
       setFeaturedItem(initialFeatured);
 
-      // Set grid items to be all top-level categories *except* the featured one
       if (initialFeatured) {
         setGridItems(topLevelCategories.filter(cat => cat.id !== initialFeatured.id).slice(0, 12));
       } else {
@@ -94,7 +91,7 @@ export function InteractiveHero() {
     );
   }
 
-  if (!displayItem && gridItems.length === 0) {
+  if (!displayItem) {
     return (
       <section className="bg-muted h-[480px] flex flex-col items-center justify-center text-center p-4">
         <h3 className="font-headline text-2xl font-bold">
@@ -116,7 +113,7 @@ export function InteractiveHero() {
           onMouseLeave={handleMouseLeave}
           className="relative isolate flex flex-col items-start justify-end p-8 text-white min-h-[400px] lg:min-h-0 aspect-[4/3] lg:aspect-auto"
         >
-          {displayItem?.imageUrl ? (
+          {displayItem.imageUrl ? (
             <Image
               src={displayItem.imageUrl}
               alt={displayItem.name}
@@ -131,7 +128,7 @@ export function InteractiveHero() {
               className={cn(
                 'absolute inset-0 -z-10',
                 fallbackColors[
-                  (allCategories?.findIndex((c) => c.id === displayItem?.id) ??
+                  (allCategories?.findIndex((c) => c.id === displayItem.id) ??
                     0) % fallbackColors.length
                 ]
               )}
@@ -143,15 +140,13 @@ export function InteractiveHero() {
           <div className="relative z-10">
             <p className="text-white/80">HanaPac Customized Packaging</p>
             <h2 className="font-headline text-5xl font-bold text-white mt-2">
-              {displayItem?.name} Packaging
+              {displayItem.name} Packaging
             </h2>
-            {displayItem && (
-              <Button asChild className="mt-4">
-                <Link href={`/products?category=${displayItem.id}`}>
-                  Shop Now
-                </Link>
-              </Button>
-            )}
+            <Button asChild className="mt-4">
+              <Link href={`/products?category=${displayItem.id}`}>
+                Shop Now
+              </Link>
+            </Button>
           </div>
         </div>
 

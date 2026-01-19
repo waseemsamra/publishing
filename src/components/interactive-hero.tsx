@@ -44,27 +44,39 @@ export function InteractiveHero() {
   }, [db]);
 
   const { data: allCategories, isLoading } = useCollection<Category>(categoriesQuery);
-
   const [activeHoverItem, setActiveHoverItem] = useState<Category | null>(null);
 
-  const topLevelCategories = useMemo(() => {
-    if (!allCategories) return [];
-    return allCategories.filter((cat) => !cat.parentId);
-  }, [allCategories]);
+  const { featuredItem, gridItems, allItemsForCarousel } = useMemo(() => {
+    if (!allCategories) {
+      return { featuredItem: null, gridItems: [], allItemsForCarousel: [] };
+    }
+    
+    const topLevelCategories = allCategories.filter((cat) => !cat.parentId);
 
-  const featuredItem = useMemo(() => {
-    if (topLevelCategories.length === 0) return null;
     const foodPackagingCategory = topLevelCategories.find(
       (cat) => cat.name.toLowerCase() === 'food packaging'
     );
-    return foodPackagingCategory || topLevelCategories[0];
-  }, [topLevelCategories]);
+    
+    const initialFeaturedItem = foodPackagingCategory || (topLevelCategories.length > 0 ? topLevelCategories[0] : null);
 
-  const gridItems = useMemo(() => {
-    if (!featuredItem) return topLevelCategories.slice(0, 12);
-    return topLevelCategories.filter(cat => cat.id !== featuredItem.id).slice(0, 12);
-  }, [topLevelCategories, featuredItem]);
+    const remainingItems = topLevelCategories.filter(cat => cat.id !== initialFeaturedItem?.id);
+    
+    return {
+      featuredItem: initialFeaturedItem,
+      gridItems: remainingItems,
+      allItemsForCarousel: topLevelCategories,
+    };
+  }, [allCategories]);
   
+  const displayItem = activeHoverItem || featuredItem;
+
+  const colorIndex = useMemo(() => {
+    if (!displayItem || !allItemsForCarousel?.length) return 0;
+    const idx = allItemsForCarousel.findIndex((c: Category) => c.id === displayItem.id);
+    return (idx > -1 ? idx : 0) % fallbackColors.length;
+  }, [displayItem, allItemsForCarousel]);
+
+
   const handleItemHover = (item: Category) => {
     setActiveHoverItem(item);
   };
@@ -72,11 +84,7 @@ export function InteractiveHero() {
   const handleMouseLeave = () => {
     setActiveHoverItem(null);
   };
-  
-  const displayItem = activeHoverItem || featuredItem;
-  
-  const allItemsForCarousel = topLevelCategories;
-  
+
   if (isLoading) {
     return (
       <section className="bg-muted flex items-center justify-center" style={{height: 'clamp(400px, 50vh, 480px)'}}>
@@ -121,10 +129,7 @@ export function InteractiveHero() {
             <div
               className={cn(
                 'absolute inset-0 -z-10',
-                fallbackColors[
-                  (allCategories?.findIndex((c) => c.id === displayItem.id) ??
-                    0) % fallbackColors.length
-                ]
+                fallbackColors[colorIndex]
               )}
             ></div>
           )}
@@ -172,7 +177,7 @@ export function InteractiveHero() {
                     className={cn(
                       'absolute inset-0 -z-10',
                       fallbackColors[
-                        (allCategories?.findIndex((c) => c.id === item.id) ?? 0) %
+                        (allItemsForCarousel.findIndex((c: Category) => c.id === item.id) ?? 0) %
                           fallbackColors.length
                       ]
                     )}
@@ -197,7 +202,7 @@ export function InteractiveHero() {
               className="w-full"
             >
               <CarouselContent>
-                {allItemsForCarousel.map((item) => (
+                {allItemsForCarousel.map((item: Category) => (
                   <CarouselItem key={item.id} className="basis-1/2 sm:basis-1/3">
                     <div
                       role="button"
@@ -223,7 +228,7 @@ export function InteractiveHero() {
                           className={cn(
                             'absolute inset-0 -z-10',
                             fallbackColors[
-                              (allCategories?.findIndex((c) => c.id === item.id) ?? 0) %
+                              (allItemsForCarousel.findIndex((c: Category) => c.id === item.id) ?? 0) %
                                 fallbackColors.length
                             ]
                           )}

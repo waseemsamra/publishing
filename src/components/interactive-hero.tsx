@@ -9,7 +9,6 @@ import { useFirestore } from '@/firebase/provider';
 import { collection, query } from 'firebase/firestore';
 import type { Category } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 // Define HeroGridItem here as it's removed from types.ts
 interface HeroGridItem {
@@ -21,8 +20,6 @@ interface HeroGridItem {
     displayImageUrl: string;
     imageHint: string;
 }
-
-const foodPackagingPlaceholder = PlaceHolderImages.find(p => p.id === 'hero-food-packaging');
 
 export function InteractiveHero() {
   const db = useFirestore();
@@ -42,13 +39,8 @@ export function InteractiveHero() {
     const topLevelCategories = allCategories.filter(cat => !cat.parentId);
 
     return topLevelCategories.slice(0, 12).map((cat): HeroGridItem => {
-        let backgroundImageUrl = cat.imageUrl || `https://picsum.photos/seed/${cat.id}/400/400`;
-        let displayImageUrl = cat.imageUrl || `https://picsum.photos/seed/${cat.id}/800/800`;
-
-        if (cat.name === 'Food Packaging' && !cat.imageUrl && foodPackagingPlaceholder) {
-            backgroundImageUrl = foodPackagingPlaceholder.imageUrl;
-            displayImageUrl = foodPackagingPlaceholder.imageUrl;
-        }
+        const backgroundImageUrl = cat.imageUrl || `https://picsum.photos/seed/${cat.id}/400/400`;
+        const displayImageUrl = cat.imageUrl || `https://picsum.photos/seed/${cat.id}/800/800`;
         
         return {
             id: cat.id,

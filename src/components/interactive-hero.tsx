@@ -50,11 +50,12 @@ export function InteractiveHero() {
     );
     
     const initialFeaturedItem = foodPackagingCategory || topLevelCategories[0];
-    const remainingItems = topLevelCategories.filter(cat => cat.id !== initialFeaturedItem?.id);
+    
+    const gridItems = topLevelCategories.slice(0, 12);
     
     return {
       featuredItem: initialFeaturedItem,
-      gridItems: remainingItems.slice(0, 4),
+      gridItems: gridItems,
       allItemsForCarousel: topLevelCategories,
     };
   }, [allCategories]);
@@ -75,7 +76,7 @@ export function InteractiveHero() {
 
   if (!isMounted) {
     return (
-      <section className="bg-muted flex items-center justify-center" style={{minHeight: 'clamp(600px, 90vh, 1050px)'}}>
+      <section className="bg-muted flex items-center justify-center" style={{minHeight: 'clamp(600px, 90vh, 800px)'}}>
         <Loader2 className="h-8 w-8 animate-spin" />
       </section>
     );
@@ -83,7 +84,7 @@ export function InteractiveHero() {
   
   if (isLoading) {
     return (
-      <section className="bg-muted flex items-center justify-center" style={{minHeight: 'clamp(600px, 90vh, 1050px)'}}>
+      <section className="bg-muted flex items-center justify-center" style={{minHeight: 'clamp(600px, 90vh, 800px)'}}>
         <Loader2 className="h-8 w-8 animate-spin" />
       </section>
     );
@@ -91,7 +92,7 @@ export function InteractiveHero() {
 
   if (!displayItem) {
     return (
-      <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{minHeight: 'clamp(600px, 90vh, 1050px)'}}>
+      <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{minHeight: 'clamp(600px, 90vh, 800px)'}}>
         <h3 className="font-headline text-2xl font-bold">
           No Categories Found
         </h3>
@@ -108,8 +109,8 @@ export function InteractiveHero() {
         {/* Left Display Panel */}
         <div
           onMouseLeave={handleMouseLeave}
-          className="relative isolate flex flex-col items-start justify-end p-8 text-white lg:col-span-1"
-          style={{minHeight: 'clamp(600px, 90vh, 1050px)'}}
+          className="relative isolate flex flex-col items-start justify-end p-8 text-white"
+          style={{minHeight: 'clamp(600px, 90vh, 800px)'}}
         >
           {displayItem.imageUrl && (
             <Image
@@ -141,7 +142,7 @@ export function InteractiveHero() {
         {/* Right Panel */}
         <div className="lg:col-span-1 bg-background flex items-center justify-center">
           {/* Desktop Grid View */}
-          <div className="hidden lg:grid grid-cols-2 w-full gap-px bg-border p-px">
+          <div className="hidden lg:grid grid-cols-4 w-full h-full gap-px bg-border">
             {gridItems.map((item) => (
               <Link
                 href={`/products?category=${item.id}`}

@@ -1,79 +1,8 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // TEMPORARY DIAGNOSTIC RULE
     match /{document=**} {
-      allow read: if true;
-    }
-
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-    
-    function isAdmin() {
-      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.hasAny(['admin']);
-    }
-
-    // --- PUBLIC COLLECTIONS ---
-    // All collections in this section are readable by anyone, but only writable by admins.
-    match /products/{docId}       { allow get, list: true; allow write: if isAdmin(); }
-    match /categories/{docId}    { allow get, list: true; allow write: if isAdmin(); }
-    match /sizes/{docId}             { allow get, list: true; allow write: if isAdmin(); }
-    match /colours/{docId}         { allow get, list: true; allow write: if isAdmin(); }
-    match /printOptions/{docId}    { allow get, list: true; allow write: if isAdmin(); }
-    match /wallTypes/{docId}       { allow get, list: true; allow write: if isAdmin(); }
-    match /thicknesses/{docId}  { allow get, list: true; allow write: if isAdmin(); }
-    match /materialTypes/{docId}     { allow get, list: true; allow write: if isAdmin(); }
-    match /finishTypes/{docId}       { allow get, list: true; allow write: if isAdmin(); }
-    match /adhesives/{docId}     { allow get, list: true; allow write: if isAdmin(); }
-    match /handles/{docId}         { allow get, list: true; allow write: if isAdmin(); }
-    match /shapes/{docId}           { allow get, list: true; allow write: if isAdmin(); }
-    match /heroSlides/{docId}      { allow get, list: true; allow write: if isAdmin(); }
-    match /trendingItems/{trendingItemId}   { allow read: true; allow write: if isSignedIn(); }
-
-    // --- ADMIN-ONLY COLLECTIONS ---
-    match /settings/{settingId} {
-      allow read, write: if isAdmin();
-    }
-
-    // --- USER DATA ---
-    match /users/{userId} {
-      allow get: if isOwner(userId) || isAdmin();
-      allow list: if isAdmin();
-      allow create: if isSignedIn();
-      allow update: if isOwner(userId) || isAdmin();
-      allow delete: if isAdmin();
-
-      match /shoppingCarts/{cartId} {
-        allow read, write: if isOwner(userId);
-        match /cartItems/{itemId} {
-          allow read, write: if isOwner(userId);
-        }
-      }
-
-      match /orders/{orderId} {
-        allow get, list: if isOwner(userId) || isAdmin();
-        allow create: if false; // Backend only
-        allow update: if isAdmin();
-        allow delete: if false;
-        match /orderItems/{itemId} {
-          allow get, list: if isOwner(userId) || isAdmin();
-          allow create, update, delete: if false;
-        }
-      }
-
-      match /shippingAddresses/{addressId} {
-        allow read, write: if isOwner(userId);
-      }
-
-      match /billingAddresses/{addressId} {
-        allow read, write: if isOwner(userId);
-      }
+      allow read, write: if request.auth != null;
     }
   }
 }

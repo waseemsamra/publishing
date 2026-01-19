@@ -90,7 +90,7 @@ export function InteractiveHero() {
   const currentActiveItem = activeItem || heroGridItems[0];
 
   return (
-    <section className="bg-background">
+    <section>
          <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-border overflow-hidden">
             {/* Left Display Panel */}
             <div className="relative isolate flex flex-col items-center justify-center p-8 text-white min-h-[400px] lg:min-h-0">
@@ -111,7 +111,7 @@ export function InteractiveHero() {
             </div>
 
             {/* Right Grid Panel */}
-            <div className="grid grid-cols-3 grid-rows-4 bg-border">
+            <div className="grid grid-cols-4 grid-rows-3 bg-border">
             {heroGridItems.map((item) => (
                 <Link
                 href={`/products?category=${item.id}`}

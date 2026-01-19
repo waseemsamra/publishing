@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirestore } from '@/firebase/provider';
-import { collection, query } from 'firebase/firestore';
+import { collection, query, orderBy } from 'firebase/firestore';
 import type { Category } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 import {
@@ -18,28 +18,13 @@ import {
 } from '@/components/ui/carousel';
 import { Button } from '@/components/ui/button';
 
-const fallbackColors = [
-  'bg-sky-700',
-  'bg-emerald-700',
-  'bg-amber-700',
-  'bg-rose-700',
-  'bg-indigo-700',
-  'bg-teal-700',
-  'bg-lime-700',
-  'bg-fuchsia-700',
-  'bg-cyan-700',
-  'bg-orange-700',
-  'bg-pink-700',
-  'bg-violet-700',
-];
-
 export function InteractiveHero() {
   const db = useFirestore();
   const [activeHoverItem, setActiveHoverItem] = useState<Category | null>(null);
 
   const categoriesQuery = useMemo(() => {
     if (!db) return null;
-    const q = query(collection(db, 'categories'));
+    const q = query(collection(db, 'categories'), orderBy('name', 'asc'));
     (q as any).__memo = true;
     return q;
   }, [db]);
@@ -47,18 +32,17 @@ export function InteractiveHero() {
   const { data: allCategories, isLoading } = useCollection<Category>(categoriesQuery);
 
   const { featuredItem, gridItems, allItemsForCarousel } = useMemo(() => {
-    if (!allCategories) {
-      return { featuredItem: null, gridItems: [], allItemsForCarousel: [] };
+    if (!allCategories || allCategories.length === 0) {
+        return { featuredItem: null, gridItems: [], allItemsForCarousel: [] };
     }
-    
+
     const topLevelCategories = allCategories.filter((cat) => !cat.parentId);
 
     const foodPackagingCategory = topLevelCategories.find(
       (cat) => cat.name.toLowerCase() === 'food packaging'
     );
     
-    const initialFeaturedItem = foodPackagingCategory || (topLevelCategories.length > 0 ? topLevelCategories[0] : null);
-
+    const initialFeaturedItem = foodPackagingCategory || topLevelCategories[0];
     const remainingItems = topLevelCategories.filter(cat => cat.id !== initialFeaturedItem?.id);
     
     return {
@@ -69,15 +53,6 @@ export function InteractiveHero() {
   }, [allCategories]);
   
   const displayItem = activeHoverItem || featuredItem;
-
-  const colorIndex = useMemo(() => {
-    if (!displayItem || !allItemsForCarousel || allItemsForCarousel.length === 0) {
-      return 0;
-    }
-    const idx = allItemsForCarousel.findIndex((c: Category) => c.id === displayItem.id);
-    return (idx !== -1 ? idx : 0) % fallbackColors.length;
-  }, [displayItem, allItemsForCarousel]);
-
 
   const handleItemHover = (item: Category) => {
     setActiveHoverItem(item);
@@ -93,7 +68,7 @@ export function InteractiveHero() {
 
   if (isLoading) {
     return (
-      <section className="bg-muted flex items-center justify-center" style={{minHeight: 'clamp(460px, 75vh, 715px)'}}>
+      <section className="bg-muted flex items-center justify-center" style={{minHeight: 'clamp(600px, 90vh, 850px)'}}>
         <Loader2 className="h-8 w-8 animate-spin" />
       </section>
     );
@@ -101,7 +76,7 @@ export function InteractiveHero() {
 
   if (!displayItem) {
     return (
-      <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{minHeight: 'clamp(460px, 75vh, 715px)'}}>
+      <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{minHeight: 'clamp(600px, 90vh, 850px)'}}>
         <h3 className="font-headline text-2xl font-bold">
           No Categories Found
         </h3>
@@ -119,7 +94,7 @@ export function InteractiveHero() {
         <div
           onMouseLeave={handleMouseLeave}
           className="relative isolate flex flex-col items-start justify-end p-8 text-white aspect-[4/3] lg:aspect-auto"
-          style={{minHeight: 'clamp(460px, 75vh, 715px)'}}
+          style={{minHeight: 'clamp(600px, 90vh, 850px)'}}
         >
           {displayItem.imageUrl ? (
             <Image
@@ -132,12 +107,7 @@ export function InteractiveHero() {
               unoptimized
             />
           ) : (
-            <div
-              className={cn(
-                'absolute inset-0 -z-10',
-                fallbackColors[colorIndex]
-              )}
-            ></div>
+            <div className="absolute inset-0 -z-10 bg-muted"></div>
           )}
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent -z-10"></div>
@@ -158,7 +128,7 @@ export function InteractiveHero() {
         {/* Right Panel */}
         <div>
           {/* Desktop Grid View */}
-          <div className="hidden lg:grid grid-cols-4 grid-rows-3 bg-border" style={{height: 'clamp(460px, 75vh, 715px)'}}>
+          <div className="hidden lg:grid grid-cols-4 grid-rows-3 bg-border" style={{height: 'clamp(600px, 90vh, 850px)'}}>
             {gridItems.map((item) => (
               <Link
                 href={`/products?category=${item.id}`}
@@ -179,15 +149,7 @@ export function InteractiveHero() {
                     unoptimized
                   />
                 ) : (
-                  <div
-                    className={cn(
-                      'absolute inset-0 -z-10',
-                      fallbackColors[
-                        (allItemsForCarousel.findIndex((c: Category) => c.id === item.id) ?? 0) %
-                          fallbackColors.length
-                      ]
-                    )}
-                  ></div>
+                  <div className="absolute inset-0 -z-10 bg-muted"></div>
                 )}
                 <div
                   className={cn(
@@ -230,15 +192,7 @@ export function InteractiveHero() {
                           unoptimized
                         />
                       ) : (
-                        <div
-                          className={cn(
-                            'absolute inset-0 -z-10',
-                            fallbackColors[
-                              (allItemsForCarousel.findIndex((c: Category) => c.id === item.id) ?? 0) %
-                                fallbackColors.length
-                            ]
-                          )}
-                        ></div>
+                         <div className="absolute inset-0 -z-10 bg-muted"></div>
                       )}
                       <div
                         className={cn(

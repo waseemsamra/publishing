@@ -59,7 +59,7 @@ export function InteractiveHero() {
 
   if (isLoading) {
       return (
-          <section className="bg-muted h-[600px] flex items-center justify-center">
+          <section className="bg-muted h-[480px] flex items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin" />
           </section>
       )
@@ -67,7 +67,7 @@ export function InteractiveHero() {
   
   if (!heroGridItems || heroGridItems.length === 0) {
     return (
-        <section className="bg-muted h-[600px] flex flex-col items-center justify-center text-center p-4">
+        <section className="bg-muted h-[480px] flex flex-col items-center justify-center text-center p-4">
             <h3 className="font-headline text-2xl font-bold">No Categories Found</h3>
             <p className="text-muted-foreground mt-2">Add some top-level categories in the admin panel to see them here.</p>
         </section>
@@ -98,7 +98,7 @@ export function InteractiveHero() {
             </div>
 
             {/* Right Grid Panel */}
-            <div className="grid grid-cols-3 grid-rows-4 bg-border">
+            <div className="grid grid-cols-4 grid-rows-3 bg-border">
             {heroGridItems.map((item) => (
                 <Link
                 href={`/products?category=${item.id}`}

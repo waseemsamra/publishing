@@ -175,4 +175,15 @@ export interface HeroSlide {
   updatedAt?: any;
 }
 
+export interface TrendingItem {
+  id: string;
+  title: string;
+  imageUrl: string;
+  imageHint: string;
+  order: number;
+  createdAt?: any;
+  updatedAt?: any;
+}
+    
+
     

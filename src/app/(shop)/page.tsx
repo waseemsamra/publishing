@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Loader2 } from 'lucide-react';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { LowMinimumMustHaves } from '@/components/low-minimum-must-haves';
 import { BrandStories } from '@/components/brand-stories';
 import { PackagingAlliance } from '@/components/packaging-alliance';
@@ -12,9 +11,9 @@ import { PackagingForBrands } from '@/components/packaging-for-brands';
 import { SignupBanner } from '@/components/signup-banner';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirestore } from '@/firebase/provider';
-import { collection, query, orderBy } from 'firebase/firestore';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { useMemo, useRef } from 'react';
-import type { HeroSlide } from '@/lib/types';
+import type { HeroSlide, TrendingItem } from '@/lib/types';
 import {
   Carousel,
   CarouselContent,
@@ -24,22 +23,19 @@ import {
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 
-const TrendingNowCard = ({ imageId, title }: { imageId: string, title: string }) => {
-  const image = PlaceHolderImages.find(p => p.id === imageId);
-  if (!image) return null;
-
+const TrendingNowCard = ({ item }: { item: TrendingItem }) => {
   return (
     <Link href="#" className="relative group block overflow-hidden aspect-[4/3]">
       <Image
-        src={image.imageUrl}
-        alt={image.description}
+        src={item.imageUrl}
+        alt={item.title}
         fill
         className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
-        data-ai-hint={image.imageHint}
+        data-ai-hint={item.imageHint}
       />
       <div className="absolute inset-0 bg-black/40"></div>
       <div className="absolute inset-0 flex items-end p-6">
-        <h3 className="text-white font-headline text-2xl font-bold">{title}</h3>
+        <h3 className="text-white font-headline text-2xl font-bold">{item.title}</h3>
       </div>
     </Link>
   );
@@ -159,6 +155,40 @@ function HeroCarousel() {
     )
 }
 
+function TrendingNowSection() {
+    const db = useFirestore();
+    const trendingItemsQuery = useMemo(() => {
+        if (!db) return null;
+        const q = query(collection(db, 'trendingItems'), orderBy('order', 'asc'), limit(4));
+        (q as any).__memo = true;
+        return q;
+    }, [db]);
+
+    const { data: items, isLoading } = useCollection<TrendingItem>(trendingItemsQuery);
+
+    if (isLoading) {
+        return (
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border">
+                {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="aspect-[4/3] bg-muted animate-pulse"></div>
+                ))}
+            </div>
+        );
+    }
+
+    if (!items || items.length === 0) {
+        return null; // Don't render anything if there are no items
+    }
+    
+    return (
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border">
+            {items.map((item) => (
+                <TrendingNowCard key={item.id} item={item} />
+            ))}
+        </div>
+    );
+}
+
 
 export default function HomePage() {
   return (
@@ -171,12 +201,7 @@ export default function HomePage() {
         <div className="container pt-12 md:pt-20">
             <h2 className="font-headline text-4xl font-bold mb-8">Trending now</h2>
         </div>
-        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border">
-            <TrendingNowCard imageId="trending-tapes" title="Tapes" />
-            <TrendingNowCard imageId="trending-coffee-bags" title="Coffee Bags" />
-            <TrendingNowCard imageId="trending-product-boxes" title="Product Boxes" />
-            <TrendingNowCard imageId="trending-totes" title="Totes" />
-        </div>
+        <TrendingNowSection />
       </section>
 
       <PackagingAlliance />
@@ -191,3 +216,5 @@ export default function HomePage() {
     </>
   );
 }
+
+    

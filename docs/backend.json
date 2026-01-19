@@ -253,6 +253,40 @@
         "imageUrl"
       ]
     },
+    "TrendingItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TrendingItem",
+      "type": "object",
+      "description": "Represents a single item in the 'Trending Now' section on the homepage.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the trending item."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the trending item."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the image for the item.",
+          "format": "uri"
+        },
+        "imageHint": {
+          "type": "string",
+          "description": "A hint for AI image generation tools."
+        },
+        "order": {
+          "type": "number",
+          "description": "The display order of the item."
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "imageUrl"
+      ]
+    },
     "MaterialType": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "MaterialType",
@@ -970,6 +1004,22 @@
         }
       },
       {
+        "path": "/trendingItems/{trendingItemId}",
+        "definition": {
+          "entityName": "TrendingItem",
+          "schema": {
+            "$ref": "#/backend/entities/TrendingItem"
+          },
+          "description": "Stores content for the homepage 'Trending Now' section. Publicly readable, write access restricted to administrators.",
+          "params": [
+            {
+              "name": "trendingItemId",
+              "description": "The unique identifier for the trending item."
+            }
+          ]
+        }
+      },
+      {
         "path": "/settings/{settingId}",
         "definition": {
           "entityName": "StoreSettings",
@@ -1119,4 +1169,5 @@
 }
     
 
+    
     

@@ -62,7 +62,10 @@ const navItems = [
     id: 'content',
     label: 'CMS',
     icon: FileText,
-    subItems: [{ href: '/admin/content/hero-slides', label: 'Hero Slides' }],
+    subItems: [
+      { href: '/admin/content/hero-slides', label: 'Hero Slides' },
+      { href: '/admin/content/trending-now', label: 'Trending Now' },
+    ],
   },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ];
@@ -268,3 +271,5 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </div>
   );
 }
+
+    

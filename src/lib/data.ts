@@ -211,6 +211,28 @@ export const products: Product[] = [
     images: [imageMap['paper-round-plate']],
     categoryIds: ['paper-products'],
   },
+  {
+    id: '20',
+    name: 'Aluminium Food Platter',
+    price: 0.50,
+    description: 'A disposable and recyclable aluminium platter for serving food at parties and events.',
+    materials: ['Aluminium'],
+    certifications: ['Recyclable'],
+    sustainabilityImpact: 'Lightweight, durable, and fully recyclable. A convenient option for catering.',
+    images: [imageMap['aluminium-platter']],
+    categoryIds: ['aluminium-products'],
+  },
+  {
+    id: '21',
+    name: 'Aluminium Food Container',
+    price: 0.35,
+    description: 'A sturdy aluminium container with a lid, perfect for takeout, meal prep, and storing leftovers. Oven and freezer safe.',
+    materials: ['Aluminium'],
+    certifications: ['Recyclable'],
+    sustainabilityImpact: 'Reduces the need for plastic containers and can be recycled multiple times, saving energy.',
+    images: [imageMap['aluminium-container']],
+    categoryIds: ['aluminium-products'],
+  },
 ];
 
 export const mustHaveProducts: MustHaveProduct[] = [

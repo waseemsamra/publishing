@@ -203,6 +203,72 @@
       "description": "Various types of food packaging like boxes and containers",
       "imageUrl": "https://images.unsplash.com/photo-1627992258833-255d61483040?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmb29kJTIwcGFja2FnaW5nfGVufDB8fHx8MTc3MDA2NTM0Mnww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "food packaging"
+    },
+    {
+      "id": "paper-cup-regular",
+      "description": "A regular paper cup",
+      "imageUrl": "https://picsum.photos/seed/papercupreg/600/600",
+      "imageHint": "paper cup"
+    },
+    {
+      "id": "paper-cup-premium",
+      "description": "A premium paper cup",
+      "imageUrl": "https://picsum.photos/seed/papercupprem/600/600",
+      "imageHint": "paper cup"
+    },
+    {
+      "id": "paper-ice-cream-cup",
+      "description": "A paper ice cream cup",
+      "imageUrl": "https://picsum.photos/seed/icecreamcup/600/600",
+      "imageHint": "ice cream cup"
+    },
+    {
+      "id": "paper-soup-bowl",
+      "description": "A paper soup bowl",
+      "imageUrl": "https://picsum.photos/seed/soupbowl/600/600",
+      "imageHint": "soup bowl"
+    },
+    {
+      "id": "paper-salad-bowl",
+      "description": "A paper salad bowl",
+      "imageUrl": "https://picsum.photos/seed/saladbowl/600/600",
+      "imageHint": "salad bowl"
+    },
+    {
+      "id": "paper-food-box",
+      "description": "A paper food box",
+      "imageUrl": "https://picsum.photos/seed/foodbox/600/600",
+      "imageHint": "food box"
+    },
+    {
+      "id": "paper-lunch-box",
+      "description": "A paper lunch box",
+      "imageUrl": "https://picsum.photos/seed/lunchbox/600/600",
+      "imageHint": "lunch box"
+    },
+    {
+      "id": "paper-pizza-box",
+      "description": "A paper pizza box",
+      "imageUrl": "https://picsum.photos/seed/pizzabox/600/600",
+      "imageHint": "pizza box"
+    },
+    {
+      "id": "paper-noodle-box",
+      "description": "A paper noodle box",
+      "imageUrl": "https://picsum.photos/seed/noodlebox/600/600",
+      "imageHint": "noodle box"
+    },
+    {
+      "id": "paper-boat-tray",
+      "description": "A paper boat tray",
+      "imageUrl": "https://picsum.photos/seed/boattray/600/600",
+      "imageHint": "boat tray"
+    },
+    {
+      "id": "paper-round-plate",
+      "description": "A paper round plate",
+      "imageUrl": "https://picsum.photos/seed/roundplate/600/600",
+      "imageHint": "paper plate"
     }
   ]
 }

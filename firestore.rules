@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Version: 4.0 - Simplest possible explicit rules for public access.
+// Version: 5.0 - Forcing cache bust with a new function.
 service cloud.firestore {
   match /databases/{database}/documents {
   
@@ -10,67 +10,73 @@ service cloud.firestore {
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.hasAny(['admin']);
     }
 
+    // This function always returns true, used for public read access.
+    // It is used to force a cache-bust on the rules deployment.
+    function isPublic() {
+      return request.auth != null || request.auth == null;
+    }
+
     // --- Explicit Public Collection Rules ---
 
     // Products
-    match /products { allow list: if true; }
-    match /products/{docId} { allow get: if true; allow write: if isAdmin(); }
+    match /products { allow list: if isPublic(); }
+    match /products/{docId} { allow get: if isPublic(); allow write: if isAdmin(); }
 
     // Categories
-    match /categories { allow list: if true; }
-    match /categories/{docId} { allow get: if true; allow write: if isAdmin(); }
+    match /categories { allow list: if isPublic(); }
+    match /categories/{docId} { allow get: if isPublic(); allow write: if isAdmin(); }
 
     // Sizes
-    match /sizes { allow list: if true; }
-    match /sizes/{docId} { allow get: if true; allow write: if isAdmin(); }
+    match /sizes { allow list: if isPublic(); }
+    match /sizes/{docId} { allow get: if isPublic(); allow write: if isAdmin(); }
 
     // Colours
-    match /colours { allow list: if true; }
-    match /colours/{docId} { allow get: if true; allow write: if isAdmin(); }
+    match /colours { allow list: if isPublic(); }
+    match /colours/{docId} { allow get: if isPublic(); allow write: if isAdmin(); }
 
     // PrintOptions
-    match /printOptions { allow list: if true; }
-    match /printOptions/{docId} { allow get: if true; allow write: if isAdmin(); }
+    match /printOptions { allow list: if isPublic(); }
+    match /printOptions/{docId} { allow get: if isPublic(); allow write: if isAdmin(); }
 
     // WallTypes
-    match /wallTypes { allow list: if true; }
-    match /wallTypes/{docId} { allow get: if true; allow write: if isAdmin(); }
+    match /wallTypes { allow list: if isPublic(); }
+    match /wallTypes/{docId} { allow get: if isPublic(); allow write: if isAdmin(); }
 
     // Thicknesses
-    match /thicknesses { allow list: if true; }
-    match /thicknesses/{docId} { allow get: if true; allow write: if isAdmin(); }
+    match /thicknesses { allow list: if isPublic(); }
+    match /thicknesses/{docId} { allow get: if isPublic(); allow write: if isAdmin(); }
 
     // MaterialTypes
-    match /materialTypes { allow list: if true; }
-    match /materialTypes/{docId} { allow get: if true; allow write: if isAdmin(); }
+    match /materialTypes { allow list: if isPublic(); }
+    match /materialTypes/{docId} { allow get: if isPublic(); allow write: if isAdmin(); }
 
     // FinishTypes
-    match /finishTypes { allow list: if true; }
-    match /finishTypes/{docId} { allow get: if true; allow write: if isAdmin(); }
+    match /finishTypes { allow list: if isPublic(); }
+    match /finishTypes/{docId} { allow get: if isPublic(); allow write: if isAdmin(); }
 
     // Adhesives
-    match /adhesives { allow list: if true; }
-    match /adhesives/{docId} { allow get: if true; allow write: if isAdmin(); }
+    match /adhesives { allow list: if isPublic(); }
+    match /adhesives/{docId} { allow get: if isPublic(); allow write: if isAdmin(); }
 
     // Handles
-    match /handles { allow list: if true; }
-    match /handles/{docId} { allow get: if true; allow write: if isAdmin(); }
+    match /handles { allow list: if isPublic(); }
+    match /handles/{docId} { allow get: if isPublic(); allow write: if isAdmin(); }
 
     // Shapes
-    match /shapes { allow list: if true; }
-    match /shapes/{docId} { allow get: if true; allow write: if isAdmin(); }
+    match /shapes { allow list: if isPublic(); }
+    match /shapes/{docId} { allow get: if isPublic(); allow write: if isAdmin(); }
 
     // HeroSlides
-    match /heroSlides { allow list: if true; }
-    match /heroSlides/{docId} { allow get: if true; allow write: if isAdmin(); }
+    match /heroSlides { allow list: if isPublic(); }
+    match /heroSlides/{docId} { allow get: if isPublic(); allow write: if isAdmin(); }
 
     // TrendingItems
-    match /trendingItems { allow list: if true; }
-    match /trendingItems/{docId} { allow get: if true; allow write: if isAdmin(); }
+    match /trendingItems { allow list: if isPublic(); }
+    match /trendingItems/{docId} { allow get: if isPublic(); allow write: if isAdmin(); }
 
     // Settings
-    match /settings { allow list: if true; }
-    match /settings/{docId} { allow get: if true; allow write: if isAdmin(); }
+    match /settings { allow list: if isPublic(); }
+    match /settings/{docId} { allow get: if isPublic(); allow write: if isAdmin(); }
 
     // Rules for user-specific data.
     match /users/{userId} {

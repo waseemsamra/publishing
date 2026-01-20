@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirestore } from '@/firebase/provider';
-import { collection, query, orderBy } from 'firebase/firestore';
+import { collection, query } from 'firebase/firestore';
 import type { Category } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 import {
@@ -24,7 +24,7 @@ export function InteractiveHero() {
 
   const categoriesQuery = useMemo(() => {
     if (!db) return null;
-    const q = query(collection(db, 'categories'), orderBy('order', 'asc'));
+    const q = query(collection(db, 'categories'));
     (q as any).__memo = true;
     return q;
   }, [db]);
@@ -36,22 +36,22 @@ export function InteractiveHero() {
         return { featuredItem: null, gridItems: [], allItemsForCarousel: [] };
     }
 
-    const topLevelCategories = allCategories.filter((cat) => !cat.parentId);
-    
-    topLevelCategories.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    const topLevelCategories = allCategories
+      .filter((cat) => !cat.parentId)
+      .sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
 
-    const foodPackagingCategory = topLevelCategories.find(
-      (cat) => cat.name.toLowerCase() === 'food packaging'
-    );
-    
-    const initialFeaturedItem = foodPackagingCategory || topLevelCategories[0];
-    
-    const gridItems = topLevelCategories.slice(0, 16);
+    // Find the item with order: 0 to be the main featured item
+    const initialFeaturedItem = topLevelCategories.find(cat => cat.order === 0) || topLevelCategories[0] || null;
+
+    // The grid items should be the rest of the categories, excluding the featured one.
+    const gridItems = topLevelCategories
+        .filter(cat => cat.id !== initialFeaturedItem?.id)
+        .slice(0, 16);
     
     return {
       featuredItem: initialFeaturedItem,
       gridItems: gridItems,
-      allItemsForCarousel: topLevelCategories,
+      allItemsForCarousel: topLevelCategories, // This is for mobile carousel, let's keep all
     };
   }, [allCategories]);
   
@@ -209,5 +209,3 @@ export function InteractiveHero() {
     </section>
   );
 }
-
-    

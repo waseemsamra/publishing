@@ -173,18 +173,18 @@ export default function AdminProductsPage() {
         const errors: string[] = [];
 
         lines.forEach((line, index) => {
-            const columns = line.split(',');
-            if (columns.length < 2) {
-            errors.push(`Line ${index + 1}: Invalid format. Expected Name,CategoryName.`);
-            return;
+            const lastCommaIndex = line.lastIndexOf(',');
+            if (lastCommaIndex === -1) {
+                errors.push(`Line ${index + 1}: Invalid format. Expected Name,CategoryName.`);
+                return;
             }
 
-            const name = columns[0].trim();
-            const categoryName = columns.slice(1).join(',').trim();
+            const name = line.substring(0, lastCommaIndex).trim();
+            const categoryName = line.substring(lastCommaIndex + 1).trim();
 
             if (!name || !categoryName) {
-            errors.push(`Line ${index + 1}: Name and Category Name cannot be empty.`);
-            return;
+                errors.push(`Line ${index + 1}: Name and Category Name cannot be empty.`);
+                return;
             }
             
             const categoryId = categoryMap.get(categoryName.toLowerCase());

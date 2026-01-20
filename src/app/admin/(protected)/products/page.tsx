@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { collection, doc, deleteDoc, query, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, deleteDoc, query, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirestore } from '@/firebase/provider';
 import type { Product } from '@/lib/types';
@@ -35,6 +35,14 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
     Card,
     CardContent,
     CardDescription,
@@ -45,6 +53,8 @@ import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2, Search, Copy } from 
 import { format } from 'date-fns';
 import { useAuth } from '@/context/auth-context';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 export default function AdminProductsPage() {
     const { toast } = useToast();
@@ -53,6 +63,9 @@ export default function AdminProductsPage() {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const { loading: authLoading } = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
+    const [isBulkAddOpen, setIsBulkAddOpen] = useState(false);
+    const [bulkAddText, setBulkAddText] = useState('');
+    const [isBulkAdding, setIsBulkAdding] = useState(false);
     
     const productsQuery = useMemo(() => {
         if (!db) return null;
@@ -136,6 +149,114 @@ export default function AdminProductsPage() {
     const allSelected = (filteredProducts?.length ?? 0) > 0 && selectedProductIds.length === filteredProducts?.length;
     const someSelected = selectedProductIds.length > 0 && selectedProductIds.length < (filteredProducts?.length ?? 0);
 
+    const handleBulkAdd = async () => {
+      if (!db) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+        return;
+      }
+      if (!bulkAddText.trim()) {
+        toast({ variant: 'destructive', title: 'Input Empty', description: 'Please paste some product data.' });
+        return;
+      }
+
+      setIsBulkAdding(true);
+
+      const lines = bulkAddText.trim().split('\n');
+      const batch = writeBatch(db);
+      const productsCollection = collection(db, 'products');
+      let productsAddedCount = 0;
+      const errors: string[] = [];
+
+      lines.forEach((line, index) => {
+        const columns = line.split(',');
+        if (columns.length < 3) {
+          errors.push(`Line ${index + 1}: Invalid format. Expected Name,Price,Description.`);
+          return;
+        }
+
+        const name = columns[0].trim();
+        const priceStr = columns[1].trim();
+        const description = columns.slice(2).join(',').trim();
+
+        if (!name || !priceStr || !description) {
+          errors.push(`Line ${index + 1}: Name, price, or description cannot be empty.`);
+          return;
+        }
+
+        const price = parseFloat(priceStr);
+        if (isNaN(price) || price < 0) {
+          errors.push(`Line ${index + 1}: Invalid price "${priceStr}". Must be a positive number.`);
+          return;
+        }
+
+        const newProductRef = doc(productsCollection);
+        batch.set(newProductRef, {
+          name,
+          price,
+          description,
+          images: [],
+          materials: [],
+          certifications: [],
+          sustainabilityImpact: '',
+          categoryIds: [],
+          sizeIds: [],
+          colourIds: [],
+          printOptionIds: [],
+          wallTypeIds: [],
+          thicknessIds: [],
+          materialTypeIds: [],
+          finishTypeIds: [],
+          adhesiveIds: [],
+          handleIds: [],
+          shapeIds: [],
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+        productsAddedCount++;
+      });
+
+      if (errors.length > 0) {
+        toast({
+          variant: 'destructive',
+          title: `Found ${errors.length} error(s)`,
+          description: <div className="max-h-48 overflow-y-auto"><pre className="whitespace-pre-wrap">{errors.join('\n')}</pre></div>,
+          duration: 10000,
+        });
+        setIsBulkAdding(false);
+        return;
+      }
+
+      if (productsAddedCount === 0) {
+        toast({
+          variant: 'destructive',
+          title: 'No Products to Add',
+          description: 'Could not find any valid products in the provided text.',
+        });
+        setIsBulkAdding(false);
+        return;
+      }
+
+      try {
+        await batch.commit();
+        toast({
+          title: 'Success!',
+          description: `${productsAddedCount} products have been added successfully.`,
+        });
+        setIsBulkAddOpen(false);
+        setBulkAddText('');
+      } catch (e: any) {
+        console.error("Bulk add error: ", e);
+        toast({
+          variant: 'destructive',
+          title: 'Error Saving Products',
+          description: 'An unexpected error occurred while saving to the database.',
+        });
+      } finally {
+        setIsBulkAdding(false);
+      }
+    };
+
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -143,18 +264,25 @@ export default function AdminProductsPage() {
                     <h1 className="font-headline text-3xl font-bold">Products</h1>
                     <p className="text-muted-foreground">Manage your store's products.</p>
                 </div>
-                {selectedProductIds.length > 0 ? (
-                    <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)}>
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete ({selectedProductIds.length})
-                    </Button>
-                ) : (
-                    <Button asChild>
-                        <Link href="/admin/products/new">
-                            <PlusCircle className="mr-2 h-4 w-4" /> Add Product
-                        </Link>
-                    </Button>
-                )}
+                <div className="flex items-center gap-2">
+                    {selectedProductIds.length > 0 ? (
+                        <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete ({selectedProductIds.length})
+                        </Button>
+                    ) : (
+                        <>
+                            <Button variant="outline" onClick={() => setIsBulkAddOpen(true)}>
+                                <PlusCircle className="mr-2 h-4 w-4" /> Bulk Add
+                            </Button>
+                            <Button asChild>
+                                <Link href="/admin/products/new">
+                                    <PlusCircle className="mr-2 h-4 w-4" /> Add Product
+                                </Link>
+                            </Button>
+                        </>
+                    )}
+                </div>
             </div>
             <Card>
                 <CardHeader>
@@ -255,6 +383,34 @@ export default function AdminProductsPage() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            
+            <Dialog open={isBulkAddOpen} onOpenChange={setIsBulkAddOpen}>
+                <DialogContent className="sm:max-w-[625px]">
+                    <DialogHeader>
+                        <DialogTitle>Bulk Add Products</DialogTitle>
+                        <DialogDescription>
+                            Paste a comma-separated list of products. Each product should be on a new line in the format: Name,Price,Description
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <Label htmlFor="bulk-add-textarea" className="sr-only">Product Data</Label>
+                        <Textarea
+                            id="bulk-add-textarea"
+                            value={bulkAddText}
+                            onChange={(e) => setBulkAddText(e.target.value)}
+                            placeholder="Eco-Friendly Water Bottle,24.99,A great bottle made from recycled materials...&#10;Organic Cotton T-Shirt,29.50,A soft and sustainable shirt."
+                            rows={10}
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsBulkAddOpen(false)} disabled={isBulkAdding}>Cancel</Button>
+                        <Button onClick={handleBulkAdd} disabled={isBulkAdding}>
+                            {isBulkAdding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {isBulkAdding ? 'Adding...' : 'Add Products'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

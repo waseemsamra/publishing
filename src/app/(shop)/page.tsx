@@ -3,10 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Loader2 } from 'lucide-react';
-import { LowMinimumMustHaves } from '@/components/low-minimum-must-haves';
 import { BrandStories } from '@/components/brand-stories';
 import { PackagingAlliance } from '@/components/packaging-alliance';
-import { PackagingPartner } from '@/components/packaging-partner';
 import { PackagingForBrands } from '@/components/packaging-for-brands';
 import { SignupBanner } from '@/components/signup-banner';
 import { useCollection } from '@/firebase/firestore/use-collection';
@@ -23,6 +21,7 @@ import {
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import dynamic from 'next/dynamic';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const InteractiveHero = dynamic(
   () => import('@/components/interactive-hero').then((mod) => mod.InteractiveHero),
@@ -31,6 +30,30 @@ const InteractiveHero = dynamic(
     loading: () => (
       <section className="bg-muted flex items-center justify-center" style={{minHeight: '70vh'}}>
         <Loader2 className="h-8 w-8 animate-spin" />
+      </section>
+    ),
+  }
+);
+
+const LowMinimumMustHaves = dynamic(
+  () => import('@/components/low-minimum-must-haves').then((mod) => mod.LowMinimumMustHaves),
+  { 
+    ssr: false,
+    loading: () => (
+      <section className="py-12 md:py-20">
+        <div className="container"><Skeleton className="h-96 w-full" /></div>
+      </section>
+    ),
+  }
+);
+
+const PackagingPartner = dynamic(
+  () => import('@/components/packaging-partner').then((mod) => mod.PackagingPartner),
+  { 
+    ssr: false,
+    loading: () => (
+      <section className="py-12 md:py-20">
+        <div className="container"><Skeleton className="h-96 w-full" /></div>
       </section>
     ),
   }

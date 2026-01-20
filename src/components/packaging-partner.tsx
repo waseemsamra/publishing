@@ -7,6 +7,7 @@ import {
   CarouselContent,
   CarouselItem,
   CarouselNext,
+  CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Badge } from '@/components/ui/badge';
 import { mustHaveProducts } from '@/lib/data';
@@ -59,8 +60,8 @@ export function PackagingPartner() {
   const filteredProducts = mustHaveProducts.filter(product => product.tags && product.tags.includes(activeTag));
 
   return (
-    <section className="py-12 md:py-20 overflow-hidden">
-       <div className="container">
+    <section className="py-12 md:py-20">
+      <div className="container">
             <h2 className="font-headline text-3xl font-bold md:text-4xl">
                 Packaging partner to world-leading brands
             </h2>
@@ -76,27 +77,26 @@ export function PackagingPartner() {
                     </Button>
                 ))}
             </div>
-        </div>
-      <Carousel
-        opts={{
-          align: 'start',
-        }}
-        className="w-full"
-      >
-        <CarouselContent className="pl-[calc((100%-1280px)/2+1rem)]">
-          {filteredProducts.map((product) => (
-            <CarouselItem
-              key={product.id}
-              className="px-2 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-[23.5%]"
-            >
-              <MustHaveProductCard product={product} />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <div className="hidden md:block">
-            <CarouselNext className="absolute top-0 right-[calc((100%-1280px)/2)]" />
-        </div>
-      </Carousel>
+        <Carousel
+          opts={{
+            align: 'start',
+          }}
+          className="w-full relative"
+        >
+          <CarouselContent className="-ml-4">
+            {filteredProducts.map((product) => (
+              <CarouselItem
+                key={product.id}
+                className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+              >
+                <MustHaveProductCard product={product} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="absolute -left-12 top-1/2 -translate-y-1/2 hidden lg:flex" />
+          <CarouselNext className="absolute -right-12 top-1/2 -translate-y-1/2 hidden lg:flex" />
+        </Carousel>
+      </div>
     </section>
   );
 }

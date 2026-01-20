@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { collection, doc, deleteDoc, query } from 'firebase/firestore';
+import { collection, doc, deleteDoc, query, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirestore } from '@/firebase/provider';
 import type { Product } from '@/lib/types';
@@ -41,7 +41,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2, Search } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2, Search, Copy } from 'lucide-react';
 import { format } from 'date-fns';
 import { useAuth } from '@/context/auth-context';
 import { Input } from '@/components/ui/input';
@@ -71,6 +71,27 @@ export default function AdminProductsPage() {
             product.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
     }, [products, searchTerm]);
+
+    const handleCloneProduct = async (productToClone: Product) => {
+        if (!db) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+            return;
+        }
+        try {
+            const { id, createdAt, updatedAt, ...clonedData } = productToClone;
+            const newProductData = {
+                ...clonedData,
+                name: `${clonedData.name} (Copy)`,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+            };
+            await addDoc(collection(db, 'products'), newProductData);
+            toast({ title: 'Success', description: `"${productToClone.name}" has been cloned.` });
+        } catch (e: any) {
+            console.error('Error cloning product:', e);
+            toast({ variant: 'destructive', title: 'Clone Error', description: e.message });
+        }
+    };
 
     const handleDeleteSelected = async () => {
         if (!db) {
@@ -204,6 +225,10 @@ export default function AdminProductsPage() {
                                                     <Link href={`/admin/products/${product.id}/edit`}>
                                                         <Edit className="mr-2 h-4 w-4" /><span>Edit</span>
                                                     </Link>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onSelect={() => handleCloneProduct(product)}>
+                                                    <Copy className="mr-2 h-4 w-4" />
+                                                    <span>Clone</span>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => { setSelectedProductIds([product.id]); setShowDeleteConfirm(true); }} className="text-red-600 focus:text-red-600 focus:bg-red-50">
                                                     <Trash2 className="mr-2 h-4 w-4" /><span>Delete</span>

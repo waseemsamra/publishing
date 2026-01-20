@@ -164,7 +164,7 @@ export default function AdminProductsPage() {
       try {
         const categoriesCollection = collection(db, 'categories');
         const categoriesSnapshot = await getDocs(categoriesCollection);
-        const categoryMap = new Map(categoriesSnapshot.docs.map(doc => [doc.data().name.toLowerCase(), doc.id]));
+        const categoryMap = new Map(categoriesSnapshot.docs.map(doc => [(doc.data().name || '').trim().toLowerCase(), doc.id]));
         
         const lines = bulkAddText.trim().split('\n');
         const batch = writeBatch(db);
@@ -173,14 +173,14 @@ export default function AdminProductsPage() {
         const errors: string[] = [];
 
         lines.forEach((line, index) => {
-            const lastCommaIndex = line.lastIndexOf(',');
-            if (lastCommaIndex === -1) {
+            const parts = line.split(',');
+            if (parts.length < 2) {
                 errors.push(`Line ${index + 1}: Invalid format. Expected Name,CategoryName.`);
                 return;
             }
 
-            const name = line.substring(0, lastCommaIndex).trim();
-            const categoryName = line.substring(lastCommaIndex + 1).trim();
+            const categoryName = (parts.pop() || '').trim();
+            const name = parts.join(',').trim();
 
             if (!name || !categoryName) {
                 errors.push(`Line ${index + 1}: Name and Category Name cannot be empty.`);

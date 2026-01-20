@@ -99,6 +99,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Compostable'],
     sustainabilityImpact: 'Made from renewable resources and commercially compostable, reducing landfill waste.',
     images: [imageMap['paper-cup-regular']],
+    categoryIds: ['paper-products'],
   },
   {
     id: '10',
@@ -109,6 +110,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Compostable'],
     sustainabilityImpact: 'Double-wall design eliminates the need for a separate sleeve, reducing waste. Made from responsibly sourced paper.',
     images: [imageMap['paper-cup-premium']],
+    categoryIds: ['paper-products'],
   },
   {
     id: '11',
@@ -119,6 +121,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified'],
     sustainabilityImpact: 'A great alternative to plastic dessert cups. Made with paper from sustainable forests.',
     images: [imageMap['paper-ice-cream-cup']],
+    categoryIds: ['paper-products'],
   },
   {
     id: '12',
@@ -129,6 +132,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Compostable'],
     sustainabilityImpact: 'Reduces the use of plastic bowls. Can be composted in commercial facilities after use.',
     images: [imageMap['paper-soup-bowl']],
+    categoryIds: ['paper-products'],
   },
   {
     id: '13',
@@ -139,6 +143,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Compostable'],
     sustainabilityImpact: 'Made from plant-based materials, offering a sustainable choice for takeout salads.',
     images: [imageMap['paper-salad-bowl']],
+    categoryIds: ['paper-products'],
   },
   {
     id: '14',
@@ -149,6 +154,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Recyclable'],
     sustainabilityImpact: 'Made from unbleached, recyclable kraft paper. A sustainable packaging solution for restaurants and food trucks.',
     images: [imageMap['paper-food-box']],
+    categoryIds: ['paper-products'],
   },
   {
     id: '15',
@@ -159,6 +165,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Recyclable'],
     sustainabilityImpact: 'Reusable and recyclable, providing an eco-friendly alternative to plastic bags.',
     images: [imageMap['paper-lunch-box']],
+    categoryIds: ['paper-products'],
   },
   {
     id: '16',
@@ -169,6 +176,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Recyclable'],
     sustainabilityImpact: 'Made from a high percentage of recycled content and is fully recyclable after use. Supports circular economy principles.',
     images: [imageMap['paper-pizza-box']],
+    categoryIds: ['paper-products'],
   },
   {
     id: '17',
@@ -179,6 +187,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified'],
     sustainabilityImpact: 'A classic takeout container that is more sustainable than full plastic alternatives.',
     images: [imageMap['paper-noodle-box']],
+    categoryIds: ['paper-products'],
   },
   {
     id: '18',
@@ -189,6 +198,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Compostable'],
     sustainabilityImpact: 'Compostable and made from renewable paper, reducing the impact of single-use food service items.',
     images: [imageMap['paper-boat-tray']],
+    categoryIds: ['paper-products'],
   },
   {
     id: '19',
@@ -199,6 +209,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Compostable'],
     sustainabilityImpact: 'A fully compostable alternative to plastic or foam plates, breaking down naturally after use.',
     images: [imageMap['paper-round-plate']],
+    categoryIds: ['paper-products'],
   },
 ];
 

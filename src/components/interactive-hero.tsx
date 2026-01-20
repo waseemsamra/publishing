@@ -51,7 +51,7 @@ export function InteractiveHero() {
     
     const initialFeaturedItem = foodPackagingCategory || topLevelCategories[0];
     
-    const gridItems = topLevelCategories.slice(0, 12);
+    const gridItems = topLevelCategories.slice(0, 16);
     
     return {
       featuredItem: initialFeaturedItem,
@@ -76,7 +76,7 @@ export function InteractiveHero() {
 
   if (!isMounted) {
     return (
-      <section className="bg-muted flex items-center justify-center" style={{minHeight: '75vh'}}>
+      <section className="bg-muted flex items-center justify-center" style={{minHeight: '70vh'}}>
         <Loader2 className="h-8 w-8 animate-spin" />
       </section>
     );
@@ -84,7 +84,7 @@ export function InteractiveHero() {
   
   if (isLoading) {
     return (
-      <section className="bg-muted flex items-center justify-center" style={{minHeight: '75vh'}}>
+      <section className="bg-muted flex items-center justify-center" style={{minHeight: '70vh'}}>
         <Loader2 className="h-8 w-8 animate-spin" />
       </section>
     );
@@ -92,7 +92,7 @@ export function InteractiveHero() {
 
   if (!displayItem) {
     return (
-      <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{minHeight: '75vh'}}>
+      <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{minHeight: '70vh'}}>
         <h3 className="font-headline text-2xl font-bold">
           No Categories Found
         </h3>
@@ -105,12 +105,11 @@ export function InteractiveHero() {
 
   return (
     <section>
-      <div className="grid grid-cols-1 lg:grid-cols-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2" style={{height: '70vh'}}>
         {/* Left Display Panel */}
         <div
           onMouseLeave={handleMouseLeave}
-          className="relative isolate flex flex-col items-start justify-end p-8 text-white"
-          style={{minHeight: '75vh'}}
+          className="relative isolate flex flex-col items-start justify-end p-8 text-white h-full"
         >
           {displayItem.imageUrl && (
             <Image
@@ -140,9 +139,9 @@ export function InteractiveHero() {
         </div>
 
         {/* Right Panel */}
-        <div className="lg:col-span-1 bg-border">
+        <div className="lg:col-span-1 bg-border h-full">
           {/* Desktop Grid View */}
-          <div className="hidden lg:grid grid-cols-4 grid-rows-3 w-full h-full gap-px">
+          <div className="hidden lg:grid grid-cols-4 grid-rows-4 w-full h-full gap-px">
             {gridItems.map((item) => (
               <Link
                 href={`/products?category=${item.id}`}

@@ -99,7 +99,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Compostable'],
     sustainabilityImpact: 'Made from renewable resources and commercially compostable, reducing landfill waste.',
     images: [imageMap['paper-cup-regular']],
-    categoryIds: ['paper-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'paper-products'],
   },
   {
     id: '10',
@@ -110,7 +110,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Compostable'],
     sustainabilityImpact: 'Double-wall design eliminates the need for a separate sleeve, reducing waste. Made from responsibly sourced paper.',
     images: [imageMap['paper-cup-premium']],
-    categoryIds: ['paper-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'paper-products'],
   },
   {
     id: '11',
@@ -121,7 +121,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified'],
     sustainabilityImpact: 'A great alternative to plastic dessert cups. Made with paper from sustainable forests.',
     images: [imageMap['paper-ice-cream-cup']],
-    categoryIds: ['paper-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'paper-products'],
   },
   {
     id: '12',
@@ -132,7 +132,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Compostable'],
     sustainabilityImpact: 'Reduces the use of plastic bowls. Can be composted in commercial facilities after use.',
     images: [imageMap['paper-soup-bowl']],
-    categoryIds: ['paper-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'paper-products'],
   },
   {
     id: '13',
@@ -143,7 +143,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Compostable'],
     sustainabilityImpact: 'Made from plant-based materials, offering a sustainable choice for takeout salads.',
     images: [imageMap['paper-salad-bowl']],
-    categoryIds: ['paper-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'paper-products'],
   },
   {
     id: '14',
@@ -154,7 +154,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Recyclable'],
     sustainabilityImpact: 'Made from unbleached, recyclable kraft paper. A sustainable packaging solution for restaurants and food trucks.',
     images: [imageMap['paper-food-box']],
-    categoryIds: ['paper-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'paper-products'],
   },
   {
     id: '15',
@@ -165,7 +165,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Recyclable'],
     sustainabilityImpact: 'Reusable and recyclable, providing an eco-friendly alternative to plastic bags.',
     images: [imageMap['paper-lunch-box']],
-    categoryIds: ['paper-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'paper-products'],
   },
   {
     id: '16',
@@ -176,7 +176,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Recyclable'],
     sustainabilityImpact: 'Made from a high percentage of recycled content and is fully recyclable after use. Supports circular economy principles.',
     images: [imageMap['paper-pizza-box']],
-    categoryIds: ['paper-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'paper-products'],
   },
   {
     id: '17',
@@ -187,7 +187,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified'],
     sustainabilityImpact: 'A classic takeout container that is more sustainable than full plastic alternatives.',
     images: [imageMap['paper-noodle-box']],
-    categoryIds: ['paper-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'paper-products'],
   },
   {
     id: '18',
@@ -198,7 +198,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Compostable'],
     sustainabilityImpact: 'Compostable and made from renewable paper, reducing the impact of single-use food service items.',
     images: [imageMap['paper-boat-tray']],
-    categoryIds: ['paper-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'paper-products'],
   },
   {
     id: '19',
@@ -209,7 +209,7 @@ export const products: Product[] = [
     certifications: ['FSC Certified', 'Compostable'],
     sustainabilityImpact: 'A fully compostable alternative to plastic or foam plates, breaking down naturally after use.',
     images: [imageMap['paper-round-plate']],
-    categoryIds: ['paper-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'paper-products'],
   },
   {
     id: '20',
@@ -220,7 +220,7 @@ export const products: Product[] = [
     certifications: ['Recyclable'],
     sustainabilityImpact: 'Lightweight, durable, and fully recyclable. A convenient option for catering.',
     images: [imageMap['aluminium-platter']],
-    categoryIds: ['aluminium-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'aluminium-products'],
   },
   {
     id: '21',
@@ -231,7 +231,7 @@ export const products: Product[] = [
     certifications: ['Recyclable'],
     sustainabilityImpact: 'Reduces the need for plastic containers and can be recycled multiple times, saving energy.',
     images: [imageMap['aluminium-container']],
-    categoryIds: ['aluminium-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'aluminium-products'],
   },
   {
     id: '22',
@@ -242,7 +242,7 @@ export const products: Product[] = [
     certifications: ['BPA-Free', 'FDA Approved'],
     sustainabilityImpact: 'Durable and reusable. Recyclable in most facilities (check local guidelines).',
     images: [imageMap['plastic-round-container']],
-    categoryIds: ['plastic-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'plastic-products'],
   },
   {
     id: '23',
@@ -253,7 +253,7 @@ export const products: Product[] = [
     certifications: ['BPA-Free', 'FDA Approved'],
     sustainabilityImpact: 'Encourages meal prepping to reduce food waste. Designed for multiple uses.',
     images: [imageMap['plastic-rectangular-container']],
-    categoryIds: ['plastic-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'plastic-products'],
   },
   {
     id: '24',
@@ -264,7 +264,7 @@ export const products: Product[] = [
     certifications: ['BPA-Free', 'FDA Approved'],
     sustainabilityImpact: 'Helps with portion control to minimize food waste. A long-lasting alternative to single-use bags.',
     images: [imageMap['plastic-compartment-container']],
-    categoryIds: ['plastic-products'],
+    categoryIds: ['eco-friendly-food-packaging', 'plastic-products'],
   },
 ];
 

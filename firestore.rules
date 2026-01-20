@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Version 6.0: Consolidating public reads with recursive wildcards.
+// Version 7.0: Radically restructuring rules to break backend cache.
 service cloud.firestore {
   match /databases/{database}/documents {
   
@@ -10,35 +10,29 @@ service cloud.firestore {
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.hasAny(['admin']);
     }
 
-    // --- Public Collections ---
-    // Anyone can read, only admins can write.
-    match /products/{docId=**} { allow read: if true; allow write: if isAdmin(); }
-    match /categories/{docId=**} { allow read: if true; allow write: if isAdmin(); }
-    match /sizes/{docId=**} { allow read: if true; allow write: if isAdmin(); }
-    match /colours/{docId=**} { allow read: if true; allow write: if isAdmin(); }
-    match /printOptions/{docId=**} { allow read: if true; allow write: if isAdmin(); }
-    match /wallTypes/{docId=**} { allow read: if true; allow write: if isAdmin(); }
-    match /thicknesses/{docId=**} { allow read: if true; allow write: if isAdmin(); }
-    match /materialTypes/{docId=**} { allow read: if true; allow write: if isAdmin(); }
-    match /finishTypes/{docId=**} { allow read: if true; allow write: if isAdmin(); }
-    match /adhesives/{docId=**} { allow read: if true; allow write: if isAdmin(); }
-    match /handles/{docId=**} { allow read: if true; allow write: if isAdmin(); }
-    match /shapes/{docId=**} { allow read: if true; allow write: if isAdmin(); }
-    match /heroSlides/{docId=**} { allow read: if true; allow write: if isAdmin(); }
-    match /trendingItems/{docId=**} { allow read: if true; allow write: if isAdmin(); }
-    match /settings/{docId=**} { allow read: if true; allow write: if isAdmin(); }
-
-    // --- User Data ---
-    // A user can get and update their own document.
-    // Admins can perform any action on any user document.
+    // --- User-specific Data ---
+    // More specific rules for users must come before the general public rule.
+    match /users/{userId}/{docId=**} {
+       allow read, write: if (request.auth != null && request.auth.uid == userId) || isAdmin();
+    }
     match /users/{userId} {
       allow get, update: if request.auth != null && request.auth.uid == userId;
       allow read, write: if isAdmin();
     }
-    
-    // Users can read/write their own subcollections. Admins can read/write any user's subcollections.
-    match /users/{userId}/{subcollection}/{docId=**} {
-       allow read, write: if (request.auth != null && request.auth.uid == userId) || isAdmin();
+
+    // --- General Public Data Rule ---
+    // This single rule covers all public collections by checking against a list.
+    match /{collectionId}/{docId=**} {
+      allow read: if collectionId in [
+        'products', 'categories', 'sizes', 'colours', 'printOptions',
+        'wallTypes', 'thicknesses', 'materialTypes', 'finishTypes',
+        'adhesives', 'handles', 'shapes', 'heroSlides', 'trendingItems', 'settings'
+      ];
+      allow write: if collectionId in [
+        'products', 'categories', 'sizes', 'colours', 'printOptions',
+        'wallTypes', 'thicknesses', 'materialTypes', 'finishTypes',
+        'adhesives', 'handles', 'shapes', 'heroSlides', 'trendingItems', 'settings'
+      ] && isAdmin();
     }
   }
 }

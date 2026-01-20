@@ -281,6 +281,24 @@
       "description": "An aluminium food container",
       "imageUrl": "https://images.unsplash.com/photo-1696324535687-6bb987f50e96?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxhbHVtaW5pdW0lMjBjb250YWluZXJ8ZW58MHx8fHwxNzY4OTQ5ODc1fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "aluminium container"
+    },
+    {
+      "id": "plastic-round-container",
+      "description": "A round plastic food container",
+      "imageUrl": "https://images.unsplash.com/photo-1607515456374-ac1874945417?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwbGFzdGljJTIwZm9vJTIwY29udGFpbmVyfGVufDB8fHx8MTc3MDA2NTg5MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "plastic container"
+    },
+    {
+      "id": "plastic-rectangular-container",
+      "description": "A rectangular plastic food container",
+      "imageUrl": "https://images.unsplash.com/photo-1589184523094-358b548d249d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtZWFsJTIwcHJlcCUyMGNvbnRhaW5lcnxlbnwwfHx8fDE3NzAwNjU5MjR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "meal prep container"
+    },
+    {
+      "id": "plastic-compartment-container",
+      "description": "A plastic food container with compartments",
+      "imageUrl": "https://images.unsplash.com/photo-1581142284939-9b6999c15d7e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxiZW50byUyMGJveHxlbnwwfHx8fDE3NzAwNjU5NDd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "bento box"
     }
   ]
 }

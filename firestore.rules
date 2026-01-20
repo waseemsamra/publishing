@@ -1,8 +1,46 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+  
+    // This function checks if the logged-in user has an 'admin' role.
+    function isAdmin() {
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.hasAny(['admin']);
+    }
+
+    // These collections are public and can be read by anyone.
+    // Only admins can create, update, or delete documents in them.
+    match /products/{docId} { allow read: if true; allow write: if isAdmin(); }
+    match /categories/{docId} { allow read: if true; allow write: if isAdmin(); }
+    match /sizes/{docId} { allow read: if true; allow write: if isAdmin(); }
+    match /colours/{docId} { allow read: if true; allow write: if isAdmin(); }
+    match /printOptions/{docId} { allow read: if true; allow write: if isAdmin(); }
+    match /wallTypes/{docId} { allow read: if true; allow write: if isAdmin(); }
+    match /thicknesses/{docId} { allow read: if true; allow write: if isAdmin(); }
+    match /materialTypes/{docId} { allow read: if true; allow write: if isAdmin(); }
+    match /finishTypes/{docId} { allow read: if true; allow write: if isAdmin(); }
+    match /adhesives/{docId} { allow read: if true; allow write: if isAdmin(); }
+    match /handles/{docId} { allow read: if true; allow write: if isAdmin(); }
+    match /shapes/{docId} { allow read: if true; allow write: if isAdmin(); }
+    match /heroSlides/{docId} { allow read: if true; allow write:if isAdmin(); }
+    match /trendingItems/{docId} { allow read: if true; allow write: if isAdmin(); }
+    match /settings/{docId} { allow read: if true; allow write: if isAdmin(); }
+
+    // Rules for user-specific data.
+    match /users/{userId} {
+      // A user can get and update their own document.
+      allow get, update: if request.auth != null && request.auth.uid == userId;
+      // Admins can perform any action on any user document.
+      allow read, write: if isAdmin();
+    }
+    
+    // Rules for subcollections within a user's document (e.g., shopping cart, orders).
+    match /users/{userId}/{subcollection}/{docId} {
+       // A user can read and write to their own subcollections.
+       // Admins can also read and write to any user's subcollections.
+       allow read, write: if (request.auth != null && request.auth.uid == userId) || isAdmin();
     }
   }
 }

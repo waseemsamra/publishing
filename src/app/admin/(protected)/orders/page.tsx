@@ -47,7 +47,7 @@ export default function AdminOrdersPage() {
                       {order.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
+                  <TableCell className="text-right">DH{order.total.toFixed(2)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

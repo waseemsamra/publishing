@@ -96,7 +96,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
     {
         id: 'mh-1',
         name: 'Custom Coffee Bags',
-        price: 'from £0.75 per unit',
+        price: 'from DH0.75 per unit',
         minUnits: 'Min. 500 units',
         delivery: 'Delivery: 4 - 5 weeks',
         badge: 'New',
@@ -106,7 +106,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
     {
         id: 'mh-2',
         name: 'Custom Poly Mailers',
-        price: 'from £0.17 per unit',
+        price: 'from DH0.17 per unit',
         minUnits: 'Min. 25 units',
         delivery: 'Delivery: 4 - 5 weeks',
         image: imageMap['must-have-2'],
@@ -115,7 +115,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
     {
         id: 'mh-3',
         name: 'Custom Recyclable Coffee Cups',
-        price: 'from £0.09 per unit',
+        price: 'from DH0.09 per unit',
         minUnits: 'Min. 1000 units',
         delivery: 'Delivery: 2 - 3 weeks',
         badge: 'PE',
@@ -125,7 +125,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
     {
         id: 'mh-4',
         name: 'Custom Multi Colored Tissue Paper',
-        price: 'from £0.05 per unit',
+        price: 'from DH0.05 per unit',
         minUnits: 'Min. 250 units',
         delivery: 'Delivery: 2 weeks',
         image: imageMap['must-have-4'],
@@ -134,7 +134,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
     {
         id: 'mh-5',
         name: 'Custom Stickers',
-        price: 'from £0.02 per unit',
+        price: 'from DH0.02 per unit',
         minUnits: 'Min. 1000 units',
         delivery: 'Delivery: 1 - 2 weeks',
         image: imageMap['must-have-5'],
@@ -143,7 +143,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
     {
         id: 'mh-6',
         name: 'Custom Food Grade Paper',
-        price: 'from £0.12 per unit',
+        price: 'from DH0.12 per unit',
         minUnits: 'Min. 500 units',
         delivery: 'Delivery: 3 - 4 weeks',
         image: imageMap['must-have-6'],
@@ -152,7 +152,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
     {
         id: 'mh-7',
         name: 'Custom Printed Tape',
-        price: 'from £1.50 per unit',
+        price: 'from DH1.50 per unit',
         minUnits: 'Min. 36 units',
         delivery: 'Delivery: 2 weeks',
         image: imageMap['must-have-7'],
@@ -161,7 +161,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
     {
         id: 'mh-8',
         name: 'Custom Food Box',
-        price: 'from £0.40 per unit',
+        price: 'from DH0.40 per unit',
         minUnits: 'Min. 250 units',
         delivery: 'Delivery: 4 - 5 weeks',
         image: imageMap['must-have-8'],
@@ -170,7 +170,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
     {
         id: 'mh-9',
         name: 'Custom Retail Box',
-        price: 'from £0.50 per unit',
+        price: 'from DH0.50 per unit',
         minUnits: 'Min. 100 units',
         delivery: 'Delivery: 3 - 4 weeks',
         image: imageMap['must-have-9'],
@@ -179,7 +179,7 @@ export const mustHaveProducts: MustHaveProduct[] = [
     {
         id: 'mh-10',
         name: 'Custom Shipping Box',
-        price: 'from £0.80 per unit',
+        price: 'from DH0.80 per unit',
         minUnits: 'Min. 50 units',
         delivery: 'Delivery: 2 - 3 weeks',
         image: imageMap['must-have-10'],

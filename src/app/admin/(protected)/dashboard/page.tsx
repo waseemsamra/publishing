@@ -20,7 +20,7 @@ export default function DashboardPage() {
   const stats = [
     {
       title: 'Total Revenue',
-      value: `$${totalRevenue.toFixed(2)}`,
+      value: `DH${totalRevenue.toFixed(2)}`,
       change: '+20.1% from last month',
       icon: DollarSign,
     },

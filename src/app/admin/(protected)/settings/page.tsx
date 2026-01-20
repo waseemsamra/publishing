@@ -6,9 +6,15 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote, Hand, Circle } from 'lucide-react';
+import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote, Hand, Circle, Database } from 'lucide-react';
 
 const settingsLinks = [
+     {
+        href: "/admin/seed-products",
+        title: "Seed Database",
+        description: "Populate products from the initial data file.",
+        icon: Database,
+    },
     {
         href: "/admin/sizes",
         title: "Sizes",

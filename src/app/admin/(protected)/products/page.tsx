@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { collection, doc, deleteDoc, query, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { collection, doc, deleteDoc, query, addDoc, serverTimestamp, writeBatch, getDocs } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirestore } from '@/firebase/provider';
 import type { Product } from '@/lib/types';
@@ -161,86 +161,90 @@ export default function AdminProductsPage() {
 
       setIsBulkAdding(true);
 
-      const lines = bulkAddText.trim().split('\n');
-      const batch = writeBatch(db);
-      const productsCollection = collection(db, 'products');
-      let productsAddedCount = 0;
-      const errors: string[] = [];
-
-      lines.forEach((line, index) => {
-        const columns = line.split(',');
-        if (columns.length < 3) {
-          errors.push(`Line ${index + 1}: Invalid format. Expected Name,Price,Description.`);
-          return;
-        }
-
-        const name = columns[0].trim();
-        const priceStr = columns[1].trim();
-        const description = columns.slice(2).join(',').trim();
-
-        if (!name || !priceStr || !description) {
-          errors.push(`Line ${index + 1}: Name, price, or description cannot be empty.`);
-          return;
-        }
-
-        const price = parseFloat(priceStr);
-        if (isNaN(price) || price < 0) {
-          errors.push(`Line ${index + 1}: Invalid price "${priceStr}". Must be a positive number.`);
-          return;
-        }
-
-        const newProductRef = doc(productsCollection);
-        batch.set(newProductRef, {
-          name,
-          price,
-          description,
-          images: [],
-          materials: [],
-          certifications: [],
-          sustainabilityImpact: '',
-          categoryIds: [],
-          sizeIds: [],
-          colourIds: [],
-          printOptionIds: [],
-          wallTypeIds: [],
-          thicknessIds: [],
-          materialTypeIds: [],
-          finishTypeIds: [],
-          adhesiveIds: [],
-          handleIds: [],
-          shapeIds: [],
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        });
-        productsAddedCount++;
-      });
-
-      if (errors.length > 0) {
-        toast({
-          variant: 'destructive',
-          title: `Found ${errors.length} error(s)`,
-          description: <div className="max-h-48 overflow-y-auto"><pre className="whitespace-pre-wrap">{errors.join('\n')}</pre></div>,
-          duration: 10000,
-        });
-        setIsBulkAdding(false);
-        return;
-      }
-
-      if (productsAddedCount === 0) {
-        toast({
-          variant: 'destructive',
-          title: 'No Products to Add',
-          description: 'Could not find any valid products in the provided text.',
-        });
-        setIsBulkAdding(false);
-        return;
-      }
-
       try {
+        const categoriesCollection = collection(db, 'categories');
+        const categoriesSnapshot = await getDocs(categoriesCollection);
+        const categoryMap = new Map(categoriesSnapshot.docs.map(doc => [doc.data().name.toLowerCase(), doc.id]));
+        
+        const lines = bulkAddText.trim().split('\n');
+        const batch = writeBatch(db);
+        const productsCollection = collection(db, 'products');
+        let productsAddedCount = 0;
+        const errors: string[] = [];
+
+        lines.forEach((line, index) => {
+            const columns = line.split(',');
+            if (columns.length < 2) {
+            errors.push(`Line ${index + 1}: Invalid format. Expected Name,CategoryName.`);
+            return;
+            }
+
+            const name = columns[0].trim();
+            const categoryName = columns.slice(1).join(',').trim();
+
+            if (!name || !categoryName) {
+            errors.push(`Line ${index + 1}: Name and Category Name cannot be empty.`);
+            return;
+            }
+            
+            const categoryId = categoryMap.get(categoryName.toLowerCase());
+
+            if (!categoryId) {
+                errors.push(`Line ${index + 1}: Category "${categoryName}" not found.`);
+                return;
+            }
+
+            const newProductRef = doc(productsCollection);
+            batch.set(newProductRef, {
+            name,
+            price: 0,
+            description: '',
+            categoryIds: [categoryId],
+            images: [],
+            materials: [],
+            certifications: [],
+            sustainabilityImpact: '',
+            sizeIds: [],
+            colourIds: [],
+            printOptionIds: [],
+            wallTypeIds: [],
+            thicknessIds: [],
+            materialTypeIds: [],
+            finishTypeIds: [],
+            adhesiveIds: [],
+            handleIds: [],
+            shapeIds: [],
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            });
+            productsAddedCount++;
+        });
+
+        if (errors.length > 0) {
+            toast({
+            variant: 'destructive',
+            title: `Found ${errors.length} error(s)`,
+            description: <div className="max-h-48 overflow-y-auto"><pre className="whitespace-pre-wrap">{errors.join('\n')}</pre></div>,
+            duration: 10000,
+            });
+            setIsBulkAdding(false);
+            return;
+        }
+
+        if (productsAddedCount === 0) {
+            toast({
+            variant: 'destructive',
+            title: 'No Products to Add',
+            description: 'Could not find any valid products in the provided text.',
+            });
+            setIsBulkAdding(false);
+            return;
+        }
+
         await batch.commit();
         toast({
-          title: 'Success!',
-          description: `${productsAddedCount} products have been added successfully.`,
+            title: 'Success!',
+            description: `${productsAddedCount} products have been added successfully.`,
         });
         setIsBulkAddOpen(false);
         setBulkAddText('');
@@ -249,7 +253,7 @@ export default function AdminProductsPage() {
         toast({
           variant: 'destructive',
           title: 'Error Saving Products',
-          description: 'An unexpected error occurred while saving to the database.',
+          description: e.message || 'An unexpected error occurred while saving to the database.',
         });
       } finally {
         setIsBulkAdding(false);
@@ -389,7 +393,7 @@ export default function AdminProductsPage() {
                     <DialogHeader>
                         <DialogTitle>Bulk Add Products</DialogTitle>
                         <DialogDescription>
-                            Paste a comma-separated list of products. Each product should be on a new line in the format: Name,Price,Description
+                            Paste a comma-separated list of products. Each product should be on a new line in the format: Name,CategoryName
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
@@ -398,7 +402,7 @@ export default function AdminProductsPage() {
                             id="bulk-add-textarea"
                             value={bulkAddText}
                             onChange={(e) => setBulkAddText(e.target.value)}
-                            placeholder="Eco-Friendly Water Bottle,24.99,A great bottle made from recycled materials...&#10;Organic Cotton T-Shirt,29.50,A soft and sustainable shirt."
+                            placeholder="Eco-Friendly Water Bottle,Paper Products&#10;Organic Cotton T-Shirt,Apparel"
                             rows={10}
                         />
                     </div>

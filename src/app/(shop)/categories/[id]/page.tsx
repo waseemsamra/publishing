@@ -11,6 +11,39 @@ import { ProductCard } from '@/components/product-card';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import Image from 'next/image';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+
+function ProductCarousel({ products }: { products: Product[] }) {
+    if (!products || products.length === 0) return null;
+
+    return (
+        <Carousel
+          opts={{
+            align: 'start',
+          }}
+          className="w-full relative"
+        >
+          <CarouselContent className="-ml-4">
+            {products.map((product) => (
+              <CarouselItem
+                key={product.id}
+                className="pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+              >
+                <ProductCard product={product} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="absolute -left-12 top-1/2 -translate-y-1/2 hidden lg:flex" />
+          <CarouselNext className="absolute -right-12 top-1/2 -translate-y-1/2 hidden lg:flex" />
+        </Carousel>
+    );
+}
 
 export default function CategoryPage() {
   const params = useParams<{ id: string }>();
@@ -27,6 +60,14 @@ export default function CategoryPage() {
   }, [categoryId, db]);
 
   const { data: category, isLoading: isLoadingCategory } = useDoc<Category>(categoryRef);
+  
+  const subCategoriesQuery = useMemo(() => {
+    if (!db || !categoryId) return null;
+    const q = query(collection(db, 'categories'), where('parentId', '==', categoryId));
+    (q as any).__memo = true;
+    return q;
+  }, [categoryId, db]);
+  const { data: subCategories, isLoading: isLoadingSubCategories } = useCollection<Category>(subCategoriesQuery);
 
   const productsQuery = useMemo(() => {
     if (!db || !categoryId) return null;
@@ -37,7 +78,9 @@ export default function CategoryPage() {
 
   const { data: products, isLoading: isLoadingProducts, error } = useCollection<Product>(productsQuery);
 
-  const isLoading = authLoading || isLoadingCategory || isLoadingProducts;
+  const isLoading = authLoading || isLoadingCategory || isLoadingProducts || isLoadingSubCategories;
+
+  const displayedProductIds = useMemo(() => new Set<string>(), []);
 
   if (isLoading) {
     return (
@@ -73,28 +116,54 @@ export default function CategoryPage() {
         </section>
       )}
       
-      <main className="container py-12">
+      <main className="container py-12 space-y-16">
           {error && (
             <div className="text-center text-red-500 py-12">
               <p>Error loading products: {error.message}</p>
             </div>
           )}
 
-          {!error && (
-            <>
-            {products && products.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                    {products.map(product => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </div>
-             ) : (
-                <div className="text-center py-24 border-2 border-dashed rounded-lg">
-                    <h3 className="font-headline text-2xl font-bold">No Products Found</h3>
-                    <p className="text-muted-foreground mt-2">There are no products in this category yet.</p>
-                </div>
-            )}
-            </>
+          {!error && products && (
+              <>
+                {subCategories && subCategories.sort((a,b) => (a.order || 0) - (b.order || 0)).map(subCategory => {
+                    const subCatProducts = products.filter(p => p.categoryIds?.includes(subCategory.id));
+                    if(subCatProducts.length === 0) return null;
+
+                    subCatProducts.forEach(p => displayedProductIds.add(p.id));
+                    
+                    return (
+                        <section key={subCategory.id}>
+                            <h2 className="font-headline text-3xl font-bold mb-8">{subCategory.name}</h2>
+                            <ProductCarousel products={subCatProducts} />
+                        </section>
+                    )
+                })}
+
+                {(() => {
+                    const remainingProducts = products.filter(p => !displayedProductIds.has(p.id));
+                    if (remainingProducts.length === 0) return null;
+
+                    return (
+                         <section>
+                            <h2 className="font-headline text-3xl font-bold mb-8">
+                                {subCategories && subCategories.length > 0 ? `Other ${category?.name}` : category?.name}
+                            </h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                                {remainingProducts.map(product => (
+                                    <ProductCard key={product.id} product={product} />
+                                ))}
+                            </div>
+                        </section>
+                    )
+                })()}
+                
+                {products.length === 0 && (
+                     <div className="text-center py-24 border-2 border-dashed rounded-lg">
+                        <h3 className="font-headline text-2xl font-bold">No Products Found</h3>
+                        <p className="text-muted-foreground mt-2">There are no products in this category yet.</p>
+                    </div>
+                )}
+              </>
           )}
         </main>
     </>

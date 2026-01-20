@@ -162,6 +162,7 @@ export interface Category {
   imageHint?: string;
   order?: number;
   createdAt?: any;
+  slug?: string;
 }
   
 export interface HeroSlide {

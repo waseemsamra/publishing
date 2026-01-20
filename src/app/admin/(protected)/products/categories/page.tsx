@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
-import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, setDoc, getDoc } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirestore } from '@/firebase/provider';
 import type { Category } from '@/lib/types';
@@ -53,12 +53,22 @@ import { useAuth } from '@/context/auth-context';
 
 const s3BaseUrl = 'https://printinweb.s3.us-east-1.amazonaws.com';
 
+const slugify = (text: string) =>
+  text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-') // Replace spaces with -
+    .replace(/[^\w-]+/g, '') // Remove all non-word chars
+    .replace(/--+/g, '-'); // Replace multiple - with single -
+
 export default function CategoriesPage() {
     const { toast } = useToast();
     const db = useFirestore();
     const [dialogState, setDialogState] = useState<{open: boolean; category?: Partial<Category>}>({ open: false, category: undefined });
     
     const [name, setName] = useState('');
+    const [slug, setSlug] = useState('');
     const [description, setDescription] = useState('');
     const [parentId, setParentId] = useState<string | undefined>(undefined);
     const [imageUrl, setImageUrl] = useState('');
@@ -194,6 +204,7 @@ export default function CategoriesPage() {
     useEffect(() => {
         if (dialogState.open && dialogState.category) {
             setName(dialogState.category.name || '');
+            setSlug(dialogState.category.slug || '');
             setDescription(dialogState.category.description || '');
             setParentId(dialogState.category.parentId);
             setImageUrl(dialogState.category.imageUrl?.replace(s3BaseUrl, '') || '');
@@ -202,6 +213,12 @@ export default function CategoriesPage() {
             setImageFile(null);
         }
     }, [dialogState.open, dialogState.category, categories]);
+
+    useEffect(() => {
+      if (dialogState.open && !dialogState.category?.id) {
+        setSlug(slugify(name));
+      }
+    }, [name, dialogState.open, dialogState.category?.id]);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -215,11 +232,11 @@ export default function CategoriesPage() {
             toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
             return;
         }
-        if (!name.trim()) {
+        if (!name.trim() || !slug.trim()) {
             toast({
                 variant: 'destructive',
                 title: 'Validation Error',
-                description: 'Name is required.',
+                description: 'Name and Slug are required.',
             });
             return;
         }
@@ -257,25 +274,39 @@ export default function CategoriesPage() {
                   imageUrl: finalImageUrl,
                   imageHint,
                   order,
+                  slug,
                   updatedAt: serverTimestamp(),
                 });
 
                 toast({ title: 'Success', description: 'Category updated.' });
     
             } else { // CREATE
+                const docRef = doc(db, 'categories', slug);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Error',
+                        description: 'A category with this slug already exists. Please choose a unique slug.',
+                    });
+                    setIsUploading(false);
+                    return;
+                }
+
                 const dataToCreate: any = {
                     name,
                     description,
                     imageUrl: finalImageUrl,
                     imageHint,
                     order,
+                    slug,
                     createdAt: serverTimestamp(),
                 };
                 if (parentId) {
                     dataToCreate.parentId = parentId;
                 }
 
-                await addDoc(collection(db, 'categories'), dataToCreate);
+                await setDoc(docRef, dataToCreate);
                 toast({ title: 'Success', description: 'New category added.' });
             }
             setDialogState({ open: false, category: undefined });
@@ -316,6 +347,7 @@ export default function CategoriesPage() {
         if (!open) {
             setDialogState({ open: false, category: undefined });
             setName('');
+            setSlug('');
             setDescription('');
             setParentId(undefined);
             setImageUrl('');
@@ -456,6 +488,11 @@ export default function CategoriesPage() {
                         <div className="space-y-2">
                             <Label htmlFor="name">Name</Label>
                             <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Clothing" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="slug">Slug</Label>
+                            <Input id="slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="e.g., clothing" disabled={!!dialogState.category?.id} />
+                            {dialogState.category?.id && <p className="text-xs text-muted-foreground">Slug cannot be changed for existing categories.</p>}
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="order">Display Order</Label>

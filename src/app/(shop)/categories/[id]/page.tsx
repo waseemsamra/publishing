@@ -10,6 +10,7 @@ import type { Product, Category } from '@/lib/types';
 import { ProductCard } from '@/components/product-card';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
+import Image from 'next/image';
 
 export default function CategoryPage() {
   const params = useParams<{ id: string }>();
@@ -51,15 +52,28 @@ export default function CategoryPage() {
   }
   
   return (
-    <div className="container py-12">
-        {category && (
-            <div className="text-center mb-12">
-                <h1 className="font-headline text-4xl font-bold">{category.name}</h1>
-                <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">{category.description}</p>
-            </div>
-        )}
+    <>
+      {category && (
+        <section className="relative h-96 flex items-center justify-center text-center text-white bg-secondary">
+          {category.imageUrl && (
+            <Image
+              src={category.imageUrl}
+              alt={category.name}
+              fill
+              className="object-cover"
+              data-ai-hint={category.imageHint}
+              unoptimized
+            />
+          )}
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="relative z-10 p-4 max-w-3xl">
+            <h1 className="font-headline text-4xl md:text-5xl font-bold">{category.name}</h1>
+            <p className="text-white/90 mt-4 text-lg">{category.description}</p>
+          </div>
+        </section>
+      )}
       
-      <main>
+      <main className="container py-12">
           {error && (
             <div className="text-center text-red-500 py-12">
               <p>Error loading products: {error.message}</p>
@@ -83,6 +97,6 @@ export default function CategoryPage() {
             </>
           )}
         </main>
-    </div>
+    </>
   );
 }

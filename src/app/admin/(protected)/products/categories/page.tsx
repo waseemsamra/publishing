@@ -46,7 +46,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2, UploadCloud, Search } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2, UploadCloud, Search, ArrowUp, ArrowDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/context/auth-context';
@@ -69,6 +69,7 @@ export default function CategoriesPage() {
     const { loading: authLoading } = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
     const [refreshKey, setRefreshKey] = useState(0);
+    const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'ascending' | 'descending' } | null>({ key: 'order', direction: 'ascending' });
 
     const categoriesQuery = useMemo(() => {
         if (!db) return null;
@@ -80,19 +81,41 @@ export default function CategoriesPage() {
     const { data: categories, isLoading: isLoadingData, error } = useCollection<Category>(categoriesQuery);
     const isLoading = authLoading || isLoadingData;
 
+    const requestSort = (key: string) => {
+        let direction: 'ascending' | 'descending' = 'ascending';
+        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const getSortIcon = (key: string) => {
+        if (!sortConfig || sortConfig.key !== key) {
+          return null;
+        }
+        if (sortConfig.direction === 'ascending') {
+          return <ArrowUp className="h-4 w-4" />;
+        }
+        return <ArrowDown className="h-4 w-4" />;
+    };
+
+    const categoryMap = useMemo(() => {
+      if (!categories) return new Map();
+      return new Map(categories.map(c => [c.id, c.name]));
+    }, [categories]);
+
+    const isParentSortActive = sortConfig?.key === 'parentCategory';
+
     const filteredCategories = useMemo(() => {
         if (!categories) return [];
 
-        const categoryMap = new Map(categories.map(c => [c.id, { ...c, children: [] as Category[], depth: 0 }]));
+        const categoryNodeMap = new Map(categories.map(c => [c.id, { ...c, children: [] as Category[], depth: 0 }]));
         const topLevelCategories: (Category & { children: Category[]; depth: number })[] = [];
 
         categories.forEach(c => {
-            const node = categoryMap.get(c.id)!;
-            if (c.parentId && categoryMap.has(c.parentId)) {
-                if (!categoryMap.get(c.parentId)!.children) {
-                     categoryMap.get(c.parentId)!.children = [];
-                }
-                categoryMap.get(c.parentId)!.children.push(node);
+            const node = categoryNodeMap.get(c.id)!;
+            if (c.parentId && categoryNodeMap.has(c.parentId)) {
+                categoryNodeMap.get(c.parentId)!.children.push(node);
             } else {
                 topLevelCategories.push(node);
             }
@@ -108,7 +131,17 @@ export default function CategoriesPage() {
             }
         };
         
-        setDepthAndSort(topLevelCategories, 0);
+        if (!isParentSortActive) {
+            setDepthAndSort(topLevelCategories, 0);
+        } else {
+             topLevelCategories.forEach(node => {
+                const setDepth = (n: any, depth: number) => {
+                    n.depth = depth;
+                    n.children.forEach((child: any) => setDepth(child, depth + 1));
+                }
+                setDepth(node, 0);
+            });
+        }
 
         const flattened: (Category & { depth: number })[] = [];
         const flatten = (cats: (Category & { children: Category[]; depth: number })[]) => {
@@ -122,17 +155,31 @@ export default function CategoriesPage() {
 
         flatten(topLevelCategories);
         
+        if (sortConfig) {
+             flattened.sort((a, b) => {
+                if (sortConfig.key === 'order') {
+                    const orderA = a.order ?? Infinity;
+                    const orderB = b.order ?? Infinity;
+                    if (orderA < orderB) return sortConfig.direction === 'ascending' ? -1 : 1;
+                    if (orderA > orderB) return sortConfig.direction === 'ascending' ? 1 : -1;
+                }
+                if (sortConfig.key === 'parentCategory') {
+                    const parentA = a.parentId ? categoryMap.get(a.parentId) || '' : '';
+                    const parentB = b.parentId ? categoryMap.get(b.parentId) || '' : '';
+                    if (parentA < parentB) return sortConfig.direction === 'ascending' ? -1 : 1;
+                    if (parentA > parentB) return sortConfig.direction === 'ascending' ? 1 : -1;
+                    return (a.order ?? Infinity) - (b.order ?? Infinity);
+                }
+                return 0;
+            });
+        }
+        
         if (!searchTerm) return flattened;
 
         return flattened.filter(category =>
             category.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
-    }, [categories, searchTerm]);
-
-    const categoryMap = useMemo(() => {
-      if (!categories) return new Map();
-      return new Map(categories.map(c => [c.id, c.name]));
-    }, [categories]);
+    }, [categories, searchTerm, sortConfig, categoryMap, isParentSortActive]);
 
     const previewUrl = useMemo(() => {
         if (imageFile) {
@@ -280,6 +327,15 @@ export default function CategoriesPage() {
         }
     }
     
+    const renderSortableHeader = (key: string, label: string) => (
+        <TableHead>
+            <Button variant="ghost" onClick={() => requestSort(key)} className="px-0 hover:bg-transparent -ml-4">
+                {label}
+                <span className="w-4 ml-2">{getSortIcon(key)}</span>
+            </Button>
+        </TableHead>
+    );
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -314,10 +370,10 @@ export default function CategoriesPage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="hidden w-[100px] sm:table-cell">Image</TableHead>
-                                <TableHead>Order</TableHead>
+                                {renderSortableHeader('order', 'Order')}
                                 <TableHead>Name</TableHead>
                                 <TableHead>Description</TableHead>
-                                <TableHead>Parent Category</TableHead>
+                                {renderSortableHeader('parentCategory', 'Parent Category')}
                                 <TableHead>Created At</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -357,9 +413,9 @@ export default function CategoriesPage() {
                                     <TableCell>{category.order ?? 0}</TableCell>
                                     <TableCell 
                                         className="font-medium" 
-                                        style={{ paddingLeft: `${(category as any).depth > 0 && !searchTerm ? 1 + (category as any).depth * 1.5 : 1}rem` }}
+                                        style={{ paddingLeft: `${!isParentSortActive && (category as any).depth > 0 && !searchTerm ? 1 + (category as any).depth * 1.5 : 1}rem` }}
                                     >
-                                       { (category as any).depth > 0 && !searchTerm ? '↳ ' : ''}{category.name}
+                                       { !isParentSortActive && (category as any).depth > 0 && !searchTerm ? '↳ ' : ''}{category.name}
                                     </TableCell>
                                     <TableCell>{category.description}</TableCell>
                                     <TableCell>{category.parentId ? categoryMap.get(category.parentId) || 'N/A' : '—'}</TableCell>

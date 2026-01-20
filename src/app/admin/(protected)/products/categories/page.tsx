@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
-import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirestore } from '@/firebase/provider';
 import type { Category } from '@/lib/types';
@@ -71,7 +71,7 @@ export default function CategoriesPage() {
 
     const categoriesQuery = useMemo(() => {
         if (!db) return null;
-        const q = query(collection(db, 'categories'), orderBy('order', 'asc'));
+        const q = query(collection(db, 'categories'));
         (q as any).__memo = true;
         return q;
     }, [db]);
@@ -81,8 +81,15 @@ export default function CategoriesPage() {
 
     const filteredCategories = useMemo(() => {
         if (!categories) return [];
-        if (!searchTerm) return categories;
-        return categories.filter(category =>
+        const sorted = [...categories].sort((a, b) => {
+            const orderA = a.order ?? Infinity;
+            const orderB = b.order ?? Infinity;
+            return orderA - orderB;
+        });
+
+        if (!searchTerm) return sorted;
+
+        return sorted.filter(category =>
             category.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
     }, [categories, searchTerm]);
@@ -412,5 +419,3 @@ export default function CategoriesPage() {
         </div>
     );
 }
-
-    

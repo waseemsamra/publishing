@@ -82,15 +82,49 @@ export default function CategoriesPage() {
 
     const filteredCategories = useMemo(() => {
         if (!categories) return [];
-        const sorted = [...categories].sort((a, b) => {
-            const orderA = a.order ?? Infinity;
-            const orderB = b.order ?? Infinity;
-            return orderA - orderB;
+
+        const categoryMap = new Map(categories.map(c => [c.id, { ...c, children: [] as Category[], depth: 0 }]));
+        const topLevelCategories: (Category & { children: Category[]; depth: number })[] = [];
+
+        categories.forEach(c => {
+            const node = categoryMap.get(c.id)!;
+            if (c.parentId && categoryMap.has(c.parentId)) {
+                if (!categoryMap.get(c.parentId)!.children) {
+                     categoryMap.get(c.parentId)!.children = [];
+                }
+                categoryMap.get(c.parentId)!.children.push(node);
+            } else {
+                topLevelCategories.push(node);
+            }
         });
 
-        if (!searchTerm) return sorted;
+        const setDepthAndSort = (cats: (Category & { children: Category[]; depth: number })[], depth: number) => {
+            cats.sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+            for (const category of cats) {
+                category.depth = depth;
+                if (category.children && category.children.length > 0) {
+                    setDepthAndSort(category.children, depth + 1);
+                }
+            }
+        };
+        
+        setDepthAndSort(topLevelCategories, 0);
 
-        return sorted.filter(category =>
+        const flattened: (Category & { depth: number })[] = [];
+        const flatten = (cats: (Category & { children: Category[]; depth: number })[]) => {
+            for (const category of cats) {
+                flattened.push(category);
+                if (category.children && category.children.length > 0) {
+                    flatten(category.children);
+                }
+            }
+        };
+
+        flatten(topLevelCategories);
+        
+        if (!searchTerm) return flattened;
+
+        return flattened.filter(category =>
             category.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
     }, [categories, searchTerm]);
@@ -245,9 +279,7 @@ export default function CategoriesPage() {
             setDialogState(prev => ({ ...prev, open }));
         }
     }
-
-    const parentCategories = useMemo(() => categories?.filter(c => !c.parentId), [categories]);
-
+    
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -323,9 +355,14 @@ export default function CategoriesPage() {
                                         )}
                                     </TableCell>
                                     <TableCell>{category.order ?? 0}</TableCell>
-                                    <TableCell className="font-medium">{category.name}</TableCell>
+                                    <TableCell 
+                                        className="font-medium" 
+                                        style={{ paddingLeft: `${(category as any).depth > 0 && !searchTerm ? 1 + (category as any).depth * 1.5 : 1}rem` }}
+                                    >
+                                       { (category as any).depth > 0 && !searchTerm ? '↳ ' : ''}{category.name}
+                                    </TableCell>
                                     <TableCell>{category.description}</TableCell>
-                                    <TableCell>{category.parentId ? categoryMap.get(category.parentId) || 'N/A' : 'Top Level'}</TableCell>
+                                    <TableCell>{category.parentId ? categoryMap.get(category.parentId) || 'N/A' : '—'}</TableCell>
                                     <TableCell>{category.createdAt ? format(category.createdAt.toDate(), 'MMM d, yyyy') : 'N/A'}</TableCell>
                                     <TableCell className="text-right">
                                          <DropdownMenu>
@@ -380,7 +417,7 @@ export default function CategoriesPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">None (Top Level)</SelectItem>
-                                    {parentCategories?.filter(c => c.id !== dialogState.category?.id).map(c => (
+                                    {categories?.filter(c => c.id !== dialogState.category?.id && !c.parentId).map(c => (
                                         <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                                     ))}
                                 </SelectContent>
@@ -411,7 +448,7 @@ export default function CategoriesPage() {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => handleOpenChange(false)}>Cancel</Button>
+                        <Button variant="outline" type="button" onClick={() => handleOpenChange(false)}>Cancel</Button>
                         <Button onClick={handleSaveCategory} disabled={isUploading}>
                             {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Save

@@ -1,0 +1,88 @@
+'use client';
+
+import { useParams, notFound } from 'next/navigation';
+import { useMemo } from 'react';
+import { collection, query, where, doc } from 'firebase/firestore';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import { useDoc } from '@/firebase/firestore/use-doc';
+import { useFirestore } from '@/firebase/provider';
+import type { Product, Category } from '@/lib/types';
+import { ProductCard } from '@/components/product-card';
+import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/context/auth-context';
+
+export default function CategoryPage() {
+  const params = useParams<{ id: string }>();
+  const { loading: authLoading } = useAuth();
+  const db = useFirestore();
+
+  const categoryId = params.id;
+
+  const categoryRef = useMemo(() => {
+    if (!db || !categoryId) return null;
+    const ref = doc(db, 'categories', categoryId);
+    (ref as any).__memo = true;
+    return ref;
+  }, [categoryId, db]);
+
+  const { data: category, isLoading: isLoadingCategory } = useDoc<Category>(categoryRef);
+
+  const productsQuery = useMemo(() => {
+    if (!db || !categoryId) return null;
+    let q = query(collection(db, 'products'), where('categoryIds', 'array-contains', categoryId));
+    (q as any).__memo = true;
+    return q;
+  }, [categoryId, db]);
+
+  const { data: products, isLoading: isLoadingProducts, error } = useCollection<Product>(productsQuery);
+
+  const isLoading = authLoading || isLoadingCategory || isLoadingProducts;
+
+  if (isLoading) {
+    return (
+      <div className="container py-12 flex justify-center items-center min-h-[50vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!isLoadingCategory && !category) {
+      return notFound();
+  }
+  
+  return (
+    <div className="container py-12">
+        {category && (
+            <div className="text-center mb-12">
+                <h1 className="font-headline text-4xl font-bold">{category.name}</h1>
+                <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">{category.description}</p>
+            </div>
+        )}
+      
+      <main>
+          {error && (
+            <div className="text-center text-red-500 py-12">
+              <p>Error loading products: {error.message}</p>
+            </div>
+          )}
+
+          {!error && (
+            <>
+            {products && products.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                    {products.map(product => (
+                        <ProductCard key={product.id} product={product} />
+                    ))}
+                </div>
+             ) : (
+                <div className="text-center py-24 border-2 border-dashed rounded-lg">
+                    <h3 className="font-headline text-2xl font-bold">No Products Found</h3>
+                    <p className="text-muted-foreground mt-2">There are no products in this category yet.</p>
+                </div>
+            )}
+            </>
+          )}
+        </main>
+    </div>
+  );
+}

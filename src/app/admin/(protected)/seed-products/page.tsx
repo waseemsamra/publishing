@@ -21,7 +21,7 @@ const categoriesToSeed: (Omit<Category, 'id'> & { id: string })[] = [
 
 export default function SeedProductsPage() {
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<{ addedProducts: number; skippedProducts: number; totalProducts: number; addedCategories: number; totalCategories: number; errors: number } | null>(null);
+  const [results, setResults] = useState<{ addedProducts: number; updatedProducts: number; totalProducts: number; addedCategories: number; totalCategories: number; errors: number } | null>(null);
   const db = useFirestore();
   const { toast } = useToast();
 
@@ -50,20 +50,21 @@ export default function SeedProductsPage() {
       // Seed Products
       const productsCollection = collection(db, 'products');
       let addedProductsCount = 0;
-      let skippedProductsCount = 0;
+      let updatedProductsCount = 0;
       let errorCount = 0;
 
       const existingProductsSnapshot = await getDocs(productsCollection);
       const existingIds = new Set(existingProductsSnapshot.docs.map(d => d.id));
 
       for (const product of staticProducts) {
+        const productRef = doc(productsCollection, product.id);
+        const { createdAt, updatedAt, ...productData } = product;
+        batch.set(productRef, productData);
+        
         if (existingIds.has(product.id)) {
-          skippedProductsCount++;
+            updatedProductsCount++;
         } else {
-          const productRef = doc(productsCollection, product.id);
-          const { createdAt, updatedAt, ...productData } = product;
-          batch.set(productRef, productData);
-          addedProductsCount++;
+            addedProductsCount++;
         }
       }
 
@@ -71,7 +72,7 @@ export default function SeedProductsPage() {
       
       setResults({ 
         addedProducts: addedProductsCount, 
-        skippedProducts: skippedProductsCount, 
+        updatedProducts: updatedProductsCount, 
         totalProducts: staticProducts.length, 
         addedCategories: addedCategoriesCount,
         totalCategories: categoriesToSeed.length,
@@ -83,7 +84,7 @@ export default function SeedProductsPage() {
     } catch (e: any) {
       console.error("Seeding error: ", e);
       toast({ variant: 'destructive', title: 'Seeding Failed', description: e.message });
-      setResults({ addedProducts: 0, skippedProducts: staticProducts.length, totalProducts: staticProducts.length, addedCategories: 0, totalCategories: categoriesToSeed.length, errors: 1 });
+      setResults({ addedProducts: 0, updatedProducts: 0, totalProducts: staticProducts.length, addedCategories: 0, totalCategories: categoriesToSeed.length, errors: 1 });
     } finally {
       setLoading(false);
     }
@@ -104,7 +105,7 @@ export default function SeedProductsPage() {
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Important!</AlertTitle>
             <AlertDescription>
-              This is a one-time operation. It will add/overwrite products and categories from the static data file (`src/lib/data.ts`). This ensures the correct category hierarchy is set up.
+              This operation will add or overwrite products and categories from the static data file (`src/lib/data.ts`) to ensure all data is up-to-date.
             </AlertDescription>
           </Alert>
 
@@ -126,7 +127,7 @@ export default function SeedProductsPage() {
                  <ul className="list-disc pl-5">
                     <li>Total products in static file: {results.totalProducts}</li>
                     <li className="text-green-600">Products added: {results.addedProducts}</li>
-                    <li className="text-yellow-600">Products skipped (already exist): {results.skippedProducts}</li>
+                    <li className="text-blue-600">Products updated: {results.updatedProducts}</li>
                 </ul>
                 {results.errors > 0 && <p className="text-red-600 mt-2">Errors: {results.errors}</p>}
               </AlertDescription>

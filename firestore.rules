@@ -9,22 +9,67 @@ service cloud.firestore {
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.hasAny(['admin']);
     }
 
-    // Public Collections
-    match /products/{doc=**} { allow read: if true; allow write: if isAdmin(); }
-    match /categories/{doc=**} { allow read: if true; allow write: if isAdmin(); }
-    match /sizes/{doc=**} { allow read: if true; allow write: if isAdmin(); }
-    match /colours/{doc=**} { allow read: if true; allow write: if isAdmin(); }
-    match /printOptions/{doc=**} { allow read: if true; allow write: if isAdmin(); }
-    match /wallTypes/{doc=**} { allow read: if true; allow write: if isAdmin(); }
-    match /thicknesses/{doc=**} { allow read: if true; allow write: if isAdmin(); }
-    match /materialTypes/{doc=**} { allow read: if true; allow write: if isAdmin(); }
-    match /finishTypes/{doc=**} { allow read: if true; allow write: if isAdmin(); }
-    match /adhesives/{doc=**} { allow read: if true; allow write: if isAdmin(); }
-    match /handles/{doc=**} { allow read: if true; allow write: if isAdmin(); }
-    match /shapes/{doc=**} { allow read: if true; allow write: if isAdmin(); }
-    match /heroSlides/{doc=**} { allow read: if true; allow write: if isAdmin(); }
-    match /trendingItems/{doc=**} { allow read: if true; allow write: if isAdmin(); }
-    match /settings/{doc=**} { allow read: if true; allow write: if isAdmin(); }
+    // --- Explicit Public Collection Rules ---
+
+    // Products
+    match /products { allow list: if true; }
+    match /products/{docId} { allow get: if true; allow write: if isAdmin(); }
+
+    // Categories
+    match /categories { allow list: if true; }
+    match /categories/{docId} { allow get: if true; allow write: if isAdmin(); }
+
+    // Sizes
+    match /sizes { allow list: if true; }
+    match /sizes/{docId} { allow get: if true; allow write: if isAdmin(); }
+
+    // Colours
+    match /colours { allow list: if true; }
+    match /colours/{docId} { allow get: if true; allow write: if isAdmin(); }
+
+    // PrintOptions
+    match /printOptions { allow list: if true; }
+    match /printOptions/{docId} { allow get: if true; allow write: if isAdmin(); }
+
+    // WallTypes
+    match /wallTypes { allow list: if true; }
+    match /wallTypes/{docId} { allow get: if true; allow write: if isAdmin(); }
+
+    // Thicknesses
+    match /thicknesses { allow list: if true; }
+    match /thicknesses/{docId} { allow get: if true; allow write: if isAdmin(); }
+
+    // MaterialTypes
+    match /materialTypes { allow list: if true; }
+    match /materialTypes/{docId} { allow get: if true; allow write: if isAdmin(); }
+
+    // FinishTypes
+    match /finishTypes { allow list: if true; }
+    match /finishTypes/{docId} { allow get: if true; allow write: if isAdmin(); }
+
+    // Adhesives
+    match /adhesives { allow list: if true; }
+    match /adhesives/{docId} { allow get: if true; allow write: if isAdmin(); }
+
+    // Handles
+    match /handles { allow list: if true; }
+    match /handles/{docId} { allow get: if true; allow write: if isAdmin(); }
+
+    // Shapes
+    match /shapes { allow list: if true; }
+    match /shapes/{docId} { allow get: if true; allow write: if isAdmin(); }
+
+    // HeroSlides
+    match /heroSlides { allow list: if true; }
+    match /heroSlides/{docId} { allow get: if true; allow write: if isAdmin(); }
+
+    // TrendingItems
+    match /trendingItems { allow list: if true; }
+    match /trendingItems/{docId} { allow get: if true; allow write: if isAdmin(); }
+
+    // Settings
+    match /settings { allow list: if true; }
+    match /settings/{docId} { allow get: if true; allow write: if isAdmin(); }
 
     // Rules for user-specific data.
     match /users/{userId} {

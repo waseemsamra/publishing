@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -19,13 +19,8 @@ import {
 import { Button } from '@/components/ui/button';
 
 export function InteractiveHero() {
-  const [isMounted, setIsMounted] = useState(false);
   const db = useFirestore();
   const [activeHoverItem, setActiveHoverItem] = useState<Category | null>(null);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const categoriesQuery = useMemo(() => {
     if (!db) return null;
@@ -73,14 +68,6 @@ export function InteractiveHero() {
   const handleMouseLeave = () => {
     setActiveHoverItem(null);
   };
-
-  if (!isMounted) {
-    return (
-      <section className="bg-muted flex items-center justify-center" style={{minHeight: '70vh'}}>
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </section>
-    );
-  }
   
   if (isLoading) {
     return (

@@ -22,7 +22,20 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
-import { InteractiveHero } from '@/components/interactive-hero';
+import dynamic from 'next/dynamic';
+
+const InteractiveHero = dynamic(
+  () => import('@/components/interactive-hero').then((mod) => mod.InteractiveHero),
+  { 
+    ssr: false,
+    loading: () => (
+      <section className="bg-muted flex items-center justify-center" style={{minHeight: '70vh'}}>
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </section>
+    ),
+  }
+);
+
 
 const TrendingNowCard = ({ item }: { item: TrendingItem }) => {
   return (

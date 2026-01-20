@@ -122,6 +122,10 @@
         "imageHint": {
           "type": "string",
           "description": "A hint for AI image generation tools."
+        },
+        "order": {
+          "type": "number",
+          "description": "The display order of the category."
         }
       },
       "required": [
@@ -1170,4 +1174,6 @@
     
 
     
+    
+
     

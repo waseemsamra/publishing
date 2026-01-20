@@ -160,6 +160,7 @@ export interface Category {
   parentId?: string;
   imageUrl?: string;
   imageHint?: string;
+  order?: number;
   createdAt?: any;
 }
   
@@ -184,4 +185,6 @@ export interface TrendingItem {
   createdAt?: any;
   updatedAt?: any;
 }
+    
+
     

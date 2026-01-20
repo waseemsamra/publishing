@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
-import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirestore } from '@/firebase/provider';
 import type { Category } from '@/lib/types';
@@ -63,6 +63,7 @@ export default function CategoriesPage() {
     const [parentId, setParentId] = useState<string | undefined>(undefined);
     const [imageUrl, setImageUrl] = useState('');
     const [imageHint, setImageHint] = useState('');
+    const [order, setOrder] = useState(0);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const { loading: authLoading } = useAuth();
@@ -70,7 +71,7 @@ export default function CategoriesPage() {
 
     const categoriesQuery = useMemo(() => {
         if (!db) return null;
-        const q = query(collection(db, 'categories'));
+        const q = query(collection(db, 'categories'), orderBy('order', 'asc'));
         (q as any).__memo = true;
         return q;
     }, [db]);
@@ -108,9 +109,10 @@ export default function CategoriesPage() {
             setParentId(dialogState.category.parentId);
             setImageUrl(dialogState.category.imageUrl?.replace(s3BaseUrl, '') || '');
             setImageHint(dialogState.category.imageHint || '');
+            setOrder(dialogState.category.order ?? (categories?.length || 0));
             setImageFile(null);
         }
-    }, [dialogState.open, dialogState.category]);
+    }, [dialogState.open, dialogState.category, categories]);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -165,6 +167,7 @@ export default function CategoriesPage() {
                   parentId: parentId || null,
                   imageUrl: finalImageUrl,
                   imageHint,
+                  order,
                   updatedAt: serverTimestamp(),
                 });
 
@@ -176,6 +179,7 @@ export default function CategoriesPage() {
                     description,
                     imageUrl: finalImageUrl,
                     imageHint,
+                    order,
                     createdAt: serverTimestamp(),
                 };
                 if (parentId) {
@@ -225,6 +229,7 @@ export default function CategoriesPage() {
             setParentId(undefined);
             setImageUrl('');
             setImageHint('');
+            setOrder(0);
             setImageFile(null);
         } else {
             setDialogState(prev => ({ ...prev, open }));
@@ -240,7 +245,7 @@ export default function CategoriesPage() {
                     <h1 className="font-headline text-3xl font-bold">Categories</h1>
                     <p className="text-muted-foreground">Manage product categories and sub-categories.</p>
                 </div>
-                <Button onClick={() => setDialogState({ open: true, category: {} })}>
+                <Button onClick={() => setDialogState({ open: true, category: { order: categories?.length || 0 } })}>
                     <PlusCircle className="mr-2 h-4 w-4" />Add Category
                 </Button>
             </div>
@@ -267,6 +272,7 @@ export default function CategoriesPage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="hidden w-[100px] sm:table-cell">Image</TableHead>
+                                <TableHead>Order</TableHead>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Description</TableHead>
                                 <TableHead>Parent Category</TableHead>
@@ -277,17 +283,17 @@ export default function CategoriesPage() {
                         <TableBody>
                             {isLoading && (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell>
+                                    <TableCell colSpan={7} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && error && (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center text-red-500">{error.message}</TableCell>
+                                    <TableCell colSpan={7} className="text-center text-red-500">{error.message}</TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && filteredCategories?.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-24 text-center">No categories found.</TableCell>
+                                    <TableCell colSpan={7} className="h-24 text-center">No categories found.</TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && filteredCategories?.map((category) => (
@@ -306,6 +312,7 @@ export default function CategoriesPage() {
                                           <div className="h-16 w-16 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">No Image</div>
                                         )}
                                     </TableCell>
+                                    <TableCell>{category.order ?? 0}</TableCell>
                                     <TableCell className="font-medium">{category.name}</TableCell>
                                     <TableCell>{category.description}</TableCell>
                                     <TableCell>{category.parentId ? categoryMap.get(category.parentId) || 'N/A' : 'Top Level'}</TableCell>
@@ -346,6 +353,10 @@ export default function CategoriesPage() {
                         <div className="space-y-2">
                             <Label htmlFor="name">Name</Label>
                             <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Clothing" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="order">Display Order</Label>
+                            <Input id="order" type="number" value={order} onChange={(e) => setOrder(Number(e.target.value))} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="description">Description</Label>
@@ -401,3 +412,5 @@ export default function CategoriesPage() {
         </div>
     );
 }
+
+    

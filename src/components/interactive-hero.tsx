@@ -24,7 +24,7 @@ export function InteractiveHero() {
 
   const categoriesQuery = useMemo(() => {
     if (!db) return null;
-    const q = query(collection(db, 'categories'), orderBy('name', 'asc'));
+    const q = query(collection(db, 'categories'), orderBy('order', 'asc'));
     (q as any).__memo = true;
     return q;
   }, [db]);
@@ -38,7 +38,7 @@ export function InteractiveHero() {
 
     const topLevelCategories = allCategories.filter((cat) => !cat.parentId);
     
-    topLevelCategories.sort((a, b) => a.name.localeCompare(b.name));
+    topLevelCategories.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
     const foodPackagingCategory = topLevelCategories.find(
       (cat) => cat.name.toLowerCase() === 'food packaging'
@@ -209,3 +209,5 @@ export function InteractiveHero() {
     </section>
   );
 }
+
+    

@@ -1,10 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { Toaster } from '@/components/ui/toaster';
-import { CartProvider } from '@/context/cart-context';
-import { AuthProvider } from '@/context/auth-context';
-import { FirebaseProvider } from '@/firebase/provider';
+import { ClientProviders } from './client-providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,14 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} font-body antialiased`}>
-        <FirebaseProvider>
-          <AuthProvider>
-            <CartProvider>
-              {children}
-              <Toaster />
-            </CartProvider>
-          </AuthProvider>
-        </FirebaseProvider>
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
   );

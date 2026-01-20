@@ -68,13 +68,14 @@ export default function CategoriesPage() {
     const [isUploading, setIsUploading] = useState(false);
     const { loading: authLoading } = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const categoriesQuery = useMemo(() => {
         if (!db) return null;
         const q = query(collection(db, 'categories'));
         (q as any).__memo = true;
         return q;
-    }, [db]);
+    }, [db, refreshKey]);
 
     const { data: categories, isLoading: isLoadingData, error } = useCollection<Category>(categoriesQuery);
     const isLoading = authLoading || isLoadingData;
@@ -197,6 +198,7 @@ export default function CategoriesPage() {
                 toast({ title: 'Success', description: 'New category added.' });
             }
             setDialogState({ open: false, category: undefined });
+            setRefreshKey(k => k + 1);
         } catch (e: any) {
             console.error(e);
             toast({ variant: 'destructive', title: 'Error', description: e.message });
@@ -222,6 +224,7 @@ export default function CategoriesPage() {
         try {
             await deleteDoc(doc(db, 'categories', id));
             toast({ title: 'Success', description: 'Category deleted.' });
+            setRefreshKey(k => k + 1);
         } catch (e: any) {
             console.error(e);
             toast({ variant: 'destructive', title: 'Error', description: e.message });

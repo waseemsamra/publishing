@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
-import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, setDoc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirestore } from '@/firebase/provider';
 import type { Category } from '@/lib/types';
@@ -203,8 +203,9 @@ export default function CategoriesPage() {
     
     useEffect(() => {
         if (dialogState.open && dialogState.category) {
-            setName(dialogState.category.name || '');
-            setSlug(dialogState.category.slug || '');
+            const initialName = dialogState.category.name || '';
+            setName(initialName);
+            setSlug(dialogState.category.slug || slugify(initialName));
             setDescription(dialogState.category.description || '');
             setParentId(dialogState.category.parentId);
             setImageUrl(dialogState.category.imageUrl?.replace(s3BaseUrl, '') || '');
@@ -215,10 +216,10 @@ export default function CategoriesPage() {
     }, [dialogState.open, dialogState.category, categories]);
 
     useEffect(() => {
-      if (dialogState.open && !dialogState.category?.id) {
+      if (dialogState.open) {
         setSlug(slugify(name));
       }
-    }, [name, dialogState.open, dialogState.category?.id]);
+    }, [name, dialogState.open]);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -256,6 +257,31 @@ export default function CategoriesPage() {
                 finalImageUrl = result.url;
             }
 
+            const q = query(collection(db, 'categories'), where('slug', '==', slug));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+                if (!dialogState.category?.id || querySnapshot.docs[0].id !== dialogState.category.id) {
+                     toast({
+                        variant: 'destructive',
+                        title: 'Error',
+                        description: 'A category with this slug already exists. Please choose a unique name.',
+                    });
+                    setIsUploading(false);
+                    return;
+                }
+            }
+
+            const dataToSave = {
+                name,
+                slug,
+                description,
+                parentId: parentId || null,
+                imageUrl: finalImageUrl,
+                imageHint,
+                order,
+                updatedAt: serverTimestamp(),
+            };
+
             if (dialogState.category?.id) { // UPDATE
                 if (dialogState.category.id === parentId) {
                     toast({
@@ -267,46 +293,14 @@ export default function CategoriesPage() {
                     return;
                 }
                 
-                await updateDoc(doc(db, 'categories', dialogState.category.id), {
-                  name,
-                  description,
-                  parentId: parentId || null,
-                  imageUrl: finalImageUrl,
-                  imageHint,
-                  order,
-                  slug,
-                  updatedAt: serverTimestamp(),
-                });
-
+                await updateDoc(doc(db, 'categories', dialogState.category.id), dataToSave);
                 toast({ title: 'Success', description: 'Category updated.' });
     
             } else { // CREATE
-                const docRef = doc(db, 'categories', slug);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    toast({
-                        variant: 'destructive',
-                        title: 'Error',
-                        description: 'A category with this slug already exists. Please choose a unique slug.',
-                    });
-                    setIsUploading(false);
-                    return;
-                }
-
-                const dataToCreate: any = {
-                    name,
-                    description,
-                    imageUrl: finalImageUrl,
-                    imageHint,
-                    order,
-                    slug,
+                await addDoc(collection(db, 'categories'), {
+                    ...dataToSave,
                     createdAt: serverTimestamp(),
-                };
-                if (parentId) {
-                    dataToCreate.parentId = parentId;
-                }
-
-                await setDoc(docRef, dataToCreate);
+                });
                 toast({ title: 'Success', description: 'New category added.' });
             }
             setDialogState({ open: false, category: undefined });
@@ -491,8 +485,8 @@ export default function CategoriesPage() {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="slug">Slug</Label>
-                            <Input id="slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="e.g., clothing" disabled={!!dialogState.category?.id} />
-                            {dialogState.category?.id && <p className="text-xs text-muted-foreground">Slug cannot be changed for existing categories.</p>}
+                            <Input id="slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="e.g., clothing" disabled />
+                            <p className="text-xs text-muted-foreground">The slug is auto-generated from the name and must be unique.</p>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="order">Display Order</Label>

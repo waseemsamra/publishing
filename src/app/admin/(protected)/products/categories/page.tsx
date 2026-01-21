@@ -2,13 +2,14 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
-import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, where, getDocs, writeBatch } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirestore } from '@/firebase/provider';
 import type { Category } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -31,6 +32,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
     Card,
     CardContent,
@@ -80,6 +91,8 @@ export default function CategoriesPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [refreshKey, setRefreshKey] = useState(0);
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'ascending' | 'descending' } | null>({ key: 'order', direction: 'ascending' });
+    const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     const categoriesQuery = useMemo(() => {
         if (!db) return null;
@@ -313,27 +326,52 @@ export default function CategoriesPage() {
         }
     };
 
-    const handleDeleteCategory = async (id: string) => {
-        if (!db) {
-            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected.' });
+    const handleDeleteSelected = async () => {
+        if (!db || !categories) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Database not connected or categories not loaded.' });
             return;
         }
-        const isParent = categories?.some(c => c.parentId === id);
-        if (isParent) {
+
+        const parentIdsInUse = new Set(categories.map(c => c.parentId).filter(Boolean));
+        const parentCategoriesToDelete = selectedCategoryIds.filter(id => parentIdsInUse.has(id));
+
+        if (parentCategoriesToDelete.length > 0) {
+            const parentNames = categories
+                .filter(c => parentCategoriesToDelete.includes(c.id))
+                .map(c => c.name)
+                .join(', ');
+
             toast({
                 variant: 'destructive',
                 title: 'Deletion Blocked',
-                description: 'Cannot delete a category that has sub-categories. Please re-parent or delete sub-categories first.',
+                description: `Cannot delete categories that are parents: ${parentNames}. Please re-parent or delete their sub-categories first.`,
+                duration: 8000,
             });
+            setShowDeleteConfirm(false);
             return;
         }
+
         try {
-            await deleteDoc(doc(db, 'categories', id));
-            toast({ title: 'Success', description: 'Category deleted.' });
+            const batch = writeBatch(db);
+            selectedCategoryIds.forEach(id => {
+                batch.delete(doc(db, 'categories', id));
+            });
+            await batch.commit();
+            
+            toast({
+                title: `${selectedCategoryIds.length} categor(y/ies) deleted.`,
+                description: 'The selected categories have been removed.',
+            });
+            setSelectedCategoryIds([]);
             setRefreshKey(k => k + 1);
-        } catch (e: any) {
-            console.error(e);
-            toast({ variant: 'destructive', title: 'Error', description: e.message });
+        } catch(e: any) {
+             toast({
+                variant: 'destructive',
+                title: 'Error Deleting Categories',
+                description: e.message || 'There was a problem deleting the categories.',
+            });
+        } finally {
+            setShowDeleteConfirm(false);
         }
     };
     
@@ -362,6 +400,25 @@ export default function CategoriesPage() {
         </TableHead>
     );
 
+    const handleSelectAll = (checked: boolean | 'indeterminate') => {
+        if (checked === true) {
+            setSelectedCategoryIds(filteredCategories?.map(c => c.id) || []);
+        } else {
+            setSelectedCategoryIds([]);
+        }
+    };
+
+    const handleSelectCategory = (categoryId: string, checked: boolean) => {
+        if (checked) {
+            setSelectedCategoryIds((prev) => [...prev, categoryId]);
+        } else {
+            setSelectedCategoryIds((prev) => prev.filter((id) => id !== categoryId));
+        }
+    };
+
+    const allSelected = (filteredCategories?.length ?? 0) > 0 && selectedCategoryIds.length === filteredCategories?.length;
+    const someSelected = selectedCategoryIds.length > 0 && selectedCategoryIds.length < (filteredCategories?.length ?? 0);
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -369,9 +426,18 @@ export default function CategoriesPage() {
                     <h1 className="font-headline text-3xl font-bold">Categories</h1>
                     <p className="text-muted-foreground">Manage product categories and sub-categories.</p>
                 </div>
-                <Button onClick={() => setDialogState({ open: true, category: { order: categories?.length || 0 } })}>
-                    <PlusCircle className="mr-2 h-4 w-4" />Add Category
-                </Button>
+                 <div className="flex items-center gap-2">
+                    {selectedCategoryIds.length > 0 ? (
+                        <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete ({selectedCategoryIds.length})
+                        </Button>
+                    ) : (
+                        <Button onClick={() => setDialogState({ open: true, category: { order: categories?.length || 0 } })}>
+                            <PlusCircle className="mr-2 h-4 w-4" />Add Category
+                        </Button>
+                    )}
+                </div>
             </div>
             <Card>
                 <CardHeader>
@@ -395,6 +461,13 @@ export default function CategoriesPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead className="w-12">
+                                     <Checkbox
+                                        onCheckedChange={handleSelectAll}
+                                        checked={allSelected ? true : someSelected ? 'indeterminate' : false}
+                                        disabled={isLoading || !filteredCategories || filteredCategories.length === 0}
+                                    />
+                                </TableHead>
                                 <TableHead className="hidden w-[100px] sm:table-cell">Image</TableHead>
                                 {renderSortableHeader('order', 'Order')}
                                 <TableHead>Name</TableHead>
@@ -407,21 +480,28 @@ export default function CategoriesPage() {
                         <TableBody>
                             {isLoading && (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell>
+                                    <TableCell colSpan={8} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && error && (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center text-red-500">{error.message}</TableCell>
+                                    <TableCell colSpan={8} className="text-center text-red-500">{error.message}</TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && filteredCategories?.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="h-24 text-center">No categories found.</TableCell>
+                                    <TableCell colSpan={8} className="h-24 text-center">No categories found.</TableCell>
                                 </TableRow>
                             )}
                             {!isLoading && filteredCategories?.map((category) => (
-                                <TableRow key={category.id}>
+                                <TableRow key={category.id} data-state={selectedCategoryIds.includes(category.id) && "selected"}>
+                                    <TableCell>
+                                        <Checkbox
+                                            checked={selectedCategoryIds.includes(category.id)}
+                                            onCheckedChange={(checked) => handleSelectCategory(category.id, !!checked)}
+                                            aria-label={`Select category ${category.name}`}
+                                        />
+                                    </TableCell>
                                     <TableCell className="hidden sm:table-cell">
                                         {category.imageUrl ? (
                                             <Image
@@ -456,7 +536,7 @@ export default function CategoriesPage() {
                                                     <Edit className="mr-2 h-4 w-4" />
                                                     <span>Edit</span>
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleDeleteCategory(category.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50">
+                                                <DropdownMenuItem onClick={() => { setSelectedCategoryIds([category.id]); setShowDeleteConfirm(true); }} className="text-red-600 focus:text-red-600 focus:bg-red-50">
                                                     <Trash2 className="mr-2 h-4 w-4" />
                                                     <span>Delete</span>
                                                 </DropdownMenuItem>
@@ -470,6 +550,21 @@ export default function CategoriesPage() {
                 </CardContent>
             </Card>
             
+             <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the selected categories. Any sub-categories will need to be re-assigned, and products in these categories will need to be re-categorized.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteSelected} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
             <Dialog open={dialogState.open} onOpenChange={handleOpenChange}>
                 <DialogContent className="sm:max-w-[525px]">
                     <DialogHeader>

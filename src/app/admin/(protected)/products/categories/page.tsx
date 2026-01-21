@@ -203,6 +203,53 @@ export default function CategoriesPage() {
             category.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
     }, [categories, searchTerm, sortConfig, categoryMap, isParentSortActive]);
+    
+    const categoryOptions = useMemo(() => {
+        if (!categories) return [];
+
+        const categoryNodeMap = new Map(categories.map(c => [c.id, { ...c, children: [] as Category[] }]));
+        const topLevelCategories: (Category & { children: Category[] })[] = [];
+
+        categories.forEach(c => {
+            if (c.parentId && categoryNodeMap.has(c.parentId)) {
+                categoryNodeMap.get(c.parentId)!.children.push(categoryNodeMap.get(c.id)!);
+            } else {
+                topLevelCategories.push(categoryNodeMap.get(c.id)!);
+            }
+        });
+
+        const sortChildren = (cats: (Category & { children: Category[] })[]) => {
+            cats.sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+            cats.forEach(c => sortChildren(c.children));
+        };
+        sortChildren(topLevelCategories);
+
+        const flattened: { category: Category; depth: number }[] = [];
+        const flatten = (cats: (Category & { children: Category[] })[], depth: number) => {
+            for (const category of cats) {
+                flattened.push({ category, depth });
+                if (category.children.length > 0) {
+                    flatten(category.children, depth + 1);
+                }
+            }
+        };
+        flatten(topLevelCategories, 0);
+
+        if (dialogState.category?.id) {
+            const descendantIds = new Set<string>();
+            const getDescendants = (categoryId: string) => {
+                descendantIds.add(categoryId);
+                const children = categoryNodeMap.get(categoryId)?.children || [];
+                children.forEach(child => getDescendants(child.id));
+            };
+            getDescendants(dialogState.category.id);
+            
+            return flattened.filter(({ category }) => !descendantIds.has(category.id));
+        }
+
+        return flattened;
+    }, [categories, dialogState.category?.id]);
+
 
     const previewUrl = useMemo(() => {
         if (imageFile) {
@@ -296,16 +343,6 @@ export default function CategoriesPage() {
             };
 
             if (dialogState.category?.id) { // UPDATE
-                if (dialogState.category.id === parentId) {
-                    toast({
-                        variant: 'destructive',
-                        title: 'Validation Error',
-                        description: 'A category cannot be its own parent.',
-                    });
-                    setIsUploading(false);
-                    return;
-                }
-                
                 await updateDoc(doc(db, 'categories', dialogState.category.id), dataToSave);
                 toast({ title: 'Success', description: 'Category updated.' });
     
@@ -574,14 +611,18 @@ export default function CategoriesPage() {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="parent">Parent Category</Label>
-                             <Select value={parentId} onValueChange={(value) => setParentId(value === 'none' ? undefined : value)}>
+                             <Select value={parentId || 'none'} onValueChange={(value) => setParentId(value === 'none' ? undefined : value)}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select a parent category" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">None (Top Level)</SelectItem>
-                                    {categories?.filter(c => c.id !== dialogState.category?.id && !c.parentId).map(c => (
-                                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                                    {categoryOptions.map(({ category, depth }) => (
+                                        <SelectItem key={category.id} value={category.id}>
+                                            <span style={{ paddingLeft: `${depth * 1.5}rem` }}>
+                                               {depth > 0 ? '↳ ' : ''}{category.name}
+                                            </span>
+                                        </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>

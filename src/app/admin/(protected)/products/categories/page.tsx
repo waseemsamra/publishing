@@ -332,25 +332,6 @@ export default function CategoriesPage() {
             return;
         }
 
-        const parentIdsInUse = new Set(categories.map(c => c.parentId).filter(Boolean));
-        const parentCategoriesToDelete = selectedCategoryIds.filter(id => parentIdsInUse.has(id));
-
-        if (parentCategoriesToDelete.length > 0) {
-            const parentNames = categories
-                .filter(c => parentCategoriesToDelete.includes(c.id))
-                .map(c => c.name)
-                .join(', ');
-
-            toast({
-                variant: 'destructive',
-                title: 'Deletion Blocked',
-                description: `Cannot delete categories that are parents: ${parentNames}. Please re-parent or delete their sub-categories first.`,
-                duration: 8000,
-            });
-            setShowDeleteConfirm(false);
-            return;
-        }
-
         try {
             const batch = writeBatch(db);
             selectedCategoryIds.forEach(id => {

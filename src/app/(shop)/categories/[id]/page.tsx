@@ -141,9 +141,8 @@ export default function CategoryPage() {
 
                 {(() => {
                     const remainingProducts = products.filter(p => !displayedProductIds.has(p.id));
-                    if (remainingProducts.length === 0) return null;
-
-                    return (
+                    if (remainingProducts.length > 0) {
+                       return (
                          <section>
                             <h2 className="font-headline text-3xl font-bold mb-8">
                                 {subCategories && subCategories.length > 0 ? `Other ${category?.name}` : category?.name}
@@ -154,15 +153,19 @@ export default function CategoryPage() {
                                 ))}
                             </div>
                         </section>
-                    )
+                       )
+                    }
+                    // Only show "No products" message if there are no subcategories AND no remaining products.
+                    if (products.length === 0) {
+                      return (
+                        <div className="text-center py-24 border-2 border-dashed rounded-lg">
+                          <h3 className="font-headline text-2xl font-bold">No Products Found</h3>
+                          <p className="text-muted-foreground mt-2">There are no products in this category yet.</p>
+                        </div>
+                      )
+                    }
+                    return null;
                 })()}
-                
-                {products.length === 0 && (
-                     <div className="text-center py-24 border-2 border-dashed rounded-lg">
-                        <h3 className="font-headline text-2xl font-bold">No Products Found</h3>
-                        <p className="text-muted-foreground mt-2">There are no products in this category yet.</p>
-                    </div>
-                )}
               </>
           )}
         </main>

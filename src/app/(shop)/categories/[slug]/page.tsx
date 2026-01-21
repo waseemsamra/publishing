@@ -2,8 +2,9 @@
 
 import { useParams, notFound } from 'next/navigation';
 import { useMemo } from 'react';
-import { collection, query, where, doc, limit } from 'firebase/firestore';
+import { collection, query, where, doc } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
+import { useDoc } from '@/firebase/firestore/use-doc';
 import { useFirestore } from '@/firebase/provider';
 import type { Product, Category } from '@/lib/types';
 import { ProductCard } from '@/components/product-card';
@@ -49,17 +50,16 @@ export default function CategoryPage() {
   const { loading: authLoading } = useAuth();
   const db = useFirestore();
 
-  const categorySlug = params.slug;
+  const categoryId = params.slug;
 
-  const categoryQuery = useMemo(() => {
-    if (!db || !categorySlug) return null;
-    const q = query(collection(db, 'categories'), where('slug', '==', categorySlug), limit(1));
-    (q as any).__memo = true;
-    return q;
-  }, [categorySlug, db]);
+  const categoryRef = useMemo(() => {
+    if (!db || !categoryId) return null;
+    const ref = doc(db, 'categories', categoryId);
+    (ref as any).__memo = true;
+    return ref;
+  }, [categoryId, db]);
 
-  const { data: categories, isLoading: isLoadingCategory } = useCollection<Category>(categoryQuery);
-  const category = categories?.[0];
+  const { data: category, isLoading: isLoadingCategory } = useDoc<Category>(categoryRef);
   
   const subCategoriesQuery = useMemo(() => {
     if (!db || !category?.id) return null;

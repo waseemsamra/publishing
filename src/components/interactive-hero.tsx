@@ -118,7 +118,7 @@ export function InteractiveHero() {
               {displayItem.name}
             </h2>
             <Button asChild className="mt-4">
-              <Link href={`/categories/${displayItem.slug || displayItem.id}`}>
+              <Link href={`/categories/${displayItem.id}`}>
                 Shop Now
               </Link>
             </Button>
@@ -131,7 +131,7 @@ export function InteractiveHero() {
           <div className="hidden lg:grid grid-cols-4 grid-rows-4 w-full h-full gap-px">
             {gridItems.map((item) => (
               <Link
-                href={`/categories/${item.slug || item.id}`}
+                href={`/categories/${item.id}`}
                 key={item.id}
                 onMouseEnter={() => handleItemHover(item)}
                 className={cn(

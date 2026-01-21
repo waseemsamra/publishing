@@ -2,13 +2,14 @@
 
 import { useParams, notFound } from 'next/navigation';
 import { useMemo } from 'react';
+import Link from 'next/link';
 import { collection, query, where, doc } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useDoc } from '@/firebase/firestore/use-doc';
 import { useFirestore } from '@/firebase/provider';
 import type { Product, Category } from '@/lib/types';
 import { ProductCard } from '@/components/product-card';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import Image from 'next/image';
 import {
@@ -133,7 +134,13 @@ export default function CategoryPage() {
                     
                     return (
                         <section key={subCategory.id}>
-                            <h2 className="font-headline text-3xl font-bold mb-8">{subCategory.name}</h2>
+                            <div className="flex justify-between items-center mb-8">
+                                <h2 className="font-headline text-3xl font-bold">{subCategory.name}</h2>
+                                <Link href={`/products?category=${subCategory.id}`} className="text-sm font-semibold text-primary hover:underline flex items-center gap-1">
+                                    View all
+                                    <ArrowRight className="h-4 w-4" />
+                                </Link>
+                            </div>
                             <ProductCarousel products={subCatProducts} />
                         </section>
                     )

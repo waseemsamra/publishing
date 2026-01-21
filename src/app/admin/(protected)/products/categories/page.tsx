@@ -259,16 +259,16 @@ export default function CategoriesPage() {
 
             const q = query(collection(db, 'categories'), where('slug', '==', slug));
             const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
-                if (!dialogState.category?.id || querySnapshot.docs[0].id !== dialogState.category.id) {
-                     toast({
-                        variant: 'destructive',
-                        title: 'Error',
-                        description: 'A category with this slug already exists. Please choose a unique name.',
-                    });
-                    setIsUploading(false);
-                    return;
-                }
+            const conflictingDoc = querySnapshot.docs.find(doc => doc.id !== dialogState.category?.id);
+
+            if (conflictingDoc) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Duplicate Category',
+                    description: 'A category with this slug already exists. Please choose a unique name.',
+                });
+                setIsUploading(false);
+                return;
             }
 
             const dataToSave = {

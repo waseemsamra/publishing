@@ -113,7 +113,7 @@ export function InteractiveHero() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent -z-10"></div>
 
           <div className="relative z-10">
-            <p className="text-white/80">HanaPac Customized Packaging</p>
+            <p className="text-white/80">Infylux Customized Packaging</p>
             <h2 className="font-headline text-5xl font-bold text-white mt-2">
               {displayItem.name}
             </h2>

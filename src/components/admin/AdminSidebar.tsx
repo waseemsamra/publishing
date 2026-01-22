@@ -14,7 +14,6 @@ import {
   SidebarGroup,
   SidebarGroupLabel
 } from '@/components/ui/sidebar';
-import { Logo } from '@/components/logo';
 import {
   LayoutDashboard,
   Package,
@@ -26,25 +25,14 @@ import {
   LayoutPanelLeft,
   FolderCog,
   LogOut,
-  Home
+  Home,
+  UserCheck,
+  TrendingUp,
 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 
-const mainNav = [
-  { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
-  { href: '/admin/products', label: 'Products', icon: Package },
-  { href: '/admin/users', label: 'Users', icon: Users },
-  { href: '/admin/content', label: 'Content', icon: LayoutPanelLeft },
-  { href: '/admin/analytics', label: 'Analytics', icon: BarChart },
-  { href: '/admin/calendar', label: 'Calendar', icon: Calendar },
-];
-
-const settingsNav = [
-    { href: '/admin/products/categories', label: 'Categories', icon: FolderCog },
-    { href: '/admin/settings', label: 'Store Settings', icon: Settings },
-];
 
 export function AdminSidebar() {
   const pathname = usePathname();
@@ -59,49 +47,111 @@ export function AdminSidebar() {
     return name.slice(0, 2).toUpperCase();
   };
 
+  const isProductRouteActive = pathname.startsWith('/admin/products');
+  const isCmsRouteActive = pathname.startsWith('/admin/content');
+
+
   return (
     <Sidebar>
       <SidebarContent>
         <SidebarHeader>
-          <Logo />
+           <div className="flex items-center gap-2">
+                <span className="font-headline text-2xl font-bold">AdminHub</span>
+                <Badge variant="outline">Beta</Badge>
+            </div>
         </SidebarHeader>
         <SidebarMenu>
+            <SidebarMenuItem>
+                <Link href="/admin/dashboard" legacyBehavior passHref>
+                    <SidebarMenuButton isActive={pathname === '/admin/dashboard'} tooltip="Dashboard">
+                        <LayoutDashboard /><span>Dashboard</span>
+                    </SidebarMenuButton>
+                </Link>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <Link href="/admin/orders" legacyBehavior passHref>
+                    <SidebarMenuButton isActive={pathname === '/admin/orders'} tooltip="Orders">
+                        <ShoppingCart /><span>Orders</span>
+                    </SidebarMenuButton>
+                </Link>
+            </SidebarMenuItem>
+            
             <SidebarGroup>
-                <SidebarMenu>
-                    {mainNav.map((item) => (
-                        <SidebarMenuItem key={item.label}>
-                            <Link href={item.href} legacyBehavior passHref>
-                                <SidebarMenuButton
-                                    isActive={pathname.startsWith(item.href)}
-                                    tooltip={item.label}
-                                >
-                                    <item.icon />
-                                    <span>{item.label}</span>
-                                </SidebarMenuButton>
-                            </Link>
-                        </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
-            </SidebarGroup>
-            <SidebarSeparator />
-            <SidebarGroup>
-                <SidebarGroupLabel>Settings</SidebarGroupLabel>
+                <SidebarGroupLabel>Products</SidebarGroupLabel>
                  <SidebarMenu>
-                    {settingsNav.map((item) => (
-                        <SidebarMenuItem key={item.label}>
-                            <Link href={item.href} legacyBehavior passHref>
-                                <SidebarMenuButton
-                                    isActive={pathname.startsWith(item.href)}
-                                    tooltip={item.label}
-                                >
-                                    <item.icon />
-                                    <span>{item.label}</span>
-                                </SidebarMenuButton>
-                            </Link>
-                        </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
+                    <SidebarMenuItem>
+                        <Link href="/admin/products" legacyBehavior passHref>
+                            <SidebarMenuButton isActive={pathname === '/admin/products'} tooltip="All Products">
+                                All Products
+                            </SidebarMenuButton>
+                        </Link>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                        <Link href="/admin/products/categories" legacyBehavior passHref>
+                            <SidebarMenuButton isActive={pathname === '/admin/products/categories'} tooltip="Categories">
+                                Categories
+                            </SidebarMenuButton>
+                        </Link>
+                    </SidebarMenuItem>
+                 </SidebarMenu>
             </SidebarGroup>
+
+             <SidebarMenuItem>
+                <Link href="/admin/users" legacyBehavior passHref>
+                    <SidebarMenuButton isActive={pathname === '/admin/users'} tooltip="Users">
+                        <Users /><span>Users</span>
+                    </SidebarMenuButton>
+                </Link>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <Link href="/admin/analytics" legacyBehavior passHref>
+                    <SidebarMenuButton isActive={pathname === '/admin/analytics'} tooltip="Analytics">
+                        <BarChart /><span>Analytics</span>
+                    </SidebarMenuButton>
+                </Link>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+                <Link href="/admin/calendar" legacyBehavior passHref>
+                    <SidebarMenuButton isActive={pathname === '/admin/calendar'} tooltip="Calendar">
+                        <Calendar /><span>Calendar</span>
+                    </SidebarMenuButton>
+                </Link>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <Link href="/admin/grant-admin" legacyBehavior passHref>
+                    <SidebarMenuButton isActive={pathname === '/admin/grant-admin'} tooltip="Grant Admin">
+                        <UserCheck /><span>Grant Admin</span>
+                    </SidebarMenuButton>
+                </Link>
+            </SidebarMenuItem>
+
+            <SidebarGroup>
+                <SidebarGroupLabel>CMS</SidebarGroupLabel>
+                 <SidebarMenu>
+                    <SidebarMenuItem>
+                        <Link href="/admin/content/hero-slides" legacyBehavior passHref>
+                            <SidebarMenuButton isActive={pathname === '/admin/content/hero-slides'} tooltip="Hero Slides">
+                                Hero Slides
+                            </SidebarMenuButton>
+                        </Link>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                        <Link href="/admin/content/trending-now" legacyBehavior passHref>
+                            <SidebarMenuButton isActive={pathname === '/admin/content/trending-now'} tooltip="Trending Now">
+                                Trending Now
+                            </SidebarMenuButton>
+                        </Link>
+                    </SidebarMenuItem>
+                 </SidebarMenu>
+            </SidebarGroup>
+
+            <SidebarMenuItem>
+                <Link href="/admin/settings" legacyBehavior passHref>
+                    <SidebarMenuButton isActive={pathname.startsWith('/admin/settings')} tooltip="Settings">
+                        <Settings /><span>Settings</span>
+                    </SidebarMenuButton>
+                </Link>
+            </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
        <SidebarFooter>

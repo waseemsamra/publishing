@@ -1,6 +1,4 @@
 
-import { redirect } from 'next/navigation';
-
-export default function AdminContentPage() {
-  redirect('/admin/content/hero-slides');
+export default function Page() {
+  return null;
 }

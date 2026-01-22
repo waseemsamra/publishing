@@ -71,7 +71,7 @@ export function ProductsDrawer({ onLinkClick }: { onLinkClick?: () => void }) {
               <ul className="space-y-3 pl-4">
                 <li>
                   <Link
-                    href={`/categories/${category.id}`}
+                    href={`/categories/${category.slug || category.id}`}
                     className="block hover:text-primary font-medium"
                     onClick={onLinkClick}
                   >
@@ -81,7 +81,7 @@ export function ProductsDrawer({ onLinkClick }: { onLinkClick?: () => void }) {
                 {category.subCategories.map(subCategory => (
                   <li key={subCategory.id}>
                     <Link
-                      href={`/categories/${subCategory.id}`}
+                      href={`/categories/${subCategory.slug || subCategory.id}`}
                       className="block hover:text-primary"
                       onClick={onLinkClick}
                     >

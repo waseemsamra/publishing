@@ -26,13 +26,17 @@ service cloud.firestore {
       allow read: if collectionId in [
         'products', 'categories', 'sizes', 'colours', 'printOptions',
         'wallTypes', 'thicknesses', 'materialTypes', 'finishTypes',
-        'adhesives', 'handles', 'shapes', 'heroSlides', 'trendingItems', 'settings'
+        'adhesives', 'handles', 'shapes', 'heroSlides', 'trendingItems', 'settings',
+        'lids'
       ];
       allow write: if collectionId in [
         'products', 'categories', 'sizes', 'colours', 'printOptions',
         'wallTypes', 'thicknesses', 'materialTypes', 'finishTypes',
-        'adhesives', 'handles', 'shapes', 'heroSlides', 'trendingItems', 'settings'
+        'adhesives', 'handles', 'shapes', 'heroSlides', 'trendingItems', 'settings',
+        'lids'
       ] && isAdmin();
     }
   }
 }
+
+    

@@ -207,6 +207,30 @@
         "name"
       ]
     },
+    "Lid": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Lid",
+      "type": "object",
+      "description": "Represents a product lid type (e.g., Sip, Straw Slot).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the lid type."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the lid type (e.g., Sip Lid)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the lid type."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
      "HeroSlide": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "HeroSlide",
@@ -521,6 +545,13 @@
           "type": "array",
           "description": "References to Shapes.",
           "items": { "type": "string" }
+        },
+        "lidIds": {
+          "type": "array",
+          "description": "References to Lids.",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
@@ -991,6 +1022,22 @@
           ]
         }
       },
+      {
+        "path": "/lids/{lidId}",
+        "definition": {
+          "entityName": "Lid",
+          "schema": {
+            "$ref": "#/backend/entities/Lid"
+          },
+          "description": "Stores available product lid types. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "lidId",
+              "description": "The unique identifier for the lid."
+            }
+          ]
+        }
+      },
        {
         "path": "/heroSlides/{heroSlideId}",
         "definition": {
@@ -1174,6 +1221,8 @@
     
 
     
+    
+
     
 
     

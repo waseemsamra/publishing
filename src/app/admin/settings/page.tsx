@@ -6,7 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote, Hand, Circle, Database } from 'lucide-react';
+import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote, Hand, Circle, Disc3 } from 'lucide-react';
 
 const settingsLinks = [
     {
@@ -70,6 +70,12 @@ const settingsLinks = [
         icon: Circle,
     },
     {
+        href: "/admin/lids",
+        title: "Lids",
+        description: "Manage product lid options like Sip or Straw Slot.",
+        icon: Disc3,
+    },
+    {
         href: "/admin/settings/store-details",
         title: "Store Details",
         description: "Update your store name, contact info, and address.",
@@ -123,3 +129,5 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+
+    

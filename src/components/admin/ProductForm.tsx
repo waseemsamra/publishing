@@ -7,7 +7,7 @@ import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 import { doc, addDoc, updateDoc, collection, serverTimestamp, query } from 'firebase/firestore';
 import { useFirestore } from '@/firebase/provider';
-import type { Product, Category, Size, Colour, PrintOption, WallType, Thickness, MaterialType, FinishType, Adhesive, Handle, Shape } from '@/lib/types';
+import type { Product, Category, Size, Colour, PrintOption, WallType, Thickness, MaterialType, FinishType, Adhesive, Handle, Shape, Lid } from '@/lib/types';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -47,6 +47,7 @@ const productSchema = z.object({
   adhesiveIds: z.array(z.string()).optional(),
   handleIds: z.array(z.string()).optional(),
   shapeIds: z.array(z.string()).optional(),
+  lidIds: z.array(z.string()).optional(),
   images: z.array(imageSchema).optional(),
 });
 
@@ -64,9 +65,10 @@ const optionCollections = [
   { name: 'adhesives', field: 'adhesiveIds' },
   { name: 'handles', field: 'handleIds' },
   { name: 'shapes', field: 'shapeIds' },
+  { name: 'lids', field: 'lidIds' },
 ] as const;
 
-type OptionType = Category | Size | Colour | PrintOption | WallType | Thickness | MaterialType | FinishType | Adhesive | Handle | Shape;
+type OptionType = Category | Size | Colour | PrintOption | WallType | Thickness | MaterialType | FinishType | Adhesive | Handle | Shape | Lid;
 
 export function ProductForm({ product }: { product?: Product }) {
   const { toast } = useToast();
@@ -89,6 +91,17 @@ export function ProductForm({ product }: { product?: Product }) {
           price: 0,
           images: [],
           categoryIds: [],
+          sizeIds: [],
+          colourIds: [],
+          printOptionIds: [],
+          wallTypeIds: [],
+          thicknessIds: [],
+          materialTypeIds: [],
+          finishTypeIds: [],
+          adhesiveIds: [],
+          handleIds: [],
+          shapeIds: [],
+          lidIds: [],
           materials: [],
           certifications: [],
         },
@@ -184,6 +197,13 @@ export function ProductForm({ product }: { product?: Product }) {
     return q;
   }, [collections.shapes]);
 
+  const lidsQuery = useMemo(() => {
+    if(!collections.lids) return null;
+    const q = query(collections.lids);
+    (q as any).__memo = true;
+    return q;
+  }, [collections.lids]);
+
   const { data: categories } = useCollection<Category>(categoriesQuery);
   const { data: sizes } = useCollection<Size>(sizesQuery);
   const { data: colours } = useCollection<Colour>(coloursQuery);
@@ -195,6 +215,7 @@ export function ProductForm({ product }: { product?: Product }) {
   const { data: adhesives } = useCollection<Adhesive>(adhesivesQuery);
   const { data: handles } = useCollection<Handle>(handlesQuery);
   const { data: shapes } = useCollection<Shape>(shapesQuery);
+  const { data: lids } = useCollection<Lid>(lidsQuery);
 
   const optionData = {
     categories: categories || [],
@@ -208,6 +229,7 @@ export function ProductForm({ product }: { product?: Product }) {
     adhesives: adhesives || [],
     handles: handles || [],
     shapes: shapes || [],
+    lids: lids || [],
   };
 
   const handleImageChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
@@ -373,12 +395,12 @@ export function ProductForm({ product }: { product?: Product }) {
                     <CardHeader><CardTitle>Product Attributes</CardTitle></CardHeader>
                     <CardContent className="space-y-4">
                         {optionCollections.filter(c => c.name !== 'categories').map(({ name, field }) => (
-                            optionData[name] && optionData[name].length > 0 && (
-                                <FormField key={name} control={form.control} name={field} render={({ field }) => (
+                            (optionData as any)[name] && (optionData as any)[name].length > 0 && (
+                                <FormField key={name} control={form.control} name={field as any} render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>{name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, ' $1')}</FormLabel>
                                         <div className="space-y-2 max-h-40 overflow-y-auto border p-2 rounded-md">
-                                            {optionData[name].map((item: OptionType) => (
+                                            {(optionData as any)[name].map((item: OptionType) => (
                                                 <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
                                                     <FormControl>
                                                         <Checkbox checked={field.value?.includes(item.id)} onCheckedChange={(checked) => (
@@ -401,3 +423,5 @@ export function ProductForm({ product }: { product?: Product }) {
     </Form>
   );
 }
+
+    

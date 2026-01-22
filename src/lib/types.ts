@@ -22,6 +22,7 @@ export interface Product {
   adhesiveIds?: string[];
   handleIds?: string[];
   shapeIds?: string[];
+  lidIds?: string[];
 
   createdAt?: any;
   updatedAt?: any;
@@ -139,6 +140,13 @@ export interface Shape {
   createdAt?: any;
 }
 
+export interface Lid {
+  id: string;
+  name: string;
+  description: string;
+  createdAt?: any;
+}
+
 export interface StoreSettings {
   id: string;
   storeName?: string;
@@ -183,6 +191,8 @@ export interface TrendingItem {
   createdAt?: any;
   updatedAt?: any;
 }
+    
+
     
 
     

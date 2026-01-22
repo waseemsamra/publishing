@@ -23,18 +23,6 @@ import Autoplay from 'embla-carousel-autoplay';
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const InteractiveHero = dynamic(
-  () => import('@/components/interactive-hero').then((mod) => mod.InteractiveHero),
-  { 
-    ssr: false,
-    loading: () => (
-      <section className="bg-muted flex items-center justify-center" style={{minHeight: '70vh'}}>
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </section>
-    ),
-  }
-);
-
 const LowMinimumMustHaves = dynamic(
   () => import('@/components/low-minimum-must-haves').then((mod) => mod.LowMinimumMustHaves),
   { 
@@ -230,7 +218,7 @@ function TrendingNowSection() {
 export default function HomePage() {
   return (
     <>
-      <InteractiveHero />
+      <HeroCarousel />
       
       <LowMinimumMustHaves />
 

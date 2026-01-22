@@ -56,13 +56,10 @@ export interface User {
   email: string;
   firstName?: string;
   lastName?: string;
-  displayName?: string; // Optional if you use firstName/lastName
-  role: 'admin' | 'editor' | 'viewer' | 'customer';
+  displayName?: string;
   roles: ('admin' | 'customer')[];
-  status: 'active' | 'inactive' | 'pending';
-  createdAt: any; // Consider using Date | firebase.firestore.Timestamp
-  lastLogin?: any; // Consider using Date | firebase.firestore.Timestamp
-  phone?: string;
+  createdAt?: any;
+  lastLogin?: any;
   photoURL?: string;
 }
 

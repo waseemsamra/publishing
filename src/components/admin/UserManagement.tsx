@@ -70,6 +70,11 @@ export default function UserManagement() {
             (user.email?.toLowerCase() || '').includes(searchTerm.toLowerCase())
         );
     }, [users, searchTerm]);
+    
+    const getPrimaryRole = (roles: User['roles'] | undefined) => {
+        if (!roles) return 'customer';
+        return roles.includes('admin') ? 'admin' : roles[0] || 'customer';
+    };
 
     const handleDeleteSelected = async () => {
         if (!db) {
@@ -184,7 +189,7 @@ export default function UserManagement() {
                                     </TableCell>
                                     <TableCell className="font-medium">{user.displayName || `${user.firstName} ${user.lastName}`}</TableCell>
                                     <TableCell>{user.email}</TableCell>
-                                    <TableCell>{user.role}</TableCell>
+                                    <TableCell>{getPrimaryRole(user.roles)}</TableCell>
                                     <TableCell>{user.createdAt ? format(user.createdAt.toDate(), 'MMM d, yyyy') : 'N/A'}</TableCell>
                                     <TableCell className="text-right">
                                         <DropdownMenu>

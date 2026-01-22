@@ -111,7 +111,6 @@ export function SiteFooter() {
         </div>
         <div className="text-sm text-muted-foreground flex items-center gap-4">
           <FirebaseConnectionStatus />
-          <Link href="/db-check" className="hover:text-primary">Connection Check</Link>
           <span>&copy; HanaPac {new Date().getFullYear()}</span>
           <Link href="#" className="hover:text-primary">T & C's</Link>
           <Link href="#" className="hover:text-primary">Privacy Policy</Link>

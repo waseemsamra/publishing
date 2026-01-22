@@ -5,7 +5,7 @@ import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useRouter } from 'next/navigation';
-import { doc, addDoc, updateDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { doc, addDoc, updateDoc, collection, serverTimestamp, query } from 'firebase/firestore';
 import { useFirestore } from '@/firebase/provider';
 import type { Product, Category, Size, Colour, PrintOption, WallType, Thickness, MaterialType, FinishType, Adhesive, Handle, Shape } from '@/lib/types';
 import { useCollection } from '@/firebase/firestore/use-collection';

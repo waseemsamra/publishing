@@ -201,7 +201,9 @@ export default function MaterialTypesPage() {
                     <DialogHeader>
                         <DialogTitle>{dialogState.material?.id ? 'Edit Material' : 'Add New Material'}</DialogTitle>
                         <DialogDescription>
-                            {dialogState.material?.id ? `Update the details for ${dialogState.material.name}.` : 'Enter the details for the new material.'}
+                            {dialogState.material?.id ? `Update the details for ${"\'\'\'"
+                            + dialogState.material.name +
+                            "\'\'\'"}.` : 'Enter the details for the new material.'}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">

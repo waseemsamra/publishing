@@ -196,7 +196,9 @@ export default function WallTypesPage() {
                     <DialogHeader>
                         <DialogTitle>{dialogState.wallType?.id ? 'Edit Wall Type' : 'Add New Wall Type'}</DialogTitle>
                         <DialogDescription>
-                            {dialogState.wallType?.id ? `Update the details for ${dialogState.wallType.name}.` : 'Enter the details for the new wall type.'}
+                            {dialogState.wallType?.id ? `Update the details for ${"\'\'\'"
+                            + dialogState.wallType.name +
+                            "\'\'\'"}.` : 'Enter the details for the new wall type.'}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">

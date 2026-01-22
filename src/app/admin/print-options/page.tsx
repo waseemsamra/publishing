@@ -201,7 +201,9 @@ export default function PrintOptionsPage() {
                     <DialogHeader>
                         <DialogTitle>{dialogState.printOption?.id ? 'Edit Print Option' : 'Add New Print Option'}</DialogTitle>
                         <DialogDescription>
-                            {dialogState.printOption?.id ? `Update the details for ${dialogState.printOption.name}.` : 'Enter the details for the new print option.'}
+                            {dialogState.printOption?.id ? `Update the details for ${"\'\'\'"
+                            + dialogState.printOption.name +
+                            "\'\'\'"}.` : 'Enter the details for the new print option.'}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">

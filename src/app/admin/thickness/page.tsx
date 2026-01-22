@@ -201,7 +201,9 @@ export default function ThicknessesPage() {
                     <DialogHeader>
                         <DialogTitle>{dialogState.thickness?.id ? 'Edit Thickness' : 'Add New Thickness'}</DialogTitle>
                         <DialogDescription>
-                            {dialogState.thickness?.id ? `Update the details for ${dialogState.thickness.name}.` : 'Enter the details for the new thickness option.'}
+                            {dialogState.thickness?.id ? `Update the details for ${"\'\'\'"
+                            + dialogState.thickness.name +
+                            "\'\'\'"}.` : 'Enter the details for the new thickness option.'}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">

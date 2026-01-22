@@ -202,7 +202,9 @@ export default function HandlesPage() {
                     <DialogHeader>
                         <DialogTitle>{dialogState.handle?.id ? 'Edit Handle' : 'Add New Handle'}</DialogTitle>
                         <DialogDescription>
-                            {dialogState.handle?.id ? `Update the details for ${dialogState.handle.name}.` : 'Enter the details for the new handle option.'}
+                            {dialogState.handle?.id ? `Update the details for ${"\'\'\'"
+                            + dialogState.handle.name +
+                            "\'\'\'"}.` : 'Enter the details for the new handle option.'}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">

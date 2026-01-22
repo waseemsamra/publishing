@@ -202,7 +202,9 @@ export default function ShapesPage() {
                     <DialogHeader>
                         <DialogTitle>{dialogState.shape?.id ? 'Edit Shape' : 'Add New Shape'}</DialogTitle>
                         <DialogDescription>
-                            {dialogState.shape?.id ? `Update the details for ${dialogState.shape.name}.` : 'Enter the details for the new shape option.'}
+                            {dialogState.shape?.id ? `Update the details for ${"\'\'\'"
+                            + dialogState.shape.name +
+                            "\'\'\'"}.` : 'Enter the details for the new shape option.'}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">

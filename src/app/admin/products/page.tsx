@@ -402,7 +402,7 @@ export default function AdminProductsPage() {
                             id="bulk-add-textarea"
                             value={bulkAddText}
                             onChange={(e) => setBulkAddText(e.target.value)}
-                            placeholder="Eco-Friendly Water Bottle,Paper Products&#10;Organic Cotton T-Shirt,Apparel"
+                            placeholder={"Eco-Friendly Water Bottle,Paper Products\nOrganic Cotton T-Shirt,Apparel"}
                             rows={10}
                         />
                     </div>

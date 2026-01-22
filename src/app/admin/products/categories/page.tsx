@@ -588,7 +588,9 @@ export default function CategoriesPage() {
                     <DialogHeader>
                         <DialogTitle>{dialogState.category?.id ? 'Edit Category' : 'Add New Category'}</DialogTitle>
                         <DialogDescription>
-                            {dialogState.category?.id ? `Update the details for ${dialogState.category.name}.` : 'Enter the details for the new category.'}
+                            {dialogState.category?.id ? `Update the details for ${"\'\'\'"
+                            + dialogState.category.name +
+                            "\'\'\'"}.` : 'Enter the details for the new category.'}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-4">

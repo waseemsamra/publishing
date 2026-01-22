@@ -258,7 +258,7 @@ export default function StoreDetailsPage() {
                     <FormItem>
                       <FormLabel>Company & VAT Details</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="e.g. VAT ID: 123456789&#10;Company Reg: 987654321" rows={4} {...field} />
+                        <Textarea placeholder={"e.g. VAT ID: 123456789\nCompany Reg: 987654321"} rows={4} {...field} />
                       </FormControl>
                        <FormMessage />
                     </FormItem>

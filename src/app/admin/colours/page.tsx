@@ -205,7 +205,9 @@ export default function ColoursPage() {
                     <DialogHeader>
                         <DialogTitle>{dialogState.colour?.id ? 'Edit Colour' : 'Add New Colour'}</DialogTitle>
                         <DialogDescription>
-                            {dialogState.colour?.id ? `Update the details for ${dialogState.colour.name}.` : 'Enter the details for the new colour.'}
+                            {dialogState.colour?.id ? `Update the details for ${"\'\'\'"
+                            + dialogState.colour.name +
+                            "\'\'\'"}.` : 'Enter the details for the new colour.'}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">

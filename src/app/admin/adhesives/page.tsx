@@ -202,7 +202,9 @@ export default function AdhesivesPage() {
                     <DialogHeader>
                         <DialogTitle>{dialogState.adhesive?.id ? 'Edit Adhesive' : 'Add New Adhesive'}</DialogTitle>
                         <DialogDescription>
-                            {dialogState.adhesive?.id ? `Update the details for ${dialogState.adhesive.name}.` : 'Enter the details for the new adhesive option.'}
+                            {dialogState.adhesive?.id ? `Update the details for ${"\'\'\'"
+                              + dialogState.adhesive.name +
+                            "\'\'\'"}.` : 'Enter the details for the new adhesive option.'}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">

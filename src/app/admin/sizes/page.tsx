@@ -200,7 +200,9 @@ export default function SizesPage() {
                     <DialogHeader>
                         <DialogTitle>{dialogState.size?.id ? 'Edit Size' : 'Add New Size'}</DialogTitle>
                         <DialogDescription>
-                            {dialogState.size?.id ? `Update the details for ${dialogState.size.name}.` : 'Enter the details for the new size.'}
+                            {dialogState.size?.id ? `Update the details for ${"\'\'\'"
+                            + dialogState.size.name +
+                            "\'\'\'"}.` : 'Enter the details for the new size.'}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">

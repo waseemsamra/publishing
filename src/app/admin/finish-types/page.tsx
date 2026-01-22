@@ -201,7 +201,9 @@ export default function FinishTypesPage() {
                     <DialogHeader>
                         <DialogTitle>{dialogState.finishType?.id ? 'Edit Finish Type' : 'Add New Finish Type'}</DialogTitle>
                         <DialogDescription>
-                            {dialogState.finishType?.id ? `Update the details for ${dialogState.finishType.name}.` : 'Enter the details for the new finish type.'}
+                            {dialogState.finishType?.id ? `Update the details for ${"\'\'\'"
+                            + dialogState.finishType.name +
+                            "\'\'\'"}.` : 'Enter the details for the new finish type.'}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">

@@ -123,7 +123,7 @@ export function AdminSidebar() {
             </SidebarMenuItem>
          </SidebarMenu>
          <SidebarSeparator />
-         <div className="flex items-center gap-3 p-2">
+         <Link href="/admin/profile" className="flex items-center gap-3 p-2 rounded-md hover:bg-muted">
             <Avatar className="h-9 w-9">
               <AvatarImage src={user?.photoURL || undefined} alt={user?.displayName || 'User'} />
               <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
@@ -132,7 +132,7 @@ export function AdminSidebar() {
                 <p className="font-medium text-sm truncate">{user?.displayName}</p>
                 <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
             </div>
-         </div>
+         </Link>
       </SidebarFooter>
     </Sidebar>
   );

@@ -20,12 +20,12 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
     }
 
     if (!user) {
-      router.push('/login'); // Redirect to login if not authenticated
+      router.push('/admin/login'); // Redirect to admin login if not authenticated
       return;
     }
 
     if (requiredRole && user.role !== requiredRole) {
-      router.push('/'); // Redirect to home if role doesn't match
+      router.push('/admin/login'); // Redirect to admin login if role doesn't match
     }
   }, [user, loading, router, requiredRole]);
 

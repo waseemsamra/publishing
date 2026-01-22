@@ -107,17 +107,82 @@ export function ProductForm({ product }: { product?: Product }) {
     }, {} as Record<(typeof optionCollections)[number]['name'], ReturnType<typeof collection>>);
   }, [db]);
   
-  const categoriesQuery = useMemo(() => collections.categories ? query(collections.categories) : null, [collections.categories]);
-  const sizesQuery = useMemo(() => collections.sizes ? query(collections.sizes) : null, [collections.sizes]);
-  const coloursQuery = useMemo(() => collections.colours ? query(collections.colours) : null, [collections.colours]);
-  const printOptionsQuery = useMemo(() => collections.printOptions ? query(collections.printOptions) : null, [collections.printOptions]);
-  const wallTypesQuery = useMemo(() => collections.wallTypes ? query(collections.wallTypes) : null, [collections.wallTypes]);
-  const thicknessesQuery = useMemo(() => collections.thicknesses ? query(collections.thicknesses) : null, [collections.thicknesses]);
-  const materialTypesQuery = useMemo(() => collections.materialTypes ? query(collections.materialTypes) : null, [collections.materialTypes]);
-  const finishTypesQuery = useMemo(() => collections.finishTypes ? query(collections.finishTypes) : null, [collections.finishTypes]);
-  const adhesivesQuery = useMemo(() => collections.adhesives ? query(collections.adhesives) : null, [collections.adhesives]);
-  const handlesQuery = useMemo(() => collections.handles ? query(collections.handles) : null, [collections.handles]);
-  const shapesQuery = useMemo(() => collections.shapes ? query(collections.shapes) : null, [collections.shapes]);
+  const categoriesQuery = useMemo(() => {
+    if(!collections.categories) return null;
+    const q = query(collections.categories);
+    (q as any).__memo = true;
+    return q;
+  }, [collections.categories]);
+
+  const sizesQuery = useMemo(() => {
+    if(!collections.sizes) return null;
+    const q = query(collections.sizes);
+    (q as any).__memo = true;
+    return q;
+  }, [collections.sizes]);
+
+  const coloursQuery = useMemo(() => {
+    if(!collections.colours) return null;
+    const q = query(collections.colours);
+    (q as any).__memo = true;
+    return q;
+  }, [collections.colours]);
+
+  const printOptionsQuery = useMemo(() => {
+    if(!collections.printOptions) return null;
+    const q = query(collections.printOptions);
+    (q as any).__memo = true;
+    return q;
+  }, [collections.printOptions]);
+  
+  const wallTypesQuery = useMemo(() => {
+    if(!collections.wallTypes) return null;
+    const q = query(collections.wallTypes);
+    (q as any).__memo = true;
+    return q;
+  }, [collections.wallTypes]);
+  
+  const thicknessesQuery = useMemo(() => {
+    if(!collections.thicknesses) return null;
+    const q = query(collections.thicknesses);
+    (q as any).__memo = true;
+    return q;
+  }, [collections.thicknesses]);
+
+  const materialTypesQuery = useMemo(() => {
+    if(!collections.materialTypes) return null;
+    const q = query(collections.materialTypes);
+    (q as any).__memo = true;
+    return q;
+  }, [collections.materialTypes]);
+  
+  const finishTypesQuery = useMemo(() => {
+    if(!collections.finishTypes) return null;
+    const q = query(collections.finishTypes);
+    (q as any).__memo = true;
+    return q;
+  }, [collections.finishTypes]);
+
+  const adhesivesQuery = useMemo(() => {
+    if(!collections.adhesives) return null;
+    const q = query(collections.adhesives);
+    (q as any).__memo = true;
+    return q;
+  }, [collections.adhesives]);
+
+  const handlesQuery = useMemo(() => {
+    if(!collections.handles) return null;
+    const q = query(collections.handles);
+    (q as any).__memo = true;
+    return q;
+  }, [collections.handles]);
+
+  const shapesQuery = useMemo(() => {
+    if(!collections.shapes) return null;
+    const q = query(collections.shapes);
+    (q as any).__memo = true;
+    return q;
+  }, [collections.shapes]);
 
   const { data: categories } = useCollection<Category>(categoriesQuery);
   const { data: sizes } = useCollection<Size>(sizesQuery);

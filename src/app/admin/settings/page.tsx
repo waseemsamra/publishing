@@ -6,9 +6,15 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote, Hand, Circle, Disc3 } from 'lucide-react';
+import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote, Hand, Circle, Disc3, Building2 } from 'lucide-react';
 
 const settingsLinks = [
+    {
+        href: "/admin/vendors",
+        title: "Vendors",
+        description: "Manage product vendors or brands.",
+        icon: Building2,
+    },
     {
         href: "/admin/sizes",
         title: "Sizes",
@@ -129,5 +135,7 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+
+    
 
     

@@ -7,7 +7,7 @@ import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 import { doc, addDoc, updateDoc, collection, serverTimestamp, query } from 'firebase/firestore';
 import { useFirestore } from '@/firebase/provider';
-import type { Product, Category, Size, Colour, PrintOption, WallType, Thickness, MaterialType, FinishType, Adhesive, Handle, Shape, Lid } from '@/lib/types';
+import type { Product, Category, Size, Colour, PrintOption, WallType, Thickness, MaterialType, FinishType, Adhesive, Handle, Shape, Lid, Vendor } from '@/lib/types';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -209,6 +209,13 @@ export function ProductForm({ product }: { product?: Product }) {
     return q;
   }, [collections.lids]);
 
+  const vendorsQuery = useMemo(() => {
+    if (!db) return null;
+    const q = query(collection(db, 'vendors'));
+    (q as any).__memo = true;
+    return q;
+  }, [db]);
+
   const { data: categories } = useCollection<Category>(categoriesQuery);
   const { data: sizes } = useCollection<Size>(sizesQuery);
   const { data: colours } = useCollection<Colour>(coloursQuery);
@@ -221,6 +228,7 @@ export function ProductForm({ product }: { product?: Product }) {
   const { data: handles } = useCollection<Handle>(handlesQuery);
   const { data: shapes } = useCollection<Shape>(shapesQuery);
   const { data: lids } = useCollection<Lid>(lidsQuery);
+  const { data: vendors } = useCollection<Vendor>(vendorsQuery);
 
   const optionData = {
     categories: categories || [],
@@ -370,9 +378,31 @@ export function ProductForm({ product }: { product?: Product }) {
                         <CardDescription>Categorize and identify your product.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                         <FormField control={form.control} name="vendor" render={({ field }) => (
-                            <FormItem><FormLabel>Vendor</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-                        )} />
+                        <FormField
+                            control={form.control}
+                            name="vendor"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Vendor</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value || ''}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a vendor" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    <SelectItem value="">None</SelectItem>
+                                    {vendors?.map((vendor) => (
+                                        <SelectItem key={vendor.id} value={vendor.name}>
+                                        {vendor.name}
+                                        </SelectItem>
+                                    ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                          <FormField control={form.control} name="sku" render={({ field }) => (
                             <FormItem><FormLabel>SKU</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
@@ -443,6 +473,8 @@ export function ProductForm({ product }: { product?: Product }) {
     </Form>
   );
 }
+
+    
 
     
 

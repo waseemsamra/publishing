@@ -205,12 +205,21 @@ export interface TrendingItem {
   createdAt?: any;
   updatedAt?: any;
 }
+
+export interface Vendor {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt?: any;
+}
     
 
     
 
     
 
+
+    
 
     
 

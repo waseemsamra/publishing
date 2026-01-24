@@ -818,6 +818,30 @@
         "lastName"
       ]
     },
+    "Vendor": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Vendor",
+      "type": "object",
+      "description": "Represents a product vendor or brand.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the vendor."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the vendor."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the vendor."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
     "WallType": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "WallType",
@@ -1136,6 +1160,22 @@
         }
       },
       {
+        "path": "/vendors/{vendorId}",
+        "definition": {
+          "entityName": "Vendor",
+          "schema": {
+            "$ref": "#/backend/entities/Vendor"
+          },
+          "description": "Stores available product vendors. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "vendorId",
+              "description": "The unique identifier for the vendor."
+            }
+          ]
+        }
+      },
+      {
         "path": "/users/{userId}/shoppingCarts/{shoppingCartId}",
         "definition": {
           "entityName": "ShoppingCart",
@@ -1269,6 +1309,8 @@
 }
     
     
+    
+
     
 
     

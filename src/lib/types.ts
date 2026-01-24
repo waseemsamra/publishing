@@ -184,13 +184,9 @@ export interface HeroSlide {
 
 export interface HeroBox {
   id: string;
-  title: string;
-  link: string;
-  imageUrl: string;
-  imageHint?: string;
+  categoryId: string;
   order: number;
   isFeatured?: boolean;
-  categoryId?: string;
   createdAt?: any;
   updatedAt?: any;
 }

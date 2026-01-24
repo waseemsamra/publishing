@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirestore } from '@/firebase/provider';
-import { collection, query, orderBy } from 'firebase/firestore';
-import type { HeroBox } from '@/lib/types';
+import { collection, query, orderBy, where, documentId } from 'firebase/firestore';
+import type { HeroBox, Category } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 import {
   Carousel,
@@ -18,9 +18,11 @@ import {
 } from '@/components/ui/carousel';
 import { Button } from '@/components/ui/button';
 
+type MergedHeroItem = HeroBox & Partial<Category>;
+
 export function InteractiveHero() {
   const db = useFirestore();
-  const [activeHoverItem, setActiveHoverItem] = useState<HeroBox | null>(null);
+  const [activeHoverItem, setActiveHoverItem] = useState<MergedHeroItem | null>(null);
 
   const heroBoxesQuery = useMemo(() => {
     if (!db) return null;
@@ -29,29 +31,55 @@ export function InteractiveHero() {
     return q;
   }, [db]);
 
-  const { data: allItems, isLoading } = useCollection<HeroBox>(heroBoxesQuery);
+  const { data: heroBoxes, isLoading: isLoadingBoxes } = useCollection<HeroBox>(heroBoxesQuery);
 
+  const categoryIds = useMemo(() => {
+    if (!heroBoxes) return [];
+    return heroBoxes.map(box => box.categoryId).filter(id => id);
+  }, [heroBoxes]);
+
+  const categoriesQuery = useMemo(() => {
+    if (!db || categoryIds.length === 0) return null;
+    const q = query(collection(db, 'categories'), where(documentId(), 'in', categoryIds));
+    (q as any).__memo = true;
+    return q;
+  }, [db, categoryIds]);
+
+  const { data: categories, isLoading: isLoadingCategories } = useCollection<Category>(categoriesQuery);
+
+  const categoryMap = useMemo(() => {
+    if (!categories) return new Map();
+    return new Map(categories.map(c => [c.id, c]));
+  }, [categories]);
+
+  const mergedItems: MergedHeroItem[] = useMemo(() => {
+    if (!heroBoxes || !categories) return [];
+    return heroBoxes
+      .map(box => {
+        const category = categoryMap.get(box.categoryId);
+        if (!category) return null;
+        return { ...box, ...category };
+      })
+      .filter((item): item is MergedHeroItem => item !== null);
+  }, [heroBoxes, categories, categoryMap]);
+  
   const { featuredItem, gridItems } = useMemo(() => {
-    if (!allItems || allItems.length === 0) {
+    if (mergedItems.length === 0) {
         return { featuredItem: null, gridItems: [] };
     }
-
-    const initialFeaturedItem = allItems.find(item => item.isFeatured) || allItems[0] || null;
-    const gridItems = allItems.filter(item => item.id !== initialFeaturedItem?.id).slice(0, 16);
-    
-    return {
-      featuredItem: initialFeaturedItem,
-      gridItems: gridItems,
-    };
-  }, [allItems]);
+    const initialFeaturedItem = mergedItems.find(item => item.isFeatured) || mergedItems[0] || null;
+    const gridItems = mergedItems.filter(item => item.id !== initialFeaturedItem?.id).slice(0, 16);
+    return { featuredItem: initialFeaturedItem, gridItems: gridItems };
+  }, [mergedItems]);
   
   const displayItem = activeHoverItem || featuredItem;
+  const isLoading = isLoadingBoxes || (categoryIds.length > 0 && isLoadingCategories);
 
-  const handleItemHover = (item: HeroBox) => {
+  const handleItemHover = (item: MergedHeroItem) => {
     setActiveHoverItem(item);
   };
   
-  const handleItemTap = (item: HeroBox) => {
+  const handleItemTap = (item: MergedHeroItem) => {
     setActiveHoverItem(item);
   };
 
@@ -91,7 +119,7 @@ export function InteractiveHero() {
           {displayItem.imageUrl && (
             <Image
               src={displayItem.imageUrl}
-              alt={displayItem.title}
+              alt={displayItem.name || 'Hero Item'}
               fill
               className="object-cover -z-10 transition-all duration-500 ease-in-out"
               key={displayItem.id}
@@ -105,10 +133,10 @@ export function InteractiveHero() {
           <div className="relative z-10">
             <p className="text-white/80">Infylux Customized Packaging</p>
             <h2 className="font-headline text-5xl font-bold text-white mt-2">
-              {displayItem.title}
+              {displayItem.name}
             </h2>
             <Button asChild className="mt-4">
-              <Link href={displayItem.link || '#'}>
+              <Link href={displayItem.slug ? `/categories/${displayItem.slug}` : '#'}>
                 Shop Now
               </Link>
             </Button>
@@ -121,7 +149,7 @@ export function InteractiveHero() {
           <div className="hidden lg:grid grid-cols-4 grid-rows-4 w-full h-full gap-px">
             {gridItems.map((item) => (
               <Link
-                href={item.link || '#'}
+                href={item.slug ? `/categories/${item.slug}` : '#'}
                 key={item.id}
                 onMouseEnter={() => handleItemHover(item)}
                 className={cn(
@@ -132,7 +160,7 @@ export function InteractiveHero() {
                 {item.imageUrl && (
                   <Image
                     src={item.imageUrl}
-                    alt={item.title}
+                    alt={item.name || 'Hero item'}
                     fill
                     className="object-cover -z-10 group-hover:scale-105 transition-transform duration-300"
                     data-ai-hint={item.imageHint}
@@ -144,7 +172,7 @@ export function InteractiveHero() {
                     'absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-colors -z-10'
                   )}
                 ></div>
-                <h3 className="font-semibold text-lg">{item.title}</h3>
+                <h3 className="font-semibold text-lg">{item.name}</h3>
               </Link>
             ))}
           </div>
@@ -158,7 +186,7 @@ export function InteractiveHero() {
               className="w-full"
             >
               <CarouselContent>
-                {allItems && allItems.map((item: HeroBox) => (
+                {mergedItems && mergedItems.map((item: MergedHeroItem) => (
                   <CarouselItem key={item.id} className="basis-1/2 sm:basis-1/3">
                     <div
                       role="button"
@@ -173,7 +201,7 @@ export function InteractiveHero() {
                       {item.imageUrl && (
                         <Image
                           src={item.imageUrl}
-                          alt={item.title}
+                          alt={item.name || 'Hero item'}
                           fill
                           className="object-cover -z-10 group-hover:scale-105 transition-transform duration-300"
                           data-ai-hint={item.imageHint}
@@ -185,7 +213,7 @@ export function InteractiveHero() {
                           'absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-colors -z-10'
                         )}
                       ></div>
-                      <h3 className="font-semibold text-lg">{item.title}</h3>
+                      <h3 className="font-semibold text-lg">{item.name}</h3>
                     </div>
                   </CarouselItem>
                 ))}

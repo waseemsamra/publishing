@@ -3,10 +3,13 @@ import type { ImagePlaceholder } from './placeholder-images';
 export interface Product {
   id: string;
   name: string;
-  price: number;
+  price?: number;
   salePrice?: number;
-  pricingUnit?: 'unit' | 'box';
-  boxQuantity?: number;
+  pricingUnitId?: string;
+  packPrices?: {
+    packSizeId: string;
+    price: number;
+  }[];
   vendor?: string;
   sku?: string;
   stock?: number;
@@ -15,7 +18,7 @@ export interface Product {
   images?: ImagePlaceholder[];
   materials: string[];
   certifications: string[];
-  sustainabilityImpact: string;
+  sustainabilityImpact?: string;
   
   // Option relationships
   categoryIds?: string[];

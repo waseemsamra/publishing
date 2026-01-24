@@ -434,29 +434,20 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "PackSize",
       "type": "object",
-      "description": "Represents a pricing tier based on quantity for bulk purchases.",
+      "description": "Represents a predefined packaging quantity for a product (e.g., a pack of 50).",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the pricing tier."
+          "description": "Unique identifier for the pack size."
         },
         "quantity": {
           "type": "number",
-          "description": "The minimum quantity for this tier."
-        },
-        "pricePerUnit": {
-          "type": "number",
-          "description": "The price per unit for this tier."
-        },
-        "save": {
-          "type": "number",
-          "description": "The percentage saved compared to the base tier."
+          "description": "The number of units in the pack."
         }
       },
       "required": [
         "id",
-        "quantity",
-        "pricePerUnit"
+        "quantity"
       ]
     },
     "PrintOption": {
@@ -501,22 +492,36 @@
           "type": "string",
           "description": "Detailed description of the product."
         },
+        "pricingUnitId": {
+          "type": "string",
+          "description": "Reference to the Unit entity that defines how this product is priced (e.g., per piece, per pack)."
+        },
         "price": {
           "type": "number",
-          "description": "Price of the product. This can be per unit or per box, depending on pricingUnit."
+          "description": "Base price of the product, typically used when pricing per unit."
         },
         "salePrice": {
           "type": "number",
-          "description": "The discounted price of the product."
+          "description": "The discounted price of the product, typically used when pricing per unit."
         },
-        "pricingUnit": {
-          "type": "string",
-          "description": "The unit of pricing for the product.",
-          "enum": ["unit", "box"]
-        },
-        "boxQuantity": {
-          "type": "number",
-          "description": "Number of units in a box, if pricing is per box."
+        "packPrices": {
+          "type": "array",
+          "description": "An array of price points for different pack sizes, used when pricingUnit is 'pack'.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "packSizeId": {
+                "type": "string"
+              },
+              "price": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "packSizeId",
+              "price"
+            ]
+          }
         },
         "vendor": {
           "type": "string",
@@ -540,23 +545,39 @@
           "items": {
             "type": "object",
             "properties": {
-              "id": { "type": "string" },
-              "description": { "type": "string" },
-              "imageUrl": { "type": "string", "format": "uri" },
-              "imageHint": { "type": "string" }
+              "id": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "imageUrl": {
+                "type": "string",
+                "format": "uri"
+              },
+              "imageHint": {
+                "type": "string"
+              }
             },
-            "required": ["id", "imageUrl"]
+            "required": [
+              "id",
+              "imageUrl"
+            ]
           }
         },
         "materials": {
           "type": "array",
           "description": "Materials used to manufacture the product.",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "certifications": {
           "type": "array",
           "description": "Certifications held by the product (e.g., Fair Trade, Organic).",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "sustainabilityImpact": {
           "type": "string",
@@ -565,57 +586,79 @@
         "categoryIds": {
           "type": "array",
           "description": "References to Categories. (Relationship: Product N:N Category)",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "sizeIds": {
           "type": "array",
           "description": "References to Sizes.",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "colourIds": {
           "type": "array",
           "description": "References to Colours.",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "printOptionIds": {
           "type": "array",
           "description": "References to Print Options.",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "wallTypeIds": {
           "type": "array",
           "description": "References to Wall Types.",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "thicknessIds": {
           "type": "array",
           "description": "References to Thicknesses.",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "materialTypeIds": {
           "type": "array",
           "description": "References to Material Types.",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "finishTypeIds": {
           "type": "array",
           "description": "References to Finish Types.",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "adhesiveIds": {
           "type": "array",
           "description": "References to Adhesives.",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "handleIds": {
           "type": "array",
           "description": "References to Handles.",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "shapeIds": {
           "type": "array",
           "description": "References to Shapes.",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "lidIds": {
           "type": "array",
@@ -635,8 +678,7 @@
       "required": [
         "id",
         "name",
-        "description",
-        "price"
+        "description"
       ]
     },
     "ShippingAddress": {
@@ -817,6 +859,30 @@
         "description": {
           "type": "string",
           "description": "Description of the thickness."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "Unit": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Unit",
+      "type": "object",
+      "description": "Represents a unit of measurement for a product (e.g., unit, pack, roll, sheet).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the unit."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the unit (e.g., Pack)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the unit."
         }
       },
       "required": [
@@ -1221,13 +1287,29 @@
         }
       },
       {
+        "path": "/units/{unitId}",
+        "definition": {
+          "entityName": "Unit",
+          "schema": {
+            "$ref": "#/backend/entities/Unit"
+          },
+          "description": "Stores available product units of measurement. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "unitId",
+              "description": "The unique identifier for the unit."
+            }
+          ]
+        }
+      },
+      {
         "path": "/packSizes/{packSizeId}",
         "definition": {
           "entityName": "PackSize",
           "schema": {
             "$ref": "#/backend/entities/PackSize"
           },
-          "description": "Stores pricing tiers for bulk purchases. Publicly readable, write access restricted to administrators.",
+          "description": "Stores predefined packaging quantities. Write access is restricted to administrators.",
           "params": [
             {
               "name": "packSizeId",

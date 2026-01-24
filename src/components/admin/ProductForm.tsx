@@ -7,7 +7,7 @@ import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 import { doc, addDoc, updateDoc, collection, serverTimestamp, query } from 'firebase/firestore';
 import { useFirestore } from '@/firebase/provider';
-import type { Product, Category, Size, Colour, PrintOption, WallType, Thickness, MaterialType, FinishType, Adhesive, Handle, Shape, Lid, Vendor, PackSize } from '@/lib/types';
+import type { Product, Category, Size, Colour, PrintOption, WallType, Thickness, MaterialType, FinishType, Adhesive, Handle, Shape, Lid, Vendor, PackSize, Unit } from '@/lib/types';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -29,13 +29,18 @@ const imageSchema = z.object({
   description: z.string().optional(),
 });
 
+const packPriceSchema = z.object({
+    packSizeId: z.string(),
+    price: z.coerce.number().min(0, "Price must be non-negative."),
+});
+
 const productSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
   description: z.string().min(1, 'Description is required'),
-  price: z.coerce.number().min(0, 'Price must be a positive number'),
+  pricingUnitId: z.string().optional(),
+  price: z.coerce.number().min(0, 'Price must be a positive number').optional(),
   salePrice: z.coerce.number().min(0, 'Sale price must be positive').optional(),
-  pricingUnit: z.enum(['unit', 'box']).default('unit'),
-  boxQuantity: z.coerce.number().optional(),
+  packPrices: z.array(packPriceSchema).optional(),
   vendor: z.string().optional(),
   sku: z.string().optional(),
   stock: z.coerce.number().optional(),
@@ -57,18 +62,7 @@ const productSchema = z.object({
   lidIds: z.array(z.string()).optional(),
   packSizeIds: z.array(z.string()).optional(),
   images: z.array(imageSchema).optional(),
-}).refine(
-    (data) => {
-      if (data.pricingUnit === 'box') {
-        return data.boxQuantity !== undefined && data.boxQuantity > 0;
-      }
-      return true;
-    },
-    {
-      message: "Units per box is required when pricing per box.",
-      path: ["boxQuantity"],
-    }
-  );
+});
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
@@ -86,9 +80,10 @@ const optionCollections = [
   { name: 'shapes', field: 'shapeIds' },
   { name: 'lids', field: 'lidIds' },
   { name: 'packSizes', field: 'packSizeIds' },
+  { name: 'units', field: 'pricingUnitId' },
 ] as const;
 
-type OptionType = Category | Size | Colour | PrintOption | WallType | Thickness | MaterialType | FinishType | Adhesive | Handle | Shape | Lid | PackSize;
+type OptionType = Category | Size | Colour | PrintOption | WallType | Thickness | MaterialType | FinishType | Adhesive | Handle | Shape | Lid | PackSize | Unit;
 
 export function ProductForm({ product }: { product?: Product }) {
   const { toast } = useToast();
@@ -104,13 +99,13 @@ export function ProductForm({ product }: { product?: Product }) {
           ...product,
           price: product.price || 0,
           salePrice: product.salePrice ?? undefined,
-          boxQuantity: product.boxQuantity ?? undefined,
           vendor: product.vendor ?? '',
           sku: product.sku ?? '',
           stock: product.stock ?? undefined,
           productType: product.productType ?? '',
           sustainabilityImpact: product.sustainabilityImpact ?? '',
           categoryIds: product.categoryIds ?? [],
+          packPrices: product.packPrices ?? [],
           images: product.images?.map(img => ({
             id: img.id,
             imageUrl: img.imageUrl.replace(s3BaseUrl, ''),
@@ -122,8 +117,6 @@ export function ProductForm({ product }: { product?: Product }) {
           name: '',
           description: '',
           price: 0,
-          pricingUnit: 'unit',
-          boxQuantity: 1,
           vendor: '',
           sku: '',
           productType: '',
@@ -142,6 +135,7 @@ export function ProductForm({ product }: { product?: Product }) {
           shapeIds: [],
           lidIds: [],
           packSizeIds: [],
+          packPrices: [],
           materials: [],
           certifications: [],
         },
@@ -151,9 +145,12 @@ export function ProductForm({ product }: { product?: Product }) {
     control: form.control,
     name: 'images',
   });
-  
-  const pricingUnit = form.watch('pricingUnit');
 
+  const { fields: packPriceFields, append: appendPackPrice, remove: removePackPrice } = useFieldArray({
+      control: form.control,
+      name: "packPrices"
+  });
+  
   const collections = useMemo(() => {
     if (!db) return {};
     return optionCollections.reduce((acc, { name }) => {
@@ -259,6 +256,13 @@ export function ProductForm({ product }: { product?: Product }) {
     (q as any).__memo = true;
     return q;
   }, [db]);
+  
+  const unitsQuery = useMemo(() => {
+      if(!collections.units) return null;
+      const q = query(collections.units);
+      (q as any).__memo = true;
+      return q;
+  }, [collections.units]);
 
   const { data: categories } = useCollection<Category>(categoriesQuery);
   const { data: sizes } = useCollection<Size>(sizesQuery);
@@ -274,24 +278,63 @@ export function ProductForm({ product }: { product?: Product }) {
   const { data: lids } = useCollection<Lid>(lidsQuery);
   const { data: packSizes } = useCollection<PackSize>(packSizesQuery);
   const { data: vendors } = useCollection<Vendor>(vendorsQuery);
+  const { data: units } = useCollection<Unit>(unitsQuery);
 
-  const selectedCategoryIds = form.watch("categoryIds");
+  const selectedCategoryIds = form.watch("categoryIds") || [];
 
   const productTypeOptions = useMemo(() => {
-    if (!categories || !selectedCategoryIds) {
+    if (!categories) {
       return [];
     }
-    return categories.filter(category => selectedCategoryIds.includes(category.id));
+    const selectedCategoryNames = categories
+      .filter(category => selectedCategoryIds.includes(category.id))
+      .map(c => c.name);
+
+    return selectedCategoryNames;
   }, [categories, selectedCategoryIds]);
   
   const productType = form.watch('productType');
+  const pricingUnitId = form.watch('pricingUnitId');
+  const selectedPackSizeIds = form.watch('packSizeIds', []);
+
+  const isPackPricing = useMemo(() => {
+      if (!units || !pricingUnitId) return false;
+      const selectedUnit = units.find(u => u.id === pricingUnitId);
+      return selectedUnit?.name.toLowerCase() === 'pack';
+  }, [units, pricingUnitId]);
 
   useEffect(() => {
-    // If the currently selected productType is no longer in the list of valid options, clear it.
-    if (productType && !productTypeOptions.some(opt => opt.name === productType)) {
+    if (productType && !productTypeOptions.includes(productType)) {
         form.setValue('productType', '', { shouldDirty: true });
     }
   }, [productType, productTypeOptions, form]);
+
+  useEffect(() => {
+    if (!isPackPricing) {
+        form.setValue('packPrices', []);
+    } else {
+        const currentPackPriceIds = packPriceFields.map(f => f.packSizeId);
+        
+        // Add new ones
+        selectedPackSizeIds.forEach(id => {
+            if (!currentPackPriceIds.includes(id)) {
+                appendPackPrice({ packSizeId: id, price: 0 });
+            }
+        });
+
+        // Remove old ones
+        const packPriceIdsToRemove: number[] = [];
+        packPriceFields.forEach((field, index) => {
+            if (!selectedPackSizeIds.includes(field.packSizeId)) {
+                packPriceIdsToRemove.push(index);
+            }
+        });
+        // remove in reverse order to avoid index shifting issues
+        for (let i = packPriceIdsToRemove.length - 1; i >= 0; i--) {
+            removePackPrice(packPriceIdsToRemove[i]);
+        }
+    }
+}, [isPackPricing, selectedPackSizeIds, packPriceFields, appendPackPrice, removePackPrice, form]);
 
   const optionData = {
     categories: categories || [],
@@ -307,6 +350,7 @@ export function ProductForm({ product }: { product?: Product }) {
     shapes: shapes || [],
     lids: lids || [],
     packSizes: packSizes || [],
+    units: units || [],
   };
 
   const handleImageChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
@@ -348,6 +392,7 @@ export function ProductForm({ product }: { product?: Product }) {
         
         const dataToSave = {
             ...data,
+            price: data.price ?? 0,
             images: data.images?.map((img, index) => ({...img, imageUrl: uploadedImageUrls[index] })),
             updatedAt: serverTimestamp(),
         };
@@ -385,54 +430,109 @@ export function ProductForm({ product }: { product?: Product }) {
                 <Card>
                     <CardHeader>
                         <CardTitle>Basic Information</CardTitle>
-                        <CardDescription>Set the name, description, and price for your product.</CardDescription>
+                        <CardDescription>Set the name, description, and pricing for your product.</CardDescription>
                     </CardHeader>
-                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <CardContent className="space-y-4">
                         <FormField control={form.control} name="name" render={({ field }) => (
-                            <FormItem className="md:col-span-2"><FormLabel>Product Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Product Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="description" render={({ field }) => (
-                            <FormItem className="md:col-span-2"><FormLabel>Description</FormLabel><FormControl><Textarea {...field} rows={5} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} rows={5} /></FormControl><FormMessage /></FormItem>
                         )} />
-                        <FormField control={form.control} name="price" render={({ field }) => (
-                            <FormItem><FormLabel>Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
-                        )} />
-                        <FormField control={form.control} name="salePrice" render={({ field }) => (
-                            <FormItem><FormLabel>Sale Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
-                        )} />
-                        <FormField
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                          <FormField
                             control={form.control}
-                            name="pricingUnit"
+                            name="pricingUnitId"
                             render={({ field }) => (
                                 <FormItem>
                                 <FormLabel>Pricing Unit</FormLabel>
-                                <Select onValueChange={field.onChange} value={field.value || 'unit'}>
+                                <Select onValueChange={field.onChange} value={field.value || ''}>
                                     <FormControl>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select a pricing unit" />
                                     </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                    <SelectItem value="unit">Per Unit</SelectItem>
-                                    <SelectItem value="box">Per Box</SelectItem>
+                                    {optionData.units.map((unit) => (
+                                        <SelectItem key={unit.id} value={unit.id}>
+                                        {unit.name}
+                                        </SelectItem>
+                                    ))}
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
                                 </FormItem>
                             )}
-                        />
-                        {pricingUnit === 'box' && (
+                          />
+                        </div>
+
+                        {!isPackPricing ? (
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <FormField control={form.control} name="price" render={({ field }) => (
+                                  <FormItem><FormLabel>Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                              )} />
+                              <FormField control={form.control} name="salePrice" render={({ field }) => (
+                                  <FormItem><FormLabel>Sale Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                              )} />
+                           </div>
+                        ) : (
+                          <div className="space-y-4">
                             <FormField
+                                key="packSizeIds"
                                 control={form.control}
-                                name="boxQuantity"
+                                name="packSizeIds"
                                 render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Units per Box</FormLabel>
-                                        <FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
+                                  <FormItem>
+                                    <FormLabel>Available Pack Sizes</FormLabel>
+                                    <div className="space-y-2 max-h-40 overflow-y-auto border p-2 rounded-md">
+                                      {optionData.packSizes.map((item: PackSize) => (
+                                        <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
+                                          <FormControl>
+                                            <Checkbox
+                                              checked={field.value?.includes(item.id)}
+                                              onCheckedChange={(checked) => {
+                                                const newValue = checked
+                                                  ? [...(field.value || []), item.id]
+                                                  : (field.value || []).filter((v) => v !== item.id);
+                                                field.onChange(newValue);
+                                              }}
+                                            />
+                                          </FormControl>
+                                          <FormLabel className="font-normal">{item.quantity}</FormLabel>
+                                        </FormItem>
+                                      ))}
+                                    </div>
+                                  </FormItem>
                                 )}
-                            />
+                              />
+
+                              {selectedPackSizeIds.length > 0 && (
+                                  <Card className="bg-muted/50">
+                                    <CardHeader><CardTitle className="text-base">Pack Prices</CardTitle></CardHeader>
+                                    <CardContent className="space-y-4">
+                                      {packPriceFields.map((field, index) => {
+                                        const packSize = optionData.packSizes.find(p => p.id === field.packSizeId);
+                                        if (!packSize) return null;
+                                        return (
+                                          <FormField
+                                            control={form.control}
+                                            key={field.id}
+                                            name={`packPrices.${index}.price`}
+                                            render={({ field: priceField }) => (
+                                              <FormItem>
+                                                <FormLabel className="font-normal">Price for {packSize.quantity} pack</FormLabel>
+                                                <FormControl><Input type="number" step="0.01" {...priceField} /></FormControl>
+                                                <FormMessage />
+                                              </FormItem>
+                                            )}
+                                          />
+                                        )
+                                      })}
+                                    </CardContent>
+                                  </Card>
+                                )}
+                          </div>
                         )}
                     </CardContent>
                 </Card>
@@ -520,40 +620,6 @@ export function ProductForm({ product }: { product?: Product }) {
                         )} />
                         <FormField
                             control={form.control}
-                            name="productType"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Product Type</FormLabel>
-                                <Select
-                                    onValueChange={field.onChange}
-                                    value={field.value || ''}
-                                    disabled={productTypeOptions.length === 0}
-                                >
-                                    <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select a primary product type" />
-                                    </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                    {productTypeOptions.length > 0 ? (
-                                        productTypeOptions.map((cat) => (
-                                        <SelectItem key={cat.id} value={cat.name}>
-                                            {cat.name}
-                                        </SelectItem>
-                                        ))
-                                    ) : (
-                                        <SelectItem value="none" disabled>
-                                        Select categories first
-                                        </SelectItem>
-                                    )}
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                            />
-                        <FormField
-                            control={form.control}
                             name="categoryIds"
                             render={({ field }) => (
                                 <FormItem>
@@ -579,12 +645,46 @@ export function ProductForm({ product }: { product?: Product }) {
                                 </FormItem>
                             )}
                         />
+                        <FormField
+                            control={form.control}
+                            name="productType"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Product Type</FormLabel>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    value={field.value || ''}
+                                    disabled={productTypeOptions.length === 0}
+                                >
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a primary product type" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    {productTypeOptions.length > 0 ? (
+                                        productTypeOptions.map((catName) => (
+                                        <SelectItem key={catName} value={catName}>
+                                            {catName}
+                                        </SelectItem>
+                                        ))
+                                    ) : (
+                                        <SelectItem value="none" disabled>
+                                        Select categories first
+                                        </SelectItem>
+                                    )}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader><CardTitle>Product Attributes</CardTitle></CardHeader>
                     <CardContent className="space-y-4">
-                        {optionCollections.filter(c => c.name !== 'categories').map(({ name, field }) => (
+                        {optionCollections.filter(c => c.name !== 'categories' && c.name !== 'units' && c.name !== 'packSizes').map(({ name, field }) => (
                             (optionData as any)[name] && (optionData as any)[name].length > 0 && (
                                 <FormField key={name} control={form.control} name={field as any} render={({ field: formField }) => (
                                     <FormItem>

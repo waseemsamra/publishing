@@ -123,9 +123,9 @@
           "type": "string",
           "description": "A hint for AI image generation tools."
         },
-        "order": {
+        "categoryOrder": {
           "type": "number",
-          "description": "The display order of the category."
+          "description": "The display order for this category on a category page. Lower numbers appear first."
         }
       },
       "required": [
@@ -1219,10 +1219,4 @@
   }
 }
     
-
-    
-    
-
-    
-
     

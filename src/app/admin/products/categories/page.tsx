@@ -84,13 +84,13 @@ export default function CategoriesPage() {
     const [parentId, setParentId] = useState<string | undefined>(undefined);
     const [imageUrl, setImageUrl] = useState('');
     const [imageHint, setImageHint] = useState('');
-    const [order, setOrder] = useState(0);
+    const [categoryOrder, setCategoryOrder] = useState(0);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const { loading: authLoading } = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
     const [refreshKey, setRefreshKey] = useState(0);
-    const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'ascending' | 'descending' } | null>({ key: 'order', direction: 'ascending' });
+    const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'ascending' | 'descending' } | null>({ key: 'categoryOrder', direction: 'ascending' });
     const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -145,7 +145,7 @@ export default function CategoriesPage() {
         });
 
         const setDepthAndSort = (cats: (Category & { children: Category[]; depth: number })[], depth: number) => {
-            cats.sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+            cats.sort((a, b) => (a.categoryOrder ?? Infinity) - (b.categoryOrder ?? Infinity));
             for (const category of cats) {
                 category.depth = depth;
                 if (category.children && category.children.length > 0) {
@@ -180,9 +180,9 @@ export default function CategoriesPage() {
         
         if (sortConfig) {
              flattened.sort((a, b) => {
-                if (sortConfig.key === 'order') {
-                    const orderA = a.order ?? Infinity;
-                    const orderB = b.order ?? Infinity;
+                if (sortConfig.key === 'categoryOrder') {
+                    const orderA = a.categoryOrder ?? Infinity;
+                    const orderB = b.categoryOrder ?? Infinity;
                     if (orderA < orderB) return sortConfig.direction === 'ascending' ? -1 : 1;
                     if (orderA > orderB) return sortConfig.direction === 'ascending' ? 1 : -1;
                 }
@@ -191,7 +191,7 @@ export default function CategoriesPage() {
                     const parentB = b.parentId ? categoryMap.get(b.parentId) || '' : '';
                     if (parentA < parentB) return sortConfig.direction === 'ascending' ? -1 : 1;
                     if (parentA > parentB) return sortConfig.direction === 'ascending' ? 1 : -1;
-                    return (a.order ?? Infinity) - (b.order ?? Infinity);
+                    return (a.categoryOrder ?? Infinity) - (b.categoryOrder ?? Infinity);
                 }
                 return 0;
             });
@@ -219,7 +219,7 @@ export default function CategoriesPage() {
         });
 
         const sortChildren = (cats: (Category & { children: Category[] })[]) => {
-            cats.sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+            cats.sort((a, b) => (a.categoryOrder ?? Infinity) - (b.categoryOrder ?? Infinity));
             cats.forEach(c => sortChildren(c.children));
         };
         sortChildren(topLevelCategories);
@@ -270,7 +270,7 @@ export default function CategoriesPage() {
             setParentId(dialogState.category.parentId);
             setImageUrl(dialogState.category.imageUrl?.replace(s3BaseUrl, '') || '');
             setImageHint(dialogState.category.imageHint || '');
-            setOrder(dialogState.category.order ?? (categories?.length || 0));
+            setCategoryOrder(dialogState.category.categoryOrder ?? (categories?.length || 0));
             setImageFile(null);
         }
     }, [dialogState.open, dialogState.category, categories]);
@@ -338,7 +338,7 @@ export default function CategoriesPage() {
                 parentId: parentId || null,
                 imageUrl: finalImageUrl,
                 imageHint,
-                order,
+                categoryOrder,
                 updatedAt: serverTimestamp(),
             };
 
@@ -402,7 +402,7 @@ export default function CategoriesPage() {
             setParentId(undefined);
             setImageUrl('');
             setImageHint('');
-            setOrder(0);
+            setCategoryOrder(0);
             setImageFile(null);
         } else {
             setDialogState(prev => ({ ...prev, open }));
@@ -451,7 +451,7 @@ export default function CategoriesPage() {
                             Delete ({selectedCategoryIds.length})
                         </Button>
                     ) : (
-                        <Button onClick={() => setDialogState({ open: true, category: { order: categories?.length || 0 } })}>
+                        <Button onClick={() => setDialogState({ open: true, category: { categoryOrder: categories?.length || 0 } })}>
                             <PlusCircle className="mr-2 h-4 w-4" />Add Category
                         </Button>
                     )}
@@ -487,7 +487,7 @@ export default function CategoriesPage() {
                                     />
                                 </TableHead>
                                 <TableHead className="hidden w-[100px] sm:table-cell">Image</TableHead>
-                                {renderSortableHeader('order', 'Order')}
+                                {renderSortableHeader('categoryOrder', 'Order')}
                                 <TableHead>Name</TableHead>
                                 <TableHead>Description</TableHead>
                                 {renderSortableHeader('parentCategory', 'Parent Category')}
@@ -534,7 +534,7 @@ export default function CategoriesPage() {
                                           <div className="h-16 w-16 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">No Image</div>
                                         )}
                                     </TableCell>
-                                    <TableCell>{category.order ?? 0}</TableCell>
+                                    <TableCell>{category.categoryOrder ?? 0}</TableCell>
                                     <TableCell 
                                         className="font-medium" 
                                         style={{ paddingLeft: `${!isParentSortActive && (category as any).depth > 0 && !searchTerm ? 1 + (category as any).depth * 1.5 : 1}rem` }}
@@ -604,8 +604,8 @@ export default function CategoriesPage() {
                             <p className="text-xs text-muted-foreground">The slug is auto-generated from the name and must be unique.</p>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="order">Display Order</Label>
-                            <Input id="order" type="number" value={order} onChange={(e) => setOrder(Number(e.target.value))} />
+                            <Label htmlFor="categoryOrder">Category Order</Label>
+                            <Input id="categoryOrder" type="number" value={categoryOrder} onChange={(e) => setCategoryOrder(Number(e.target.value))} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="description">Description</Label>

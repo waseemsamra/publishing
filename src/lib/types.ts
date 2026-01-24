@@ -165,7 +165,7 @@ export interface Category {
   parentId?: string;
   imageUrl?: string;
   imageHint?: string;
-  order?: number;
+  categoryOrder?: number;
   createdAt?: any;
   slug?: string;
 }

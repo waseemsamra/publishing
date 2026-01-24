@@ -38,10 +38,10 @@ export function InteractiveHero() {
 
     const topLevelCategories = allCategories
       .filter((cat) => !cat.parentId)
-      .sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+      .sort((a, b) => (a.categoryOrder ?? Infinity) - (b.categoryOrder ?? Infinity));
 
-    // Find the item with order: 0 to be the main featured item
-    const initialFeaturedItem = topLevelCategories.find(cat => cat.order === 0) || topLevelCategories[0] || null;
+    // Find the item with categoryOrder: 0 to be the main featured item
+    const initialFeaturedItem = topLevelCategories.find(cat => cat.categoryOrder === 0) || topLevelCategories[0] || null;
 
     // The grid items should be the rest of the categories, excluding the featured one.
     const gridItems = topLevelCategories

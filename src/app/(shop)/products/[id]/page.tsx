@@ -26,8 +26,6 @@ import { useAuth } from '@/context/auth-context';
 import { Separator } from '@/components/ui/separator';
 
 type PricingTier = { qty: number; pricePerUnit: number; save: number; total: number; };
-const defaultTier = { qty: 1000, pricePerUnit: 0.130, save: 0, total: 130.00 };
-
 
 export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
@@ -71,7 +69,7 @@ export default function ProductDetailPage() {
   const [selectedWall, setSelectedWall] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedLid, setSelectedLid] = useState<string | null>('None');
-  const [selectedTier, setSelectedTier] = useState<PricingTier>(defaultTier);
+  const [selectedTier, setSelectedTier] = useState<PricingTier | null>(null);
   const [selectedColour, setSelectedColour] = useState<string | null>(null);
 
   const isLoading = authLoading || isLoadingProduct;
@@ -101,7 +99,7 @@ export default function ProductDetailPage() {
   }
   
   const handleDesignLater = () => {
-    if (product) {
+    if (product && selectedTier) {
         addToCart(product, selectedTier.qty);
     }
   };
@@ -259,13 +257,19 @@ export default function ProductDetailPage() {
 
                 <div className="mt-6 text-right">
                   <p className="text-sm text-muted-foreground">Total (excl. VAT)</p>
-                  <p className="font-headline text-3xl font-bold">DH{selectedTier.total.toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">or financing from DH{(selectedTier.total / 4).toFixed(2)}/Mo.</p>
+                  {selectedTier ? (
+                    <>
+                      <p className="font-headline text-3xl font-bold">DH{selectedTier.total.toFixed(2)}</p>
+                      <p className="text-xs text-muted-foreground">or financing from DH{(selectedTier.total / 4).toFixed(2)}/Mo.</p>
+                    </>
+                  ) : (
+                    <div className="h-12 flex items-center justify-end"><Loader2 className="h-6 w-6 animate-spin" /></div>
+                  )}
                 </div>
 
                 <div className="mt-6 space-y-3">
                   <Button size="lg" className="w-full bg-pink-500 hover:bg-pink-600 text-white">Upload design</Button>
-                  <Button size="lg" variant="outline" className="w-full" onClick={handleDesignLater}>
+                  <Button size="lg" variant="outline" className="w-full" onClick={handleDesignLater} disabled={!selectedTier}>
                     Design later — Add to cart
                   </Button>
                 </div>
@@ -277,5 +281,7 @@ export default function ProductDetailPage() {
     </>
   );
 }
+
+    
 
     

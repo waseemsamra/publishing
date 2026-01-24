@@ -6,7 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote, Hand, Circle, Disc3, Building2 } from 'lucide-react';
+import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote, Hand, Circle, Disc3, Building2, TrendingUp } from 'lucide-react';
 
 const settingsLinks = [
     {
@@ -82,6 +82,12 @@ const settingsLinks = [
         icon: Disc3,
     },
     {
+        href: "/admin/quantity-tiers",
+        title: "Quantity Tiers",
+        description: "Manage quantity-based pricing tiers.",
+        icon: TrendingUp,
+    },
+    {
         href: "/admin/settings/store-details",
         title: "Store Details",
         description: "Update your store name, contact info, and address.",
@@ -135,6 +141,8 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+
+    
 
     
 

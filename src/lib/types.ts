@@ -213,11 +213,21 @@ export interface Vendor {
   createdAt?: any;
 }
     
-
+export interface QuantityTier {
+  id: string;
+  quantity: number;
+  pricePerUnit: number;
+  save: number;
+  createdAt?: any;
+}
     
 
     
 
+    
+
+
+    
 
     
 

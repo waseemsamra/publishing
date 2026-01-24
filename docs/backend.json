@@ -594,6 +594,35 @@
         "price"
       ]
     },
+    "QuantityTier": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "QuantityTier",
+      "type": "object",
+      "description": "Represents a pricing tier based on quantity for bulk purchases.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the pricing tier."
+        },
+        "quantity": {
+          "type": "number",
+          "description": "The minimum quantity for this tier."
+        },
+        "pricePerUnit": {
+          "type": "number",
+          "description": "The price per unit for this tier."
+        },
+        "save": {
+          "type": "number",
+          "description": "The percentage saved compared to the base tier."
+        }
+      },
+      "required": [
+        "id",
+        "quantity",
+        "pricePerUnit"
+      ]
+    },
     "ShippingAddress": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "ShippingAddress",
@@ -1176,6 +1205,22 @@
         }
       },
       {
+        "path": "/quantityTiers/{tierId}",
+        "definition": {
+          "entityName": "QuantityTier",
+          "schema": {
+            "$ref": "#/backend/entities/QuantityTier"
+          },
+          "description": "Stores pricing tiers for bulk purchases. Publicly readable, write access restricted to administrators.",
+          "params": [
+            {
+              "name": "tierId",
+              "description": "The unique identifier for the pricing tier."
+            }
+          ]
+        }
+      },
+      {
         "path": "/users/{userId}/shoppingCarts/{shoppingCartId}",
         "definition": {
           "entityName": "ShoppingCart",
@@ -1309,6 +1354,8 @@
 }
     
     
+    
+
     
 
     

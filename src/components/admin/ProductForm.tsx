@@ -103,7 +103,12 @@ export function ProductForm({ product }: { product?: Product }) {
       ? {
           ...product,
           price: product.price || 0,
-          images: product.images?.map(img => ({...img, imageUrl: img.imageUrl.replace(s3BaseUrl, '')})) || [],
+          images: product.images?.map(img => ({
+            id: img.id,
+            imageUrl: img.imageUrl.replace(s3BaseUrl, ''),
+            imageHint: img.imageHint || '',
+            description: img.description || ''
+          })) || [],
         }
       : {
           name: '',
@@ -111,6 +116,10 @@ export function ProductForm({ product }: { product?: Product }) {
           price: 0,
           pricingUnit: 'unit',
           boxQuantity: 1,
+          vendor: '',
+          sku: '',
+          productType: '',
+          sustainabilityImpact: '',
           images: [],
           categoryIds: [],
           sizeIds: [],
@@ -359,11 +368,14 @@ export function ProductForm({ product }: { product?: Product }) {
                         <FormField control={form.control} name="description" render={({ field }) => (
                             <FormItem className="md:col-span-2"><FormLabel>Description</FormLabel><FormControl><Textarea {...field} rows={5} /></FormControl><FormMessage /></FormItem>
                         )} />
+                         <FormField control={form.control} name="sustainabilityImpact" render={({ field }) => (
+                            <FormItem className="md:col-span-2"><FormLabel>Sustainability Impact</FormLabel><FormControl><Textarea {...field} value={field.value ?? ''} rows={3} /></FormControl><FormMessage /></FormItem>
+                        )} />
                         <FormField control={form.control} name="price" render={({ field }) => (
                             <FormItem><FormLabel>Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="salePrice" render={({ field }) => (
-                            <FormItem><FormLabel>Sale Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Sale Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField
                             control={form.control}
@@ -393,7 +405,7 @@ export function ProductForm({ product }: { product?: Product }) {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Units per Box</FormLabel>
-                                        <FormControl><Input type="number" {...field} /></FormControl>
+                                        <FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -422,7 +434,15 @@ export function ProductForm({ product }: { product?: Product }) {
                                 </div>
                                 <div className="flex-1 space-y-2">
                                 <Input type="file" accept="image/*" onChange={(e) => handleImageChange(index, e)} />
-                                <Input {...form.register(`images.${index}.imageHint`)} placeholder="AI Image Hint (e.g. coffee cup)" />
+                                <FormField
+                                    control={form.control}
+                                    name={`images.${index}.imageHint`}
+                                    render={({ field: imageHintField }) => (
+                                        <FormControl>
+                                            <Input {...imageHintField} value={imageHintField.value ?? ''} placeholder="AI Image Hint (e.g. coffee cup)" />
+                                        </FormControl>
+                                    )}
+                                />
                                 </div>
                                 <Button type="button" variant="ghost" size="icon" onClick={() => removeImage(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                             </div>
@@ -470,13 +490,13 @@ export function ProductForm({ product }: { product?: Product }) {
                             )}
                         />
                          <FormField control={form.control} name="sku" render={({ field }) => (
-                            <FormItem><FormLabel>SKU</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>SKU</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="stock" render={({ field }) => (
-                            <FormItem><FormLabel>Stock</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Stock</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="productType" render={({ field }) => (
-                            <FormItem><FormLabel>Product Type</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Product Type</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField
                             control={form.control}

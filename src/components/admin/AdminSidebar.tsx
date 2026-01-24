@@ -70,7 +70,7 @@ export function AdminSidebar() {
         </SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <Link href="/admin/dashboard" legacyBehavior passHref>
+            <Link href="/admin/dashboard">
               <SidebarMenuButton isActive={pathname === '/admin/dashboard'} tooltip="Dashboard">
                 <LayoutDashboard />
                 <span>Dashboard</span>
@@ -78,7 +78,7 @@ export function AdminSidebar() {
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/admin/orders" legacyBehavior passHref>
+            <Link href="/admin/orders">
               <SidebarMenuButton isActive={pathname === '/admin/orders'} tooltip="Orders">
                 <ShoppingCart />
                 <span>Orders</span>
@@ -105,14 +105,14 @@ export function AdminSidebar() {
               <CollapsibleContent>
                 <SidebarMenuSub>
                   <SidebarMenuSubItem>
-                    <Link href="/admin/products" legacyBehavior passHref>
+                    <Link href="/admin/products">
                       <SidebarMenuSubButton isActive={pathname === '/admin/products'}>
                         All Products
                       </SidebarMenuSubButton>
                     </Link>
                   </SidebarMenuSubItem>
                   <SidebarMenuSubItem>
-                    <Link href="/admin/products/categories" legacyBehavior passHref>
+                    <Link href="/admin/products/categories">
                       <SidebarMenuSubButton isActive={pathname === '/admin/products/categories'}>
                         Categories
                       </SidebarMenuSubButton>
@@ -124,7 +124,7 @@ export function AdminSidebar() {
           </SidebarMenuItem>
 
           <SidebarMenuItem>
-            <Link href="/admin/users" legacyBehavior passHref>
+            <Link href="/admin/users">
               <SidebarMenuButton isActive={pathname === '/admin/users'} tooltip="Users">
                 <Users />
                 <span>Users</span>
@@ -132,7 +132,7 @@ export function AdminSidebar() {
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/admin/analytics" legacyBehavior passHref>
+            <Link href="/admin/analytics">
               <SidebarMenuButton isActive={pathname === '/admin/analytics'} tooltip="Analytics">
                 <BarChart />
                 <span>Analytics</span>
@@ -140,7 +140,7 @@ export function AdminSidebar() {
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/admin/calendar" legacyBehavior passHref>
+            <Link href="/admin/calendar">
               <SidebarMenuButton isActive={pathname === '/admin/calendar'} tooltip="Calendar">
                 <Calendar />
                 <span>Calendar</span>
@@ -148,7 +148,7 @@ export function AdminSidebar() {
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/admin/grant-admin" legacyBehavior passHref>
+            <Link href="/admin/grant-admin">
               <SidebarMenuButton isActive={pathname === '/admin/grant-admin'} tooltip="Grant Admin">
                 <UserCheck />
                 <span>Grant Admin</span>
@@ -175,14 +175,14 @@ export function AdminSidebar() {
               <CollapsibleContent>
                 <SidebarMenuSub>
                   <SidebarMenuSubItem>
-                    <Link href="/admin/content/hero-slides" legacyBehavior passHref>
+                    <Link href="/admin/content/hero-slides">
                       <SidebarMenuSubButton isActive={pathname === '/admin/content/hero-slides'}>
                         Hero Slides
                       </SidebarMenuSubButton>
                     </Link>
                   </SidebarMenuSubItem>
                   <SidebarMenuSubItem>
-                    <Link href="/admin/content/trending-now" legacyBehavior passHref>
+                    <Link href="/admin/content/trending-now">
                       <SidebarMenuSubButton isActive={pathname === '/admin/content/trending-now'}>
                         Trending Now
                       </SidebarMenuSubButton>
@@ -194,7 +194,7 @@ export function AdminSidebar() {
           </SidebarMenuItem>
 
           <SidebarMenuItem>
-            <Link href="/admin/settings" legacyBehavior passHref>
+            <Link href="/admin/settings">
               <SidebarMenuButton isActive={pathname.startsWith('/admin/settings')} tooltip="Settings">
                 <Settings />
                 <span>Settings</span>
@@ -207,7 +207,7 @@ export function AdminSidebar() {
         <SidebarSeparator />
         <SidebarMenu>
           <SidebarMenuItem>
-            <Link href="/" legacyBehavior passHref>
+            <Link href="/">
               <SidebarMenuButton tooltip="Back to Shop">
                 <Home />
                 <span>Back to Shop</span>

@@ -5,6 +5,8 @@ export interface Product {
   name: string;
   price: number;
   salePrice?: number;
+  pricingUnit?: 'unit' | 'box';
+  boxQuantity?: number;
   vendor?: string;
   sku?: string;
   stock?: number;

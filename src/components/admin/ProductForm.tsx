@@ -34,6 +34,8 @@ const productSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   price: z.coerce.number().min(0, 'Price must be a positive number'),
   salePrice: z.coerce.number().min(0, 'Sale price must be positive').optional(),
+  pricingUnit: z.enum(['unit', 'box']).default('unit'),
+  boxQuantity: z.coerce.number().optional(),
   vendor: z.string().optional(),
   sku: z.string().optional(),
   stock: z.coerce.number().optional(),
@@ -55,7 +57,18 @@ const productSchema = z.object({
   lidIds: z.array(z.string()).optional(),
   packSizeIds: z.array(z.string()).optional(),
   images: z.array(imageSchema).optional(),
-});
+}).refine(
+    (data) => {
+      if (data.pricingUnit === 'box') {
+        return data.boxQuantity !== undefined && data.boxQuantity > 0;
+      }
+      return true;
+    },
+    {
+      message: "Units per box is required when pricing per box.",
+      path: ["boxQuantity"],
+    }
+  );
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
@@ -96,6 +109,8 @@ export function ProductForm({ product }: { product?: Product }) {
           name: '',
           description: '',
           price: 0,
+          pricingUnit: 'unit',
+          boxQuantity: 1,
           images: [],
           categoryIds: [],
           sizeIds: [],
@@ -119,6 +134,8 @@ export function ProductForm({ product }: { product?: Product }) {
     control: form.control,
     name: 'images',
   });
+  
+  const pricingUnit = form.watch('pricingUnit');
 
   const collections = useMemo(() => {
     if (!db) return {};
@@ -348,6 +365,40 @@ export function ProductForm({ product }: { product?: Product }) {
                         <FormField control={form.control} name="salePrice" render={({ field }) => (
                             <FormItem><FormLabel>Sale Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
+                        <FormField
+                            control={form.control}
+                            name="pricingUnit"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Pricing Unit</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value || 'unit'}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a pricing unit" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    <SelectItem value="unit">Per Unit</SelectItem>
+                                    <SelectItem value="box">Per Box</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        {pricingUnit === 'box' && (
+                            <FormField
+                                control={form.control}
+                                name="boxQuantity"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Units per Box</FormLabel>
+                                        <FormControl><Input type="number" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
                     </CardContent>
                 </Card>
 

@@ -494,11 +494,20 @@
         },
         "price": {
           "type": "number",
-          "description": "Price of the product."
+          "description": "Price of the product. This can be per unit or per box, depending on pricingUnit."
         },
         "salePrice": {
           "type": "number",
           "description": "The discounted price of the product."
+        },
+        "pricingUnit": {
+          "type": "string",
+          "description": "The unit of pricing for the product.",
+          "enum": ["unit", "box"]
+        },
+        "boxQuantity": {
+          "type": "number",
+          "description": "Number of units in a box, if pricing is per box."
         },
         "vendor": {
           "type": "string",

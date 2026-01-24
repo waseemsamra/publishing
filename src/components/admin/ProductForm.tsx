@@ -277,46 +277,21 @@ export function ProductForm({ product }: { product?: Product }) {
 
   const selectedCategoryIds = form.watch("categoryIds");
 
-  const categoryHierarchy = useMemo(() => {
-    const hierarchy = new Map<string, Category[]>();
-    if (!categories) return hierarchy;
-    
-    categories.forEach(cat => {
-      if (cat.parentId) {
-        if (!hierarchy.has(cat.parentId)) {
-          hierarchy.set(cat.parentId, []);
-        }
-        hierarchy.get(cat.parentId)!.push(cat);
-      }
-    });
-    return hierarchy;
-  }, [categories]);
-
   const productTypeOptions = useMemo(() => {
-    if (!selectedCategoryIds || selectedCategoryIds.length === 0) {
+    if (!categories || !selectedCategoryIds) {
       return [];
     }
-    
-    const options: Category[] = [];
-    selectedCategoryIds.forEach(parentId => {
-      const children = categoryHierarchy.get(parentId);
-      if (children) {
-        options.push(...children);
-      }
-    });
-    return options;
-  }, [selectedCategoryIds, categoryHierarchy]);
-
+    return categories.filter(category => selectedCategoryIds.includes(category.id));
+  }, [categories, selectedCategoryIds]);
+  
   const productType = form.watch('productType');
 
   useEffect(() => {
-    if (productType && productTypeOptions.length > 0 && !productTypeOptions.some(opt => opt.name === productType)) {
+    // If the currently selected productType is no longer in the list of valid options, clear it.
+    if (productType && !productTypeOptions.some(opt => opt.name === productType)) {
         form.setValue('productType', '', { shouldDirty: true });
     }
-    else if (productType && productTypeOptions.length === 0 && selectedCategoryIds && selectedCategoryIds.length > 0) {
-        form.setValue('productType', '', { shouldDirty: true });
-    }
-  }, [productType, productTypeOptions, selectedCategoryIds, form]);
+  }, [productType, productTypeOptions, form]);
 
   const optionData = {
     categories: categories || [],
@@ -556,19 +531,19 @@ export function ProductForm({ product }: { product?: Product }) {
                                 >
                                     <FormControl>
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Select a sub-category" />
+                                        <SelectValue placeholder="Select a primary product type" />
                                     </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
                                     {productTypeOptions.length > 0 ? (
-                                        productTypeOptions.map((subCat) => (
-                                        <SelectItem key={subCat.id} value={subCat.name}>
-                                            {subCat.name}
+                                        productTypeOptions.map((cat) => (
+                                        <SelectItem key={cat.id} value={cat.name}>
+                                            {cat.name}
                                         </SelectItem>
                                         ))
                                     ) : (
                                         <SelectItem value="none" disabled>
-                                        Select a parent category first
+                                        Select categories first
                                         </SelectItem>
                                     )}
                                     </SelectContent>

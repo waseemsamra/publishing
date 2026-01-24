@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import {
     Card,
@@ -80,6 +81,12 @@ const settingsLinks = [
         title: "Lids",
         description: "Manage product lid options like Sip or Straw Slot.",
         icon: Disc3,
+    },
+    {
+        href: "/admin/pack-sizes",
+        title: "Pack Sizes & Tiers",
+        description: "Manage quantity-based pricing for products.",
+        icon: Boxes,
     },
     {
         href: "/admin/settings/store-details",

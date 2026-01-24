@@ -47,7 +47,6 @@ const productSchema = z.object({
   productType: z.string().optional(),
   materials: z.array(z.string()).optional(),
   certifications: z.array(z.string()).optional(),
-  sustainabilityImpact: z.string().optional(),
   categoryIds: z.array(z.string()).optional(),
   sizeIds: z.array(z.string()).optional(),
   colourIds: z.array(z.string()).optional(),
@@ -103,7 +102,6 @@ export function ProductForm({ product }: { product?: Product }) {
           sku: product.sku ?? '',
           stock: product.stock ?? undefined,
           productType: product.productType ?? '',
-          sustainabilityImpact: product.sustainabilityImpact ?? '',
           categoryIds: product.categoryIds ?? [],
           packPrices: product.packPrices ?? [],
           images: product.images?.map(img => ({
@@ -120,7 +118,6 @@ export function ProductForm({ product }: { product?: Product }) {
           vendor: '',
           sku: '',
           productType: '',
-          sustainabilityImpact: '',
           images: [],
           categoryIds: [],
           sizeIds: [],
@@ -146,7 +143,7 @@ export function ProductForm({ product }: { product?: Product }) {
     name: 'images',
   });
 
-  const { fields: packPriceFields, append: appendPackPrice, remove: removePackPrice } = useFieldArray({
+  const { fields: packPriceFields } = useFieldArray({
       control: form.control,
       name: "packPrices"
   });
@@ -295,7 +292,7 @@ export function ProductForm({ product }: { product?: Product }) {
   
   const productType = form.watch('productType');
   const pricingUnitId = form.watch('pricingUnitId');
-  const selectedPackSizeIds = form.watch('packSizeIds', []);
+  const watchedPackSizeIds = form.watch('packSizeIds', []);
 
   const isPackPricing = useMemo(() => {
       if (!units || !pricingUnitId) return false;
@@ -310,31 +307,28 @@ export function ProductForm({ product }: { product?: Product }) {
   }, [productType, productTypeOptions, form]);
 
   useEffect(() => {
-    if (!isPackPricing) {
-        form.setValue('packPrices', []);
-    } else {
-        const currentPackPriceIds = packPriceFields.map(f => f.packSizeId);
-        
-        // Add new ones
-        selectedPackSizeIds.forEach(id => {
-            if (!currentPackPriceIds.includes(id)) {
-                appendPackPrice({ packSizeId: id, price: 0 });
-            }
-        });
+    const packPrices = form.getValues('packPrices') || [];
 
-        // Remove old ones
-        const packPriceIdsToRemove: number[] = [];
-        packPriceFields.forEach((field, index) => {
-            if (!selectedPackSizeIds.includes(field.packSizeId)) {
-                packPriceIdsToRemove.push(index);
-            }
-        });
-        // remove in reverse order to avoid index shifting issues
-        for (let i = packPriceIdsToRemove.length - 1; i >= 0; i--) {
-            removePackPrice(packPriceIdsToRemove[i]);
-        }
+    if (!isPackPricing) {
+      if (packPrices.length > 0) {
+        form.setValue('packPrices', []);
+      }
+      return;
     }
-}, [isPackPricing, selectedPackSizeIds, packPriceFields, appendPackPrice, removePackPrice, form]);
+
+    const selectedIds = watchedPackSizeIds || [];
+    
+    const priceMap = new Map(packPrices.map(p => [p.packSizeId, p.price]));
+
+    const newPackPrices = selectedIds.map(id => ({
+      packSizeId: id,
+      price: priceMap.get(id) ?? 0,
+    }));
+    
+    if (newPackPrices.length !== packPrices.length || !newPackPrices.every((val, index) => val.packSizeId === packPrices[index]?.packSizeId)) {
+      form.setValue('packPrices', newPackPrices, { shouldDirty: true });
+    }
+  }, [isPackPricing, JSON.stringify(watchedPackSizeIds), form]);
 
   const optionData = {
     categories: categories || [],
@@ -507,7 +501,7 @@ export function ProductForm({ product }: { product?: Product }) {
                                 )}
                               />
 
-                              {selectedPackSizeIds.length > 0 && (
+                              {watchedPackSizeIds.length > 0 && (
                                   <Card className="bg-muted/50">
                                     <CardHeader><CardTitle className="text-base">Pack Prices</CardTitle></CardHeader>
                                     <CardContent className="space-y-4">

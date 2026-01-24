@@ -182,6 +182,13 @@ export function AdminSidebar() {
                     </Link>
                   </SidebarMenuSubItem>
                   <SidebarMenuSubItem>
+                    <Link href="/admin/content/hero-boxes">
+                      <SidebarMenuSubButton isActive={pathname === '/admin/content/hero-boxes'}>
+                        Hero Boxes
+                      </SidebarMenuSubButton>
+                    </Link>
+                  </SidebarMenuSubItem>
+                  <SidebarMenuSubItem>
                     <Link href="/admin/content/trending-now">
                       <SidebarMenuSubButton isActive={pathname === '/admin/content/trending-now'}>
                         Trending Now

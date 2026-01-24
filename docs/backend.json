@@ -281,6 +281,22 @@
         "imageUrl"
       ]
     },
+    "HeroBox": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "HeroBox",
+      "type": "object",
+      "description": "Represents a single box in the interactive homepage hero section.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the hero box." },
+        "title": { "type": "string", "description": "The title displayed on the box." },
+        "link": { "type": "string", "description": "The URL the box links to (e.g., /categories/paper-products)." },
+        "imageUrl": { "type": "string", "description": "URL of the background image for the box.", "format": "uri" },
+        "imageHint": { "type": "string", "description": "A hint for AI image generation tools." },
+        "order": { "type": "number", "description": "The display order of the box in the grid." },
+        "isFeatured": { "type": "boolean", "description": "If true, this box is the main featured item on the left." }
+      },
+      "required": [ "id", "title", "link", "imageUrl", "order" ]
+    },
     "TrendingItem": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "TrendingItem",
@@ -1050,6 +1066,22 @@
             {
               "name": "heroSlideId",
               "description": "The unique identifier for the hero slide."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/heroBoxes/{heroBoxId}",
+        "definition": {
+          "entityName": "HeroBox",
+          "schema": {
+            "$ref": "#/backend/entities/HeroBox"
+          },
+          "description": "Stores content for the interactive homepage hero section. Publicly readable, write access restricted to administrators.",
+          "params": [
+            {
+              "name": "heroBoxId",
+              "description": "The unique identifier for the hero box."
             }
           ]
         }

@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirestore } from '@/firebase/provider';
-import { collection, query } from 'firebase/firestore';
-import type { Category } from '@/lib/types';
+import { collection, query, orderBy } from 'firebase/firestore';
+import type { HeroBox } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 import {
   Carousel,
@@ -20,48 +20,38 @@ import { Button } from '@/components/ui/button';
 
 export function InteractiveHero() {
   const db = useFirestore();
-  const [activeHoverItem, setActiveHoverItem] = useState<Category | null>(null);
+  const [activeHoverItem, setActiveHoverItem] = useState<HeroBox | null>(null);
 
-  const categoriesQuery = useMemo(() => {
+  const heroBoxesQuery = useMemo(() => {
     if (!db) return null;
-    const q = query(collection(db, 'categories'));
+    const q = query(collection(db, 'heroBoxes'), orderBy('order', 'asc'));
     (q as any).__memo = true;
     return q;
   }, [db]);
 
-  const { data: allCategories, isLoading } = useCollection<Category>(categoriesQuery);
+  const { data: allItems, isLoading } = useCollection<HeroBox>(heroBoxesQuery);
 
-  const { featuredItem, gridItems, allItemsForCarousel } = useMemo(() => {
-    if (!allCategories || allCategories.length === 0) {
-        return { featuredItem: null, gridItems: [], allItemsForCarousel: [] };
+  const { featuredItem, gridItems } = useMemo(() => {
+    if (!allItems || allItems.length === 0) {
+        return { featuredItem: null, gridItems: [] };
     }
 
-    const topLevelCategories = allCategories
-      .filter((cat) => !cat.parentId)
-      .sort((a, b) => (a.categoryOrder ?? Infinity) - (b.categoryOrder ?? Infinity));
-
-    // Find the item with categoryOrder: 0 to be the main featured item
-    const initialFeaturedItem = topLevelCategories.find(cat => cat.categoryOrder === 0) || topLevelCategories[0] || null;
-
-    // The grid items should be the rest of the categories, excluding the featured one.
-    const gridItems = topLevelCategories
-        .filter(cat => cat.id !== initialFeaturedItem?.id)
-        .slice(0, 16);
+    const initialFeaturedItem = allItems.find(item => item.isFeatured) || allItems[0] || null;
+    const gridItems = allItems.filter(item => item.id !== initialFeaturedItem?.id).slice(0, 16);
     
     return {
       featuredItem: initialFeaturedItem,
       gridItems: gridItems,
-      allItemsForCarousel: topLevelCategories, // This is for mobile carousel, let's keep all
     };
-  }, [allCategories]);
+  }, [allItems]);
   
   const displayItem = activeHoverItem || featuredItem;
 
-  const handleItemHover = (item: Category) => {
+  const handleItemHover = (item: HeroBox) => {
     setActiveHoverItem(item);
   };
   
-  const handleItemTap = (item: Category) => {
+  const handleItemTap = (item: HeroBox) => {
     setActiveHoverItem(item);
   };
 
@@ -81,10 +71,10 @@ export function InteractiveHero() {
     return (
       <section className="bg-muted flex flex-col items-center justify-center text-center p-4" style={{minHeight: '70vh'}}>
         <h3 className="font-headline text-2xl font-bold">
-          No Categories Found
+          No Hero Content Found
         </h3>
         <p className="text-muted-foreground mt-2">
-          Add some top-level categories in the admin panel to see them here.
+          Add some items in the 'Hero Boxes' section of the admin panel.
         </p>
       </section>
     );
@@ -101,7 +91,7 @@ export function InteractiveHero() {
           {displayItem.imageUrl && (
             <Image
               src={displayItem.imageUrl}
-              alt={displayItem.name}
+              alt={displayItem.title}
               fill
               className="object-cover -z-10 transition-all duration-500 ease-in-out"
               key={displayItem.id}
@@ -115,10 +105,10 @@ export function InteractiveHero() {
           <div className="relative z-10">
             <p className="text-white/80">Infylux Customized Packaging</p>
             <h2 className="font-headline text-5xl font-bold text-white mt-2">
-              {displayItem.name}
+              {displayItem.title}
             </h2>
             <Button asChild className="mt-4">
-              <Link href={`/categories/${displayItem.slug || displayItem.id}`}>
+              <Link href={displayItem.link || '#'}>
                 Shop Now
               </Link>
             </Button>
@@ -131,7 +121,7 @@ export function InteractiveHero() {
           <div className="hidden lg:grid grid-cols-4 grid-rows-4 w-full h-full gap-px">
             {gridItems.map((item) => (
               <Link
-                href={`/categories/${item.slug || item.id}`}
+                href={item.link || '#'}
                 key={item.id}
                 onMouseEnter={() => handleItemHover(item)}
                 className={cn(
@@ -142,7 +132,7 @@ export function InteractiveHero() {
                 {item.imageUrl && (
                   <Image
                     src={item.imageUrl}
-                    alt={item.name}
+                    alt={item.title}
                     fill
                     className="object-cover -z-10 group-hover:scale-105 transition-transform duration-300"
                     data-ai-hint={item.imageHint}
@@ -154,7 +144,7 @@ export function InteractiveHero() {
                     'absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-colors -z-10'
                   )}
                 ></div>
-                <h3 className="font-semibold text-lg">{item.name}</h3>
+                <h3 className="font-semibold text-lg">{item.title}</h3>
               </Link>
             ))}
           </div>
@@ -168,7 +158,7 @@ export function InteractiveHero() {
               className="w-full"
             >
               <CarouselContent>
-                {allItemsForCarousel.map((item: Category) => (
+                {allItems && allItems.map((item: HeroBox) => (
                   <CarouselItem key={item.id} className="basis-1/2 sm:basis-1/3">
                     <div
                       role="button"
@@ -183,7 +173,7 @@ export function InteractiveHero() {
                       {item.imageUrl && (
                         <Image
                           src={item.imageUrl}
-                          alt={item.name}
+                          alt={item.title}
                           fill
                           className="object-cover -z-10 group-hover:scale-105 transition-transform duration-300"
                           data-ai-hint={item.imageHint}
@@ -195,7 +185,7 @@ export function InteractiveHero() {
                           'absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-colors -z-10'
                         )}
                       ></div>
-                      <h3 className="font-semibold text-lg">{item.name}</h3>
+                      <h3 className="font-semibold text-lg">{item.title}</h3>
                     </div>
                   </CarouselItem>
                 ))}

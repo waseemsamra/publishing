@@ -182,6 +182,18 @@ export interface HeroSlide {
   updatedAt?: any;
 }
 
+export interface HeroBox {
+  id: string;
+  title: string;
+  link: string;
+  imageUrl: string;
+  imageHint?: string;
+  order: number;
+  isFeatured?: boolean;
+  createdAt?: any;
+  updatedAt?: any;
+}
+
 export interface TrendingItem {
   id: string;
   title: string;

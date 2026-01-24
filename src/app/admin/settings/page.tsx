@@ -83,6 +83,12 @@ const settingsLinks = [
         icon: Disc3,
     },
     {
+        href: "/admin/units",
+        title: "Units",
+        description: "Manage pricing units like pack, roll, or sheet.",
+        icon: Boxes,
+    },
+    {
         href: "/admin/pack-sizes",
         title: "Pack Sizes",
         description: "Manage predefined pack quantities (e.g., 50, 100, 250).",

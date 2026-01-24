@@ -215,6 +215,13 @@ export interface Vendor {
   description?: string;
   createdAt?: any;
 }
+
+export interface Unit {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt?: any;
+}
     
 export interface PackSize {
   id: string;

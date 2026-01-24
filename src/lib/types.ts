@@ -4,6 +4,11 @@ export interface Product {
   id: string;
   name: string;
   price: number;
+  salePrice?: number;
+  vendor?: string;
+  sku?: string;
+  stock?: number;
+  productType?: string;
   description: string;
   images?: ImagePlaceholder[];
   materials: string[];
@@ -206,5 +211,7 @@ export interface TrendingItem {
 
     
 
+
+    
 
     

@@ -16,13 +16,14 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import { Loader2, Truck, Zap, Leaf, HelpCircle } from 'lucide-react';
+import { Loader2, Truck, Zap, Leaf, HelpCircle, Share2, Star } from 'lucide-react';
 import { useCart } from '@/context/cart-context';
 import { QuantityPricingTable } from '@/components/quantity-pricing-table';
 import { ProductInfoAccordion } from '@/components/product-info-accordion';
 import { RelatedProducts } from '@/components/related-products';
 import { BrandStories } from '@/components/brand-stories';
 import { useAuth } from '@/context/auth-context';
+import { Separator } from '@/components/ui/separator';
 
 type PricingTier = { qty: number; pricePerUnit: number; save: number; total: number; };
 const defaultTier = { qty: 1000, pricePerUnit: 0.130, save: 0, total: 130.00 };
@@ -151,13 +152,39 @@ export default function ProductDetailPage() {
         <div className="md:col-span-5">
            <div className="md:sticky md:top-32 p-8 pt-16 md:py-0 md:px-12 lg:px-16">
               <div className="w-full max-w-md">
-                <div className="text-sm text-muted-foreground">
-                  <span>Hot Cups</span> — <span>Custom Coffee Cups Compostable</span>
+                <h1 className="font-headline text-3xl lg:text-4xl font-bold">{product.name}</h1>
+
+                <div className="mt-4 flex items-center gap-4">
+                    <Button variant="outline" size="sm"><Share2 className="mr-2 h-4 w-4" />Share</Button>
+                    <div className="flex items-center gap-1">
+                        <Star className="h-5 w-5 text-gray-300" />
+                        <Star className="h-5 w-5 text-gray-300" />
+                        <Star className="h-5 w-5 text-gray-300" />
+                        <Star className="h-5 w-5 text-gray-300" />
+                        <Star className="h-5 w-5 text-gray-300" />
+                        <span className="ml-2 text-sm text-muted-foreground">No reviews</span>
+                    </div>
                 </div>
 
-                <h1 className="font-headline text-3xl lg:text-4xl font-bold mt-2">{product.name}</h1>
+                <div className="mt-4 space-y-1 text-sm text-muted-foreground">
+                    {product.vendor && <p><strong>Vendor:</strong> {product.vendor}</p>}
+                    {product.sku && <p><strong>SKU:</strong> {product.sku}</p>}
+                    {product.stock && <p><strong>Availability:</strong> {product.stock > 0 ? <span className="text-green-600 font-semibold">{product.stock} In Stock</span> : <span className="text-red-600 font-semibold">Out of Stock</span>}</p>}
+                    {product.productType && <p><strong>Product Type:</strong> {product.productType}</p>}
+                </div>
+                
+                <div className="mt-6 flex items-baseline gap-2">
+                    {product.salePrice && product.salePrice < product.price ? (
+                        <>
+                            <p className="text-3xl font-bold text-red-600">DH{product.salePrice.toFixed(2)}</p>
+                            <p className="text-xl text-muted-foreground line-through">DH{product.price.toFixed(2)}</p>
+                        </>
+                    ) : (
+                        <p className="text-3xl font-bold">DH{product.price.toFixed(2)}</p>
+                    )}
+                </div>
 
-                <p className="text-lg text-muted-foreground mt-2">from DH{product.price.toFixed(3)} / unit</p>
+                <Separator className="my-6" />
 
                 <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-md text-sm text-primary">
                   Free standard shipping & proofing available on all orders*
@@ -250,3 +277,5 @@ export default function ProductDetailPage() {
     </>
   );
 }
+
+    

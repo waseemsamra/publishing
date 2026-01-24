@@ -476,6 +476,26 @@
           "type": "number",
           "description": "Price of the product."
         },
+        "salePrice": {
+          "type": "number",
+          "description": "The discounted price of the product."
+        },
+        "vendor": {
+          "type": "string",
+          "description": "The vendor or brand of the product."
+        },
+        "sku": {
+          "type": "string",
+          "description": "The Stock Keeping Unit for the product."
+        },
+        "stock": {
+          "type": "number",
+          "description": "The number of items in stock."
+        },
+        "productType": {
+          "type": "string",
+          "description": "The type of the product (e.g., Paper Cup)."
+        },
         "images": {
           "type": "array",
           "description": "Array of product images.",
@@ -1249,4 +1269,6 @@
 }
     
     
+    
+
     

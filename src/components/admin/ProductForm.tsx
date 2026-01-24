@@ -33,6 +33,11 @@ const productSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
   description: z.string().min(1, 'Description is required'),
   price: z.coerce.number().min(0, 'Price must be a positive number'),
+  salePrice: z.coerce.number().min(0, 'Sale price must be positive').optional(),
+  vendor: z.string().optional(),
+  sku: z.string().optional(),
+  stock: z.coerce.number().optional(),
+  productType: z.string().optional(),
   sustainabilityImpact: z.string().optional(),
   materials: z.array(z.string()).optional(),
   certifications: z.array(z.string()).optional(),
@@ -310,15 +315,18 @@ export function ProductForm({ product }: { product?: Product }) {
                         <CardTitle>Basic Information</CardTitle>
                         <CardDescription>Set the name, description, and price for your product.</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField control={form.control} name="name" render={({ field }) => (
-                            <FormItem><FormLabel>Product Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormItem className="md:col-span-2"><FormLabel>Product Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="description" render={({ field }) => (
-                            <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} rows={5} /></FormControl><FormMessage /></FormItem>
+                            <FormItem className="md:col-span-2"><FormLabel>Description</FormLabel><FormControl><Textarea {...field} rows={5} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="price" render={({ field }) => (
                             <FormItem><FormLabel>Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="salePrice" render={({ field }) => (
+                            <FormItem><FormLabel>Sale Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
                     </CardContent>
                 </Card>
@@ -359,9 +367,21 @@ export function ProductForm({ product }: { product?: Product }) {
                 <Card>
                     <CardHeader>
                         <CardTitle>Organization</CardTitle>
-                        <CardDescription>Categorize your product.</CardDescription>
+                        <CardDescription>Categorize and identify your product.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                         <FormField control={form.control} name="vendor" render={({ field }) => (
+                            <FormItem><FormLabel>Vendor</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                         <FormField control={form.control} name="sku" render={({ field }) => (
+                            <FormItem><FormLabel>SKU</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="stock" render={({ field }) => (
+                            <FormItem><FormLabel>Stock</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="productType" render={({ field }) => (
+                            <FormItem><FormLabel>Product Type</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
                         <FormField
                             control={form.control}
                             name="categoryIds"
@@ -423,5 +443,7 @@ export function ProductForm({ product }: { product?: Product }) {
     </Form>
   );
 }
+
+    
 
     

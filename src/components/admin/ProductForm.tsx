@@ -42,6 +42,7 @@ const productSchema = z.object({
   productType: z.string().optional(),
   materials: z.array(z.string()).optional(),
   certifications: z.array(z.string()).optional(),
+  sustainabilityImpact: z.string().optional(),
   categoryIds: z.array(z.string()).optional(),
   sizeIds: z.array(z.string()).optional(),
   colourIds: z.array(z.string()).optional(),
@@ -108,6 +109,7 @@ export function ProductForm({ product }: { product?: Product }) {
           sku: product.sku ?? '',
           stock: product.stock ?? undefined,
           productType: product.productType ?? '',
+          sustainabilityImpact: product.sustainabilityImpact ?? '',
           images: product.images?.map(img => ({
             id: img.id,
             imageUrl: img.imageUrl.replace(s3BaseUrl, ''),
@@ -124,6 +126,7 @@ export function ProductForm({ product }: { product?: Product }) {
           vendor: '',
           sku: '',
           productType: '',
+          sustainabilityImpact: '',
           images: [],
           categoryIds: [],
           sizeIds: [],
@@ -270,6 +273,27 @@ export function ProductForm({ product }: { product?: Product }) {
   const { data: lids } = useCollection<Lid>(lidsQuery);
   const { data: packSizes } = useCollection<PackSize>(packSizesQuery);
   const { data: vendors } = useCollection<Vendor>(vendorsQuery);
+
+  const selectedCategoryIds = form.watch("categoryIds");
+
+  const productTypeOptions = useMemo(() => {
+    if (!categories || !selectedCategoryIds || selectedCategoryIds.length === 0) {
+      return [];
+    }
+    const selectedSet = new Set(selectedCategoryIds);
+    return categories.filter(cat => cat.parentId && selectedSet.has(cat.parentId));
+  }, [categories, selectedCategoryIds]);
+
+  const productType = form.watch('productType');
+
+  useEffect(() => {
+    if (productType && productTypeOptions.length > 0 && !productTypeOptions.some(opt => opt.name === productType)) {
+        form.setValue('productType', '', { shouldDirty: true });
+    }
+    else if (productType && productTypeOptions.length === 0 && selectedCategoryIds && selectedCategoryIds.length > 0) {
+        form.setValue('productType', '', { shouldDirty: true });
+    }
+  }, [productType, productTypeOptions, selectedCategoryIds, form]);
 
   const optionData = {
     categories: categories || [],
@@ -496,9 +520,40 @@ export function ProductForm({ product }: { product?: Product }) {
                         <FormField control={form.control} name="stock" render={({ field }) => (
                             <FormItem><FormLabel>Stock</FormLabel><FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                         )} />
-                        <FormField control={form.control} name="productType" render={({ field }) => (
-                            <FormItem><FormLabel>Product Type</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
-                        )} />
+                        <FormField
+                            control={form.control}
+                            name="productType"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Product Type</FormLabel>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    value={field.value || ''}
+                                    disabled={productTypeOptions.length === 0}
+                                >
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a sub-category" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    {productTypeOptions.length > 0 ? (
+                                        productTypeOptions.map((subCat) => (
+                                        <SelectItem key={subCat.id} value={subCat.name}>
+                                            {subCat.name}
+                                        </SelectItem>
+                                        ))
+                                    ) : (
+                                        <SelectItem value="none" disabled>
+                                        Select a parent category first
+                                        </SelectItem>
+                                    )}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
                         <FormField
                             control={form.control}
                             name="categoryIds"

@@ -49,7 +49,7 @@ export default function AdminHeroBoxesPage() {
     
     const form = useForm<BoxFormValues>({
         resolver: zodResolver(boxSchema),
-        defaultValues: { title: '', link: '', imageUrl: '', imageHint: '', order: 0, isFeatured: false, categoryId: '' }
+        defaultValues: { title: '', link: '', imageUrl: '', imageHint: '', order: 0, isFeatured: false, categoryId: 'none' }
     });
 
     const boxesQuery = useMemo(() => {
@@ -102,18 +102,18 @@ export default function AdminHeroBoxesPage() {
                 link: dialogState.box.link || '',
                 imageUrl: dialogState.box.imageUrl?.replace(s3BaseUrl, '') || '',
                 imageHint: dialogState.box.imageHint || '',
-                order: dialogState.box.order || 0,
+                order: dialogState.box.order ?? 0,
                 isFeatured: dialogState.box.isFeatured || false,
-                categoryId: dialogState.box.categoryId || '',
+                categoryId: dialogState.box.categoryId || 'none',
             });
             setImagePreview(dialogState.box.imageUrl || null);
             setImageFile(null);
         } else {
-            form.reset({ title: '', link: '', imageUrl: '', imageHint: '', order: boxes?.length || 0, isFeatured: false, categoryId: '' });
+            form.reset({ title: '', link: '', imageUrl: '', imageHint: '', order: 0, isFeatured: false, categoryId: 'none' });
             setImagePreview(null);
             setImageFile(null);
         }
-    }, [dialogState, form, boxes]);
+    }, [dialogState, form]);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -131,7 +131,7 @@ export default function AdminHeroBoxesPage() {
             return;
         }
 
-        let finalImageUrl = dialogState.box?.imageUrl || '';
+        let finalImageUrl = data.imageUrl ? (data.imageUrl.startsWith('http') ? data.imageUrl : `${s3BaseUrl}${data.imageUrl}`) : '';
         const batch = writeBatch(db);
 
         try {
@@ -144,11 +144,9 @@ export default function AdminHeroBoxesPage() {
                 const result = await response.json();
                 finalImageUrl = result.url;
                 setIsUploading(false);
-            } else {
-                finalImageUrl = data.imageUrl ? (data.imageUrl.startsWith('http') ? data.imageUrl : `${s3BaseUrl}${data.imageUrl}`) : '';
             }
 
-            const dataToSave = { ...data, categoryId: data.categoryId || null, imageUrl: finalImageUrl, updatedAt: serverTimestamp() };
+            const dataToSave = { ...data, categoryId: data.categoryId === 'none' ? null : data.categoryId, imageUrl: finalImageUrl, updatedAt: serverTimestamp() };
             
             if (data.isFeatured) {
                 const featuredQuery = query(collection(db, 'heroBoxes'), where('isFeatured', '==', true));
@@ -211,19 +209,30 @@ export default function AdminHeroBoxesPage() {
             toast({ variant: 'destructive', title: 'Reorder Error', description: e.message });
         }
     };
+
+    const handleAddNewBox = () => {
+        if (filterCategory === 'all') {
+          toast({
+            variant: 'destructive',
+            title: 'Please select a category first',
+            description: 'You need to select a specific category or "Homepage" from the filter before adding a new box.',
+          });
+          return;
+        }
+        const newBoxData = {
+          order: filteredBoxes.length,
+          categoryId: filterCategory,
+        };
+        setDialogState({ open: true, box: newBoxData });
+    };
     
     const handleOpenChange = (open: boolean) => setDialogState(prev => ({ ...prev, open }));
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="font-headline text-3xl font-bold">Hero Boxes</h1>
-                    <p className="text-muted-foreground">Manage boxes for your interactive hero section.</p>
-                </div>
-                <Button onClick={() => setDialogState({ open: true, box: {} })}>
-                    <PlusCircle className="mr-2 h-4 w-4" />Add Box
-                </Button>
+            <div>
+                <h1 className="font-headline text-3xl font-bold">Hero Boxes</h1>
+                <p className="text-muted-foreground">Manage boxes for your interactive hero section.</p>
             </div>
             <Card>
                 <CardHeader>
@@ -232,19 +241,24 @@ export default function AdminHeroBoxesPage() {
                             <CardTitle>All Hero Boxes</CardTitle>
                             <CardDescription>A list of all hero boxes, ordered by display order.</CardDescription>
                         </div>
-                        <div className="w-64">
-                            <Select value={filterCategory} onValueChange={setFilterCategory}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Filter by category..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Categories</SelectItem>
-                                    <SelectItem value="none">Homepage (No Category)</SelectItem>
-                                    {categories?.map(cat => (
-                                        <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                        <div className="flex items-center gap-2">
+                            <div className="w-64">
+                                <Select value={filterCategory} onValueChange={setFilterCategory}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Filter by category..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Categories</SelectItem>
+                                        <SelectItem value="none">Homepage (No Category)</SelectItem>
+                                        {categories?.map(cat => (
+                                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <Button onClick={handleAddNewBox}>
+                                <PlusCircle className="mr-2 h-4 w-4" />Add Box
+                            </Button>
                         </div>
                     </div>
                 </CardHeader>
@@ -264,7 +278,7 @@ export default function AdminHeroBoxesPage() {
                         <TableBody>
                             {isLoading ? <TableRow><TableCell colSpan={7} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell></TableRow>
                             : error ? <TableRow><TableCell colSpan={7} className="text-center text-red-500">{error.message}</TableCell></TableRow>
-                            : filteredBoxes?.length === 0 ? <TableRow><TableCell colSpan={7} className="h-24 text-center">No boxes found. Add one to get started.</TableCell></TableRow>
+                            : filteredBoxes?.length === 0 ? <TableRow><TableCell colSpan={7} className="h-24 text-center">No boxes found for this filter.</TableCell></TableRow>
                             : filteredBoxes?.map((box, index) => (
                                 <TableRow key={box.id}>
                                     <TableCell className="hidden sm:table-cell">
@@ -321,14 +335,14 @@ export default function AdminHeroBoxesPage() {
                                 render={({ field }) => (
                                     <FormItem>
                                     <FormLabel>Category (Optional)</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value || ''}>
+                                    <Select onValueChange={field.onChange} value={field.value || 'none'}>
                                         <FormControl>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Assign to a category" />
                                         </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                        <SelectItem value="">None (Homepage)</SelectItem>
+                                        <SelectItem value="none">None (Homepage)</SelectItem>
                                         {categories?.map((category) => (
                                             <SelectItem key={category.id} value={category.id}>
                                             {category.name}
@@ -390,5 +404,3 @@ export default function AdminHeroBoxesPage() {
         </div>
     );
 }
-
-    

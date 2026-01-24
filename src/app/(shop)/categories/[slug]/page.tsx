@@ -127,7 +127,7 @@ export default function CategoryPage() {
 
           {!error && products && (
               <>
-                {subCategories && subCategories.sort((a,b) => (a.categoryOrder || 0) - (b.categoryOrder || 0)).map(subCategory => {
+                {subCategories && [...subCategories].sort((a,b) => (a.categoryOrder || 0) - (b.categoryOrder || 0)).map(subCategory => {
                     const subCatProducts = products.filter(p => p.categoryIds?.includes(subCategory.id));
                     if(subCatProducts.length === 0) return null;
 

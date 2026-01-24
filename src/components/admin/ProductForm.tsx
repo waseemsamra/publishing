@@ -110,6 +110,7 @@ export function ProductForm({ product }: { product?: Product }) {
           stock: product.stock ?? undefined,
           productType: product.productType ?? '',
           sustainabilityImpact: product.sustainabilityImpact ?? '',
+          categoryIds: product.categoryIds ?? [],
           images: product.images?.map(img => ({
             id: img.id,
             imageUrl: img.imageUrl.replace(s3BaseUrl, ''),
@@ -276,13 +277,35 @@ export function ProductForm({ product }: { product?: Product }) {
 
   const selectedCategoryIds = form.watch("categoryIds");
 
+  const categoryHierarchy = useMemo(() => {
+    const hierarchy = new Map<string, Category[]>();
+    if (!categories) return hierarchy;
+    
+    categories.forEach(cat => {
+      if (cat.parentId) {
+        if (!hierarchy.has(cat.parentId)) {
+          hierarchy.set(cat.parentId, []);
+        }
+        hierarchy.get(cat.parentId)!.push(cat);
+      }
+    });
+    return hierarchy;
+  }, [categories]);
+
   const productTypeOptions = useMemo(() => {
-    if (!categories || !selectedCategoryIds || selectedCategoryIds.length === 0) {
+    if (!selectedCategoryIds || selectedCategoryIds.length === 0) {
       return [];
     }
-    const selectedSet = new Set(selectedCategoryIds);
-    return categories.filter(cat => cat.parentId && selectedSet.has(cat.parentId));
-  }, [categories, selectedCategoryIds]);
+    
+    const options: Category[] = [];
+    selectedCategoryIds.forEach(parentId => {
+      const children = categoryHierarchy.get(parentId);
+      if (children) {
+        options.push(...children);
+      }
+    });
+    return options;
+  }, [selectedCategoryIds, categoryHierarchy]);
 
   const productType = form.watch('productType');
 

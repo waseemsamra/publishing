@@ -6,7 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote, Hand, Circle, Disc3, Building2 } from 'lucide-react';
+import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote, Hand, Circle, Disc3, Building2, Boxes } from 'lucide-react';
 
 const settingsLinks = [
     {
@@ -26,6 +26,12 @@ const settingsLinks = [
         title: "Colours",
         description: "Manage product colours and hex codes.",
         icon: Palette,
+    },
+     {
+        href: "/admin/pack-sizes",
+        title: "Pack Sizes",
+        description: "Manage product packaging quantities.",
+        icon: Boxes,
     },
     {
         href: "/admin/print-options",
@@ -135,9 +141,5 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
-
-    
-
-    
 
     

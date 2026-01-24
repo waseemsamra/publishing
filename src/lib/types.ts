@@ -28,6 +28,7 @@ export interface Product {
   handleIds?: string[];
   shapeIds?: string[];
   lidIds?: string[];
+  packSizeIds?: string[];
 
   createdAt?: any;
   updatedAt?: any;
@@ -221,16 +222,10 @@ export interface QuantityTier {
   createdAt?: any;
 }
     
-
-    
-
-    
-
-
-    
-
-    
-
-    
+export interface PackSize {
+  id: string;
+  quantity: number;
+  createdAt?: any;
+}
 
     

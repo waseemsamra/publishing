@@ -7,7 +7,7 @@ import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 import { doc, addDoc, updateDoc, collection, serverTimestamp, query } from 'firebase/firestore';
 import { useFirestore } from '@/firebase/provider';
-import type { Product, Category, Size, Colour, PrintOption, WallType, Thickness, MaterialType, FinishType, Adhesive, Handle, Shape, Lid, Vendor } from '@/lib/types';
+import type { Product, Category, Size, Colour, PrintOption, WallType, Thickness, MaterialType, FinishType, Adhesive, Handle, Shape, Lid, Vendor, PackSize } from '@/lib/types';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -53,6 +53,7 @@ const productSchema = z.object({
   handleIds: z.array(z.string()).optional(),
   shapeIds: z.array(z.string()).optional(),
   lidIds: z.array(z.string()).optional(),
+  packSizeIds: z.array(z.string()).optional(),
   images: z.array(imageSchema).optional(),
 });
 
@@ -71,9 +72,10 @@ const optionCollections = [
   { name: 'handles', field: 'handleIds' },
   { name: 'shapes', field: 'shapeIds' },
   { name: 'lids', field: 'lidIds' },
+  { name: 'packSizes', field: 'packSizeIds' },
 ] as const;
 
-type OptionType = Category | Size | Colour | PrintOption | WallType | Thickness | MaterialType | FinishType | Adhesive | Handle | Shape | Lid;
+type OptionType = Category | Size | Colour | PrintOption | WallType | Thickness | MaterialType | FinishType | Adhesive | Handle | Shape | Lid | PackSize;
 
 export function ProductForm({ product }: { product?: Product }) {
   const { toast } = useToast();
@@ -107,6 +109,7 @@ export function ProductForm({ product }: { product?: Product }) {
           handleIds: [],
           shapeIds: [],
           lidIds: [],
+          packSizeIds: [],
           materials: [],
           certifications: [],
         },
@@ -209,6 +212,13 @@ export function ProductForm({ product }: { product?: Product }) {
     return q;
   }, [collections.lids]);
 
+  const packSizesQuery = useMemo(() => {
+    if(!collections.packSizes) return null;
+    const q = query(collections.packSizes);
+    (q as any).__memo = true;
+    return q;
+  }, [collections.packSizes]);
+
   const vendorsQuery = useMemo(() => {
     if (!db) return null;
     const q = query(collection(db, 'vendors'));
@@ -228,6 +238,7 @@ export function ProductForm({ product }: { product?: Product }) {
   const { data: handles } = useCollection<Handle>(handlesQuery);
   const { data: shapes } = useCollection<Shape>(shapesQuery);
   const { data: lids } = useCollection<Lid>(lidsQuery);
+  const { data: packSizes } = useCollection<PackSize>(packSizesQuery);
   const { data: vendors } = useCollection<Vendor>(vendorsQuery);
 
   const optionData = {
@@ -243,6 +254,7 @@ export function ProductForm({ product }: { product?: Product }) {
     handles: handles || [],
     shapes: shapes || [],
     lids: lids || [],
+    packSizes: packSizes || [],
   };
 
   const handleImageChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
@@ -446,18 +458,18 @@ export function ProductForm({ product }: { product?: Product }) {
                     <CardContent className="space-y-4">
                         {optionCollections.filter(c => c.name !== 'categories').map(({ name, field }) => (
                             (optionData as any)[name] && (optionData as any)[name].length > 0 && (
-                                <FormField key={name} control={form.control} name={field as any} render={({ field }) => (
+                                <FormField key={name} control={form.control} name={field as any} render={({ field: formField }) => (
                                     <FormItem>
                                         <FormLabel>{name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, ' $1')}</FormLabel>
                                         <div className="space-y-2 max-h-40 overflow-y-auto border p-2 rounded-md">
                                             {(optionData as any)[name].map((item: OptionType) => (
                                                 <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
                                                     <FormControl>
-                                                        <Checkbox checked={field.value?.includes(item.id)} onCheckedChange={(checked) => (
-                                                            checked ? field.onChange([...(field.value || []), item.id]) : field.onChange(field.value?.filter(v => v !== item.id))
+                                                        <Checkbox checked={formField.value?.includes(item.id)} onCheckedChange={(checked) => (
+                                                            checked ? formField.onChange([...(formField.value || []), item.id]) : formField.onChange(formField.value?.filter(v => v !== item.id))
                                                         )}/>
                                                     </FormControl>
-                                                    <FormLabel className="font-normal">{item.name}</FormLabel>
+                                                    <FormLabel className="font-normal">{'quantity' in item ? item.quantity : item.name}</FormLabel>
                                                 </FormItem>
                                             ))}
                                         </div>
@@ -473,9 +485,5 @@ export function ProductForm({ product }: { product?: Product }) {
     </Form>
   );
 }
-
-    
-
-    
 
     

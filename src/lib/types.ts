@@ -219,7 +219,5 @@ export interface Vendor {
 export interface PackSize {
   id: string;
   quantity: number;
-  pricePerUnit: number;
-  save: number;
   createdAt?: any;
 }

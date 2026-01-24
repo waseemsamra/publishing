@@ -84,8 +84,8 @@ const settingsLinks = [
     },
     {
         href: "/admin/pack-sizes",
-        title: "Pack Sizes & Tiers",
-        description: "Manage quantity-based pricing for products.",
+        title: "Pack Sizes",
+        description: "Manage predefined pack quantities (e.g., 50, 100, 250).",
         icon: Boxes,
     },
     {

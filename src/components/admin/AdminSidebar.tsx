@@ -34,7 +34,6 @@ import {
   UserCheck,
   ChevronRight,
   FolderOpenDot,
-  Boxes,
 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -47,11 +46,9 @@ export function AdminSidebar() {
 
   const isProductRouteActive = pathname.startsWith('/admin/products');
   const isCmsRouteActive = pathname.startsWith('/admin/content');
-  const isStockRouteActive = pathname.startsWith('/admin/pack-sizes');
 
   const [isProductsOpen, setIsProductsOpen] = useState(isProductRouteActive);
   const [isCmsOpen, setIsCmsOpen] = useState(isCmsRouteActive);
-  const [isStockOpen, setIsStockOpen] = useState(isStockRouteActive);
 
   const getInitials = (name?: string | null) => {
     if (!name) return 'U';
@@ -203,36 +200,6 @@ export function AdminSidebar() {
             </Collapsible>
           </SidebarMenuItem>
           
-          {/* Stock Management Accordion */}
-          <SidebarMenuItem asChild>
-            <Collapsible open={isStockOpen} onOpenChange={setIsStockOpen}>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton
-                  isActive={isStockRouteActive}
-                  tooltip="Stock Management"
-                  className="justify-between w-full"
-                >
-                  <div className="flex items-center gap-2">
-                    <Boxes />
-                    <span>Stock Management</span>
-                  </div>
-                  <ChevronRight className={cn('h-4 w-4 transition-transform', isStockOpen && 'rotate-90')} />
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  <SidebarMenuSubItem>
-                    <Link href="/admin/pack-sizes">
-                      <SidebarMenuSubButton isActive={pathname === '/admin/pack-sizes'}>
-                        Pack Sizes & Tiers
-                      </SidebarMenuSubButton>
-                    </Link>
-                  </SidebarMenuSubItem>
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            </Collapsible>
-          </SidebarMenuItem>
-
           <SidebarMenuItem>
             <Link href="/admin/settings">
               <SidebarMenuButton isActive={pathname.startsWith('/admin/settings')} tooltip="Settings">

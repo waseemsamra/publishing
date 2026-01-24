@@ -214,6 +214,8 @@ export default function AdminProductsPage() {
             adhesiveIds: [],
             handleIds: [],
             shapeIds: [],
+            lidIds: [],
+            packSizeIds: [],
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
             });

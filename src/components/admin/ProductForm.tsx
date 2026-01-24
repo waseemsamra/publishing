@@ -40,7 +40,6 @@ const productSchema = z.object({
   sku: z.string().optional(),
   stock: z.coerce.number().optional(),
   productType: z.string().optional(),
-  sustainabilityImpact: z.string().optional(),
   materials: z.array(z.string()).optional(),
   certifications: z.array(z.string()).optional(),
   categoryIds: z.array(z.string()).optional(),
@@ -103,6 +102,12 @@ export function ProductForm({ product }: { product?: Product }) {
       ? {
           ...product,
           price: product.price || 0,
+          salePrice: product.salePrice ?? undefined,
+          boxQuantity: product.boxQuantity ?? undefined,
+          vendor: product.vendor ?? '',
+          sku: product.sku ?? '',
+          stock: product.stock ?? undefined,
+          productType: product.productType ?? '',
           images: product.images?.map(img => ({
             id: img.id,
             imageUrl: img.imageUrl.replace(s3BaseUrl, ''),
@@ -119,7 +124,6 @@ export function ProductForm({ product }: { product?: Product }) {
           vendor: '',
           sku: '',
           productType: '',
-          sustainabilityImpact: '',
           images: [],
           categoryIds: [],
           sizeIds: [],
@@ -367,9 +371,6 @@ export function ProductForm({ product }: { product?: Product }) {
                         )} />
                         <FormField control={form.control} name="description" render={({ field }) => (
                             <FormItem className="md:col-span-2"><FormLabel>Description</FormLabel><FormControl><Textarea {...field} rows={5} /></FormControl><FormMessage /></FormItem>
-                        )} />
-                         <FormField control={form.control} name="sustainabilityImpact" render={({ field }) => (
-                            <FormItem className="md:col-span-2"><FormLabel>Sustainability Impact</FormLabel><FormControl><Textarea {...field} value={field.value ?? ''} rows={3} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="price" render={({ field }) => (
                             <FormItem><FormLabel>Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>

@@ -3,8 +3,8 @@ import type { ImagePlaceholder } from './placeholder-images';
 export interface Product {
   id: string;
   name: string;
-  price?: number;
-  salePrice?: number;
+  price?: number | null;
+  salePrice?: number | null;
   pricingUnitId?: string;
   packPrices?: {
     packSizeId: string;
@@ -12,7 +12,7 @@ export interface Product {
   }[];
   vendor?: string;
   sku?: string;
-  stock?: number;
+  stock?: number | null;
   productType?: string;
   description: string;
   images?: ImagePlaceholder[];

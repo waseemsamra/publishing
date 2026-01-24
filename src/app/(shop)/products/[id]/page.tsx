@@ -109,13 +109,17 @@ export default function ProductDetailPage() {
   }
   
   const handleDesignLater = () => {
-    if (product && selectedPack) {
-        const productWithPrice = { ...product, price: selectedPack.pricePerUnit };
-        addToCart(productWithPrice, selectedPack.quantity);
+    if (product && selectedPack && product.packPrices) {
+        const packPrice = product.packPrices.find(p => p.packSizeId === selectedPack.id);
+        if (packPrice) {
+            const productWithPrice = { ...product, price: packPrice.price };
+            addToCart(productWithPrice, selectedPack.quantity);
+        }
     }
   };
 
-  const totalPrice = selectedPack ? selectedPack.quantity * selectedPack.pricePerUnit : 0;
+  const selectedPackPrice = product.packPrices?.find(p => p.packSizeId === selectedPack?.id)?.price;
+  const totalPrice = selectedPack && selectedPackPrice ? selectedPack.quantity * selectedPackPrice : 0;
 
   return (
     <>
@@ -185,15 +189,15 @@ export default function ProductDetailPage() {
                 </div>
                 
                 <div className="mt-6 flex items-baseline gap-2">
-                    {product.salePrice && product.salePrice < product.price ? (
+                    {product.salePrice != null && product.price != null && product.salePrice < product.price ? (
                         <>
-                            <p className="text-3xl font-bold text-red-600">DH{product.salePrice.toFixed(2)}</p>
-                            <p className="text-xl text-muted-foreground line-through">DH{product.price.toFixed(2)}</p>
+                            <p className="text-3xl font-bold text-red-600">DH{(product.salePrice || 0).toFixed(2)}</p>
+                            <p className="text-xl text-muted-foreground line-through">DH{(product.price || 0).toFixed(2)}</p>
                         </>
                     ) : (
-                        <p className="text-3xl font-bold">DH{product.price.toFixed(2)}</p>
+                        <p className="text-3xl font-bold">DH{(product.price || 0).toFixed(2)}</p>
                     )}
-                     <span className="text-sm text-muted-foreground">/ {product.pricingUnit || 'unit'}</span>
+                     <span className="text-sm text-muted-foreground">/ unit</span>
                 </div>
 
                 <Separator className="my-6" />

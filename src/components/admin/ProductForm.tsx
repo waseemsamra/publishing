@@ -278,16 +278,30 @@ export function ProductForm({ product }: { product?: Product }) {
   const { data: units } = useCollection<Unit>(unitsQuery);
 
   const selectedCategoryIds = form.watch("categoryIds") || [];
-
+  
   const productTypeOptions = useMemo(() => {
-    if (!categories) {
-      return [];
-    }
-    const selectedCategoryNames = categories
-      .filter(category => selectedCategoryIds.includes(category.id))
-      .map(c => c.name);
+    if (!categories) return [];
 
-    return selectedCategoryNames;
+    const categoryMap = new Map(categories.map(c => [c.id, { ...c, children: [] as Category[] }]));
+    const topLevelCategories: (Category & { children: Category[] })[] = [];
+    
+    categories.forEach(c => {
+      if (c.parentId && categoryMap.has(c.parentId)) {
+        categoryMap.get(c.parentId)!.children.push(categoryMap.get(c.id)!);
+      } else {
+        topLevelCategories.push(categoryMap.get(c.id)!);
+      }
+    });
+
+    const subCategories: Category[] = [];
+    selectedCategoryIds.forEach(id => {
+      const parent = categoryMap.get(id);
+      if(parent && parent.children) {
+        subCategories.push(...parent.children);
+      }
+    });
+
+    return subCategories;
   }, [categories, selectedCategoryIds]);
   
   const productType = form.watch('productType');
@@ -301,34 +315,36 @@ export function ProductForm({ product }: { product?: Product }) {
   }, [units, pricingUnitId]);
 
   useEffect(() => {
-    if (productType && !productTypeOptions.includes(productType)) {
-        form.setValue('productType', '', { shouldDirty: true });
+    const currentProductType = form.getValues('productType');
+    if (currentProductType && !productTypeOptions.some(opt => opt.id === currentProductType)) {
+      form.setValue('productType', '', { shouldDirty: true });
     }
-  }, [productType, productTypeOptions, form]);
+  }, [productTypeOptions, form]);
 
-  useEffect(() => {
-    const packPrices = form.getValues('packPrices') || [];
+ useEffect(() => {
+    const currentPackPrices = form.getValues('packPrices') || [];
+    const selectedPackSizeIds = watchedPackSizeIds || [];
 
     if (!isPackPricing) {
-      if (packPrices.length > 0) {
-        form.setValue('packPrices', []);
-      }
-      return;
+        if (currentPackPrices.length > 0) {
+            form.setValue('packPrices', []);
+        }
+        return;
     }
 
-    const selectedIds = watchedPackSizeIds || [];
+    const newPackPrices = selectedPackSizeIds.map(id => {
+        const existing = currentPackPrices.find(p => p.packSizeId === id);
+        return existing || { packSizeId: id, price: 0 };
+    });
     
-    const priceMap = new Map(packPrices.map(p => [p.packSizeId, p.price]));
+    // This check prevents infinite loops by only updating if the structure has actually changed.
+    const hasChanged = newPackPrices.length !== currentPackPrices.length || 
+                      !newPackPrices.every((v, i) => v.packSizeId === currentPackPrices[i]?.packSizeId);
 
-    const newPackPrices = selectedIds.map(id => ({
-      packSizeId: id,
-      price: priceMap.get(id) ?? 0,
-    }));
-    
-    if (newPackPrices.length !== packPrices.length || !newPackPrices.every((val, index) => val.packSizeId === packPrices[index]?.packSizeId)) {
-      form.setValue('packPrices', newPackPrices, { shouldDirty: true });
+    if (hasChanged) {
+        form.setValue('packPrices', newPackPrices, { shouldDirty: true });
     }
-  }, [isPackPricing, JSON.stringify(watchedPackSizeIds), form]);
+}, [isPackPricing, watchedPackSizeIds, form]);
 
   const optionData = {
     categories: categories || [],
@@ -387,6 +403,8 @@ export function ProductForm({ product }: { product?: Product }) {
         const dataToSave = {
             ...data,
             price: data.price ?? 0,
+            salePrice: data.salePrice ?? null,
+            stock: data.stock ?? null,
             images: data.images?.map((img, index) => ({...img, imageUrl: uploadedImageUrls[index] })),
             updatedAt: serverTimestamp(),
         };
@@ -640,39 +658,33 @@ export function ProductForm({ product }: { product?: Product }) {
                             )}
                         />
                         <FormField
-                            control={form.control}
-                            name="productType"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Product Type</FormLabel>
-                                <Select
-                                    onValueChange={field.onChange}
-                                    value={field.value || ''}
-                                    disabled={productTypeOptions.length === 0}
-                                >
-                                    <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select a primary product type" />
-                                    </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                    {productTypeOptions.length > 0 ? (
-                                        productTypeOptions.map((catName) => (
-                                        <SelectItem key={catName} value={catName}>
-                                            {catName}
-                                        </SelectItem>
-                                        ))
-                                    ) : (
-                                        <SelectItem value="none" disabled>
-                                        Select categories first
-                                        </SelectItem>
-                                    )}
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                            />
+                          control={form.control}
+                          name="productType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Product Type</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                value={field.value || ''}
+                                disabled={productTypeOptions.length === 0}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select a product type" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {productTypeOptions.map((cat) => (
+                                    <SelectItem key={cat.id} value={cat.name}>
+                                      {cat.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                     </CardContent>
                 </Card>
                 <Card>

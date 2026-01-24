@@ -34,6 +34,7 @@ import {
   UserCheck,
   ChevronRight,
   FolderOpenDot,
+  Boxes,
 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -46,9 +47,11 @@ export function AdminSidebar() {
 
   const isProductRouteActive = pathname.startsWith('/admin/products');
   const isCmsRouteActive = pathname.startsWith('/admin/content');
+  const isStockRouteActive = pathname.startsWith('/admin/quantity-tiers');
 
   const [isProductsOpen, setIsProductsOpen] = useState(isProductRouteActive);
   const [isCmsOpen, setIsCmsOpen] = useState(isCmsRouteActive);
+  const [isStockOpen, setIsStockOpen] = useState(isStockRouteActive);
 
   const getInitials = (name?: string | null) => {
     if (!name) return 'U';
@@ -192,6 +195,36 @@ export function AdminSidebar() {
                     <Link href="/admin/content/trending-now">
                       <SidebarMenuSubButton isActive={pathname === '/admin/content/trending-now'}>
                         Trending Now
+                      </SidebarMenuSubButton>
+                    </Link>
+                  </SidebarMenuSubItem>
+                </SidebarMenuSub>
+              </CollapsibleContent>
+            </Collapsible>
+          </SidebarMenuItem>
+          
+          {/* Stock Management Accordion */}
+          <SidebarMenuItem asChild>
+            <Collapsible open={isStockOpen} onOpenChange={setIsStockOpen}>
+              <CollapsibleTrigger asChild>
+                <SidebarMenuButton
+                  isActive={isStockRouteActive}
+                  tooltip="Stock Management"
+                  className="justify-between w-full"
+                >
+                  <div className="flex items-center gap-2">
+                    <Boxes />
+                    <span>Stock Management</span>
+                  </div>
+                  <ChevronRight className={cn('h-4 w-4 transition-transform', isStockOpen && 'rotate-90')} />
+                </SidebarMenuButton>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <SidebarMenuSub>
+                  <SidebarMenuSubItem>
+                    <Link href="/admin/quantity-tiers">
+                      <SidebarMenuSubButton isActive={pathname === '/admin/quantity-tiers'}>
+                        Quantity Tiers
                       </SidebarMenuSubButton>
                     </Link>
                   </SidebarMenuSubItem>

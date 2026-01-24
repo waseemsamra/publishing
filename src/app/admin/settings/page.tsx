@@ -6,7 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote, Hand, Circle, Disc3, Building2, TrendingUp } from 'lucide-react';
+import { Ruler, Palette, Printer, Store, CreditCard, Ship, Layers, Scaling, Package, Sparkles, StickyNote, Hand, Circle, Disc3, Building2 } from 'lucide-react';
 
 const settingsLinks = [
     {
@@ -80,12 +80,6 @@ const settingsLinks = [
         title: "Lids",
         description: "Manage product lid options like Sip or Straw Slot.",
         icon: Disc3,
-    },
-    {
-        href: "/admin/quantity-tiers",
-        title: "Quantity Tiers",
-        description: "Manage quantity-based pricing tiers.",
-        icon: TrendingUp,
     },
     {
         href: "/admin/settings/store-details",

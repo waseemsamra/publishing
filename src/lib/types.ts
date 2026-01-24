@@ -216,18 +216,10 @@ export interface Vendor {
   createdAt?: any;
 }
     
-export interface QuantityTier {
+export interface PackSize {
   id: string;
   quantity: number;
   pricePerUnit: number;
   save: number;
   createdAt?: any;
 }
-    
-export interface PackSize {
-  id: string;
-  quantity: number;
-  createdAt?: any;
-}
-
-    

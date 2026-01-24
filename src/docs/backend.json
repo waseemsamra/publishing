@@ -1,0 +1,1370 @@
+{
+  "entities": {
+    "Adhesive": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Adhesive",
+      "type": "object",
+      "description": "Represents a product adhesive type (e.g., Single, Double).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the adhesive type."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the adhesive type (e.g., Single)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the adhesive type."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "BillingAddress": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "BillingAddress",
+      "type": "object",
+      "description": "Represents a billing address.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the billing address."
+        },
+        "addressLine1": {
+          "type": "string",
+          "description": "Address line 1."
+        },
+        "addressLine2": {
+          "type": "string",
+          "description": "Address line 2 (optional)."
+        },
+        "city": {
+          "type": "string",
+          "description": "City."
+        },
+        "state": {
+          "type": "string",
+          "description": "State."
+        },
+        "zipCode": {
+          "type": "string",
+          "description": "Zip code."
+        },
+        "country": {
+          "type": "string",
+          "description": "Country."
+        }
+      },
+      "required": [
+        "id",
+        "addressLine1",
+        "city",
+        "state",
+        "zipCode",
+        "country"
+      ]
+    },
+    "CartItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CartItem",
+      "type": "object",
+      "description": "Represents an item in a shopping cart.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the cart item."
+        },
+        "productId": {
+          "type": "string",
+          "description": "Reference to Product. (Relationship: Product 1:N CartItem)"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Quantity of the product in the cart."
+        }
+      },
+      "required": [
+        "id",
+        "productId",
+        "quantity"
+      ]
+    },
+    "Category": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Category",
+      "type": "object",
+      "description": "Represents a product category.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the category."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the category."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the category."
+        },
+        "parentId": {
+          "type": "string",
+          "description": "ID of the parent category. If absent, this is a top-level category."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the category image."
+        },
+        "imageHint": {
+          "type": "string",
+          "description": "A hint for AI image generation tools."
+        },
+        "categoryOrder": {
+          "type": "number",
+          "description": "The display order for this category on a category page. Lower numbers appear first."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description"
+      ]
+    },
+    "Colour": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Colour",
+      "type": "object",
+      "description": "Represents a product colour.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the colour."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the colour (e.g., Red, Blue, Green)."
+        },
+        "hexCode": {
+          "type": "string",
+          "description": "Hex code for the colour (e.g., #FF0000)."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "hexCode"
+      ]
+    },
+    "FinishType": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FinishType",
+      "type": "object",
+      "description": "Represents a product finish type (e.g., Matt, Glossy).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the finish type."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the finish type (e.g., Matt)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the finish type."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "Handle": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Handle",
+      "type": "object",
+      "description": "Represents a bag handle type (e.g., Flat, Twisted).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the handle type."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the handle type (e.g., Flat)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the handle type."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "Lid": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Lid",
+      "type": "object",
+      "description": "Represents a product lid type (e.g., Sip, Straw Slot).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the lid type."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the lid type (e.g., Sip Lid)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the lid type."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+     "HeroSlide": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "HeroSlide",
+      "type": "object",
+      "description": "Represents a single slide in the homepage hero carousel.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the hero slide."
+        },
+        "title": {
+          "type": "string",
+          "description": "The main headline of the slide."
+        },
+        "subtitle": {
+          "type": "string",
+          "description": "The subtitle or descriptive text for the slide."
+        },
+        "links": {
+          "type": "array",
+          "description": "An array of link objects for the slide.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": { "type": "string" },
+              "href": { "type": "string" }
+            },
+            "required": ["text", "href"]
+          }
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the background image for the slide.",
+          "format": "uri"
+        },
+        "imageHint": {
+          "type": "string",
+          "description": "A hint for AI image generation tools."
+        },
+        "order": {
+          "type": "number",
+          "description": "The display order of the slide."
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "imageUrl"
+      ]
+    },
+    "HeroBox": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "HeroBox",
+      "type": "object",
+      "description": "Represents a Category that is designated to appear in the interactive homepage hero section.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the hero box." },
+        "categoryId": { "type": "string", "description": "A reference to the Category to be displayed." },
+        "order": { "type": "number", "description": "The display order of the box in the grid." },
+        "isFeatured": { "type": "boolean", "description": "If true, this box is the main featured item on the left." }
+      },
+      "required": [ "id", "categoryId", "order" ]
+    },
+    "TrendingItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TrendingItem",
+      "type": "object",
+      "description": "Represents a single item in the 'Trending Now' section on the homepage.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the trending item."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the trending item."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the image for the item.",
+          "format": "uri"
+        },
+        "imageHint": {
+          "type": "string",
+          "description": "A hint for AI image generation tools."
+        },
+        "order": {
+          "type": "number",
+          "description": "The display order of the item."
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "imageUrl"
+      ]
+    },
+    "MaterialType": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MaterialType",
+      "type": "object",
+      "description": "Represents a product material type (e.g., Standard White, Kraft).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the material type."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the material type (e.g., Standard White)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the material type."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "Order": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Order",
+      "type": "object",
+      "description": "Represents a customer order.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the order."
+        },
+        "userAccountId": {
+          "type": "string",
+          "description": "Reference to UserAccount. (Relationship: UserAccount 1:N Order)"
+        },
+        "orderDate": {
+          "type": "string",
+          "description": "Date the order was placed.",
+          "format": "date-time"
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "Total amount of the order."
+        },
+        "shippingAddressId": {
+          "type": "string",
+          "description": "Reference to ShippingAddress. (Relationship: Order 1:1 ShippingAddress)"
+        },
+        "billingAddressId": {
+          "type": "string",
+          "description": "Reference to BillingAddress. (Relationship: Order 1:1 BillingAddress)"
+        },
+        "orderItemIds": {
+          "type": "array",
+          "description": "References to OrderItems. (Relationship: Order 1:N OrderItem)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "userAccountId",
+        "orderDate",
+        "totalAmount",
+        "shippingAddressId",
+        "billingAddressId"
+      ]
+    },
+    "OrderItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "OrderItem",
+      "type": "object",
+      "description": "Represents an item in an order.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the order item."
+        },
+        "productId": {
+          "type": "string",
+          "description": "Reference to Product. (Relationship: Product 1:N OrderItem)"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Quantity of the product in the order."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the product at the time of the order."
+        }
+      },
+      "required": [
+        "id",
+        "productId",
+        "quantity",
+        "price"
+      ]
+    },
+    "PackSize": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PackSize",
+      "type": "object",
+      "description": "Represents a pricing tier based on quantity for bulk purchases.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the pricing tier."
+        },
+        "quantity": {
+          "type": "number",
+          "description": "The minimum quantity for this tier."
+        },
+        "pricePerUnit": {
+          "type": "number",
+          "description": "The price per unit for this tier."
+        },
+        "save": {
+          "type": "number",
+          "description": "The percentage saved compared to the base tier."
+        }
+      },
+      "required": [
+        "id",
+        "quantity",
+        "pricePerUnit"
+      ]
+    },
+    "PrintOption": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PrintOption",
+      "type": "object",
+      "description": "Represents a product print option.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the print option."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the print option (e.g., Embossed, Foil Stamp)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the print option."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "Product": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Product",
+      "type": "object",
+      "description": "Represents a product listed in the EcoCart Marketplace.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the product."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the product."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the product."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the product. This can be per unit or per box, depending on pricingUnit."
+        },
+        "salePrice": {
+          "type": "number",
+          "description": "The discounted price of the product."
+        },
+        "pricingUnit": {
+          "type": "string",
+          "description": "The unit of pricing for the product.",
+          "enum": ["unit", "box"]
+        },
+        "boxQuantity": {
+          "type": "number",
+          "description": "Number of units in a box, if pricing is per box."
+        },
+        "vendor": {
+          "type": "string",
+          "description": "The vendor or brand of the product."
+        },
+        "sku": {
+          "type": "string",
+          "description": "The Stock Keeping Unit for the product."
+        },
+        "stock": {
+          "type": "number",
+          "description": "The number of items in stock."
+        },
+        "productType": {
+          "type": "string",
+          "description": "The type of the product (e.g., Paper Cup)."
+        },
+        "images": {
+          "type": "array",
+          "description": "Array of product images.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "description": { "type": "string" },
+              "imageUrl": { "type": "string", "format": "uri" },
+              "imageHint": { "type": "string" }
+            },
+            "required": ["id", "imageUrl"]
+          }
+        },
+        "materials": {
+          "type": "array",
+          "description": "Materials used to manufacture the product.",
+          "items": { "type": "string" }
+        },
+        "certifications": {
+          "type": "array",
+          "description": "Certifications held by the product (e.g., Fair Trade, Organic).",
+          "items": { "type": "string" }
+        },
+        "sustainabilityImpact": {
+          "type": "string",
+          "description": "Description of the product's positive impact on sustainability."
+        },
+        "categoryIds": {
+          "type": "array",
+          "description": "References to Categories. (Relationship: Product N:N Category)",
+          "items": { "type": "string" }
+        },
+        "sizeIds": {
+          "type": "array",
+          "description": "References to Sizes.",
+          "items": { "type": "string" }
+        },
+        "colourIds": {
+          "type": "array",
+          "description": "References to Colours.",
+          "items": { "type": "string" }
+        },
+        "printOptionIds": {
+          "type": "array",
+          "description": "References to Print Options.",
+          "items": { "type": "string" }
+        },
+        "wallTypeIds": {
+          "type": "array",
+          "description": "References to Wall Types.",
+          "items": { "type": "string" }
+        },
+        "thicknessIds": {
+          "type": "array",
+          "description": "References to Thicknesses.",
+          "items": { "type": "string" }
+        },
+        "materialTypeIds": {
+          "type": "array",
+          "description": "References to Material Types.",
+          "items": { "type": "string" }
+        },
+        "finishTypeIds": {
+          "type": "array",
+          "description": "References to Finish Types.",
+          "items": { "type": "string" }
+        },
+        "adhesiveIds": {
+          "type": "array",
+          "description": "References to Adhesives.",
+          "items": { "type": "string" }
+        },
+        "handleIds": {
+          "type": "array",
+          "description": "References to Handles.",
+          "items": { "type": "string" }
+        },
+        "shapeIds": {
+          "type": "array",
+          "description": "References to Shapes.",
+          "items": { "type": "string" }
+        },
+        "lidIds": {
+          "type": "array",
+          "description": "References to Lids.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "packSizeIds": {
+          "type": "array",
+          "description": "References to PackSizes.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "price"
+      ]
+    },
+    "ShippingAddress": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ShippingAddress",
+      "type": "object",
+      "description": "Represents a shipping address.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the shipping address."
+        },
+        "addressLine1": {
+          "type": "string",
+          "description": "Address line 1."
+        },
+        "addressLine2": {
+          "type": "string",
+          "description": "Address line 2 (optional)."
+        },
+        "city": {
+          "type": "string",
+          "description": "City."
+        },
+        "state": {
+          "type": "string",
+          "description": "State."
+        },
+        "zipCode": {
+          "type": "string",
+          "description": "Zip code."
+        },
+        "country": {
+          "type": "string",
+          "description": "Country."
+        }
+      },
+      "required": [
+        "id",
+        "addressLine1",
+        "city",
+        "state",
+        "zipCode",
+        "country"
+      ]
+    },
+    "ShoppingCart": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ShoppingCart",
+      "type": "object",
+      "description": "Represents a user's shopping cart.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the shopping cart."
+        },
+        "userAccountId": {
+          "type": "string",
+          "description": "Reference to UserAccount. (Relationship: UserAccount 1:1 ShoppingCart)"
+        },
+        "cartItemIds": {
+          "type": "array",
+          "description": "References to CartItems. (Relationship: ShoppingCart 1:N CartItem)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "userAccountId"
+      ]
+    },
+    "Size": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Size",
+      "type": "object",
+      "description": "Represents a product size.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the size."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the size (e.g., Small, Medium, Large)."
+        },
+        "shortName": {
+          "type": "string",
+          "description": "Short name for the size (e.g., S, M, L)."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "Shape": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Shape",
+      "type": "object",
+      "description": "Represents a product shape (e.g., Circle, Square).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the shape."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the shape (e.g., Circle)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the shape."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "StoreSettings": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "StoreSettings",
+      "type": "object",
+      "description": "Represents the general settings for the store.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the settings document."
+        },
+        "storeName": {
+          "type": "string",
+          "description": "The name of the store."
+        },
+        "logoUrl": {
+          "type": "string",
+          "description": "URL of the store's logo.",
+          "format": "uri"
+        },
+        "contactEmail": {
+          "type": "string",
+          "description": "The primary contact email for the store.",
+          "format": "email"
+        },
+        "contactPhone": {
+          "type": "string",
+          "description": "The primary contact phone number for the store."
+        },
+        "address": {
+          "type": "string",
+          "description": "The physical address of the store."
+        },
+        "companyDetails": {
+          "type": "string",
+          "description": "Additional company details for invoices (e.g., VAT number, registration number)."
+        }
+      },
+      "required": [
+        "id",
+        "storeName"
+      ]
+    },
+    "Thickness": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Thickness",
+      "type": "object",
+      "description": "Represents a product thickness option (e.g., 100gsm).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the thickness."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the thickness (e.g., 100gsm, 12pt)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the thickness."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "UserAccount": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserAccount",
+      "type": "object",
+      "description": "Represents a user account in the EcoCart Marketplace.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user account."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the user."
+        },
+        "billingAddressId": {
+          "type": "string",
+          "description": "Reference to BillingAddress. (Relationship: UserAccount 1:1 BillingAddress)"
+        },
+        "shippingAddressId": {
+          "type": "string",
+          "description": "Reference to ShippingAddress. (Relationship: UserAccount 1:1 ShippingAddress)"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "firstName",
+        "lastName"
+      ]
+    },
+    "Vendor": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Vendor",
+      "type": "object",
+      "description": "Represents a product vendor or brand.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the vendor."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the vendor."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the vendor."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "WallType": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WallType",
+      "type": "object",
+      "description": "Represents a cup wall type (e.g., Single, Double, Ripple).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the wall type."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the wall type (e.g., Single Wall)."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "UserAccount",
+          "schema": {
+            "$ref": "#/backend/entities/UserAccount"
+          },
+          "description": "Stores user account information. Accessible only by the user and administrators.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user account."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/products/{productId}",
+        "definition": {
+          "entityName": "Product",
+          "schema": {
+            "$ref": "#/backend/entities/Product"
+          },
+          "description": "Stores product information. Publicly readable, but write access restricted to administrators.",
+          "params": [
+            {
+              "name": "productId",
+              "description": "The unique identifier for the product."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/categories/{categoryId}",
+        "definition": {
+          "entityName": "Category",
+          "schema": {
+            "$ref": "#/backend/entities/Category"
+          },
+          "description": "Stores product category information. Publicly readable, but write access restricted to administrators.",
+          "params": [
+            {
+              "name": "categoryId",
+              "description": "The unique identifier for the category."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/sizes/{sizeId}",
+        "definition": {
+          "entityName": "Size",
+          "schema": {
+            "$ref": "#/backend/entities/Size"
+          },
+          "description": "Stores available product sizes. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "sizeId",
+              "description": "The unique identifier for the size."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/colours/{colourId}",
+        "definition": {
+          "entityName": "Colour",
+          "schema": {
+            "$ref": "#/backend/entities/Colour"
+          },
+          "description": "Stores available product colours. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "colourId",
+              "description": "The unique identifier for the colour."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/printOptions/{printOptionId}",
+        "definition": {
+          "entityName": "PrintOption",
+          "schema": {
+            "$ref": "#/backend/entities/PrintOption"
+          },
+          "description": "Stores available product print options. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "printOptionId",
+              "description": "The unique identifier for the print option."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/wallTypes/{wallTypeId}",
+        "definition": {
+          "entityName": "WallType",
+          "schema": {
+            "$ref": "#/backend/entities/WallType"
+          },
+          "description": "Stores available cup wall types. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "wallTypeId",
+              "description": "The unique identifier for the wall type."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/thicknesses/{thicknessId}",
+        "definition": {
+          "entityName": "Thickness",
+          "schema": {
+            "$ref": "#/backend/entities/Thickness"
+          },
+          "description": "Stores available product thicknesses. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "thicknessId",
+              "description": "The unique identifier for the thickness."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/materialTypes/{materialTypeId}",
+        "definition": {
+          "entityName": "MaterialType",
+          "schema": {
+            "$ref": "#/backend/entities/MaterialType"
+          },
+          "description": "Stores available product material types. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "materialTypeId",
+              "description": "The unique identifier for the material type."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/finishTypes/{finishTypeId}",
+        "definition": {
+          "entityName": "FinishType",
+          "schema": {
+            "$ref": "#/backend/entities/FinishType"
+          },
+          "description": "Stores available product finish types. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "finishTypeId",
+              "description": "The unique identifier for the finish type."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/adhesives/{adhesiveId}",
+        "definition": {
+          "entityName": "Adhesive",
+          "schema": {
+            "$ref": "#/backend/entities/Adhesive"
+          },
+          "description": "Stores available product adhesive types. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "adhesiveId",
+              "description": "The unique identifier for the adhesive."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/handles/{handleId}",
+        "definition": {
+          "entityName": "Handle",
+          "schema": {
+            "$ref": "#/backend/entities/Handle"
+          },
+          "description": "Stores available bag handle types. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "handleId",
+              "description": "The unique identifier for the handle."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/shapes/{shapeId}",
+        "definition": {
+          "entityName": "Shape",
+          "schema": {
+            "$ref": "#/backend/entities/Shape"
+          },
+          "description": "Stores available product shapes. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "shapeId",
+              "description": "The unique identifier for the shape."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/lids/{lidId}",
+        "definition": {
+          "entityName": "Lid",
+          "schema": {
+            "$ref": "#/backend/entities/Lid"
+          },
+          "description": "Stores available product lid types. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "lidId",
+              "description": "The unique identifier for the lid."
+            }
+          ]
+        }
+      },
+       {
+        "path": "/heroSlides/{heroSlideId}",
+        "definition": {
+          "entityName": "HeroSlide",
+          "schema": {
+            "$ref": "#/backend/entities/HeroSlide"
+          },
+          "description": "Stores content for the homepage hero carousel. Publicly readable, write access restricted to administrators.",
+          "params": [
+            {
+              "name": "heroSlideId",
+              "description": "The unique identifier for the hero slide."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/heroBoxes/{heroBoxId}",
+        "definition": {
+          "entityName": "HeroBox",
+          "schema": {
+            "$ref": "#/backend/entities/HeroBox"
+          },
+          "description": "Stores content for the interactive homepage hero section. Publicly readable, write access restricted to administrators.",
+          "params": [
+            {
+              "name": "heroBoxId",
+              "description": "The unique identifier for the hero box."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/trendingItems/{trendingItemId}",
+        "definition": {
+          "entityName": "TrendingItem",
+          "schema": {
+            "$ref": "#/backend/entities/TrendingItem"
+          },
+          "description": "Stores content for the homepage 'Trending Now' section. Publicly readable, write access restricted to administrators.",
+          "params": [
+            {
+              "name": "trendingItemId",
+              "description": "The unique identifier for the trending item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/settings/{settingId}",
+        "definition": {
+          "entityName": "StoreSettings",
+          "schema": {
+            "$ref": "#/backend/entities/StoreSettings"
+          },
+          "description": "Stores global settings for the application, like store details. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "settingId",
+              "description": "The unique identifier for the settings document (e.g., 'storeDetails')."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/vendors/{vendorId}",
+        "definition": {
+          "entityName": "Vendor",
+          "schema": {
+            "$ref": "#/backend/entities/Vendor"
+          },
+          "description": "Stores available product vendors. Write access is restricted to administrators.",
+          "params": [
+            {
+              "name": "vendorId",
+              "description": "The unique identifier for the vendor."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/packSizes/{packSizeId}",
+        "definition": {
+          "entityName": "PackSize",
+          "schema": {
+            "$ref": "#/backend/entities/PackSize"
+          },
+          "description": "Stores pricing tiers for bulk purchases. Publicly readable, write access restricted to administrators.",
+          "params": [
+            {
+              "name": "packSizeId",
+              "description": "The unique identifier for the pack size."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/shoppingCarts/{shoppingCartId}",
+        "definition": {
+          "entityName": "ShoppingCart",
+          "schema": {
+            "$ref": "#/backend/entities/ShoppingCart"
+          },
+          "description": "Stores shopping cart information for each user. Accessible only by the user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user account."
+            },
+            {
+              "name": "shoppingCartId",
+              "description": "The unique identifier for the shopping cart."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/shoppingCarts/{shoppingCartId}/cartItems/{cartItemId}",
+        "definition": {
+          "entityName": "CartItem",
+          "schema": {
+            "$ref": "#/backend/entities/CartItem"
+          },
+          "description": "Stores individual cart items within a shopping cart. Accessible only by the user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user account."
+            },
+            {
+              "name": "shoppingCartId",
+              "description": "The unique identifier for the shopping cart."
+            },
+            {
+              "name": "cartItemId",
+              "description": "The unique identifier for the cart item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/orders/{orderId}",
+        "definition": {
+          "entityName": "Order",
+          "schema": {
+            "$ref": "#/backend/entities/Order"
+          },
+          "description": "Stores order information for each user. Accessible only by the user and administrators.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user account."
+            },
+            {
+              "name": "orderId",
+              "description": "The unique identifier for the order."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/orders/{orderId}/orderItems/{orderItemId}",
+        "definition": {
+          "entityName": "OrderItem",
+          "schema": {
+            "$ref": "#/backend/entities/OrderItem"
+          },
+          "description": "Stores individual order items within an order. Accessible only by the user and administrators.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user account."
+            },
+            {
+              "name": "orderId",
+              "description": "The unique identifier for the order."
+            },
+            {
+              "name": "orderItemId",
+              "description": "The unique identifier for the order item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/shippingAddresses/{shippingAddressId}",
+        "definition": {
+          "entityName": "ShippingAddress",
+          "schema": {
+            "$ref": "#/backend/entities/ShippingAddress"
+          },
+          "description": "Stores shipping addresses for each user. Accessible only by the user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user account."
+            },
+            {
+              "name": "shippingAddressId",
+              "description": "The unique identifier for the shipping address."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/billingAddresses/{billingAddressId}",
+        "definition": {
+          "entityName": "BillingAddress",
+          "schema": {
+            "$ref": "#/backend/entities/BillingAddress"
+          },
+          "description": "Stores billing addresses for each user. Accessible only by the user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user account."
+            },
+            {
+              "name": "billingAddressId",
+              "description": "The unique identifier for the billing address."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to be secure, scalable, and easily debuggable, following the core design principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and QAPs (Rules are not Filters).  \n\nAuthorization Independence is achieved through denormalization.  For example, if access to a cart requires knowing the user's ID, that ID is directly embedded within the cart document or its subcollections (cartItems). This eliminates the need for `get()` calls in security rules, allowing atomic operations (transactions/batches) to work correctly and simplifying debugging. Collaborative data (if any) uses the Membership Map pattern.  \n\nStructural Segregation is applied by separating data with different security requirements into distinct collections.  For example, user accounts are stored separately from products, and each user's shopping cart and orders are stored under their user ID.\n\nAccess Modeling follows consistent patterns:  User-owned data uses path-based ownership (`/users/{userId}/shoppingCarts/{shoppingCartId}`). Global roles are implemented using existence checks on dedicated collections (e.g., `/roles_admin/{uid}`).\n\nData Clarity and Predictability are ensured by using explicit state modeling (if applicable), predictable schemas, and consistent naming conventions.  All collections and documents use semantic names.  Wildcards are descriptive (e.g., `{userId}` instead of `{id}`).\n\nThis structure facilitates simple, robust, and easily debuggable security rules, supporting secure `list` operations and maintaining the integrity of ownership, timestamps, and denormalized data."
+  }
+}

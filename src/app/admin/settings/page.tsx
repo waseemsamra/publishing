@@ -27,12 +27,6 @@ const settingsLinks = [
         description: "Manage product colours and hex codes.",
         icon: Palette,
     },
-     {
-        href: "/admin/pack-sizes",
-        title: "Pack Sizes",
-        description: "Manage product packaging quantities.",
-        icon: Boxes,
-    },
     {
         href: "/admin/print-options",
         title: "Print Options",
@@ -141,5 +135,3 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
-
-    

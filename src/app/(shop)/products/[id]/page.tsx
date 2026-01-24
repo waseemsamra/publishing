@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useParams, notFound } from 'next/navigation';
 import { useMemo, useState, useEffect } from 'react';
-import type { Product, Size, WallType, Colour } from '@/lib/types';
+import type { Product, Size, WallType, Colour, PackSize } from '@/lib/types';
 import { doc, collection, query, where, documentId } from 'firebase/firestore';
 import { useDoc } from '@/firebase/firestore/use-doc';
 import { useCollection } from '@/firebase/firestore/use-collection';
@@ -18,14 +18,12 @@ import {
 } from '@/components/ui/carousel';
 import { Loader2, Truck, Zap, Leaf, HelpCircle, Share2, Star } from 'lucide-react';
 import { useCart } from '@/context/cart-context';
-import { QuantityPricingTable } from '@/components/quantity-pricing-table';
 import { ProductInfoAccordion } from '@/components/product-info-accordion';
 import { RelatedProducts } from '@/components/related-products';
 import { BrandStories } from '@/components/brand-stories';
 import { useAuth } from '@/context/auth-context';
 import { Separator } from '@/components/ui/separator';
-
-type PricingTier = { qty: number; pricePerUnit: number; save: number; total: number; };
+import { cn } from '@/lib/utils';
 
 export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
@@ -65,11 +63,19 @@ export default function ProductDetailPage() {
     return q;
   }, [product, db]);
   const { data: availableColours } = useCollection<Colour>(coloursQuery);
+  
+  const packSizesQuery = useMemo(() => {
+    if (!db || !product?.packSizeIds || product.packSizeIds.length === 0) return null;
+    const q = query(collection(db, 'packSizes'), where(documentId(), 'in', product.packSizeIds));
+    (q as any).__memo = true;
+    return q;
+  }, [product, db]);
+  const { data: availablePacks } = useCollection<PackSize>(packSizesQuery);
 
   const [selectedWall, setSelectedWall] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedLid, setSelectedLid] = useState<string | null>('None');
-  const [selectedTier, setSelectedTier] = useState<PricingTier | null>(null);
+  const [selectedPack, setSelectedPack] = useState<PackSize | null>(null);
   const [selectedColour, setSelectedColour] = useState<string | null>(null);
 
   const isLoading = authLoading || isLoadingProduct;
@@ -84,7 +90,11 @@ export default function ProductDetailPage() {
     if (availableColours && availableColours.length > 0 && !selectedColour) {
       setSelectedColour(availableColours[0].id);
     }
-  }, [availableWallTypes, availableSizes, selectedWall, selectedSize, availableColours, selectedColour]);
+    if (availablePacks && availablePacks.length > 0 && !selectedPack) {
+      const sortedPacks = [...availablePacks].sort((a,b) => a.quantity - b.quantity);
+      setSelectedPack(sortedPacks[0]);
+    }
+  }, [availableWallTypes, availableSizes, availableColours, availablePacks, selectedWall, selectedSize, selectedColour, selectedPack]);
 
   if (isLoading || !params.id) {
     return (
@@ -99,10 +109,13 @@ export default function ProductDetailPage() {
   }
   
   const handleDesignLater = () => {
-    if (product && selectedTier) {
-        addToCart(product, selectedTier.qty);
+    if (product && selectedPack) {
+        const productWithPrice = { ...product, price: selectedPack.pricePerUnit };
+        addToCart(productWithPrice, selectedPack.quantity);
     }
   };
+
+  const totalPrice = selectedPack ? selectedPack.quantity * selectedPack.pricePerUnit : 0;
 
   return (
     <>
@@ -180,6 +193,7 @@ export default function ProductDetailPage() {
                     ) : (
                         <p className="text-3xl font-bold">DH{product.price.toFixed(2)}</p>
                     )}
+                     <span className="text-sm text-muted-foreground">/ {product.pricingUnit || 'unit'}</span>
                 </div>
 
                 <Separator className="my-6" />
@@ -251,16 +265,33 @@ export default function ProductDetailPage() {
                       <Button variant={selectedLid === 'Sip' ? 'default' : 'outline'} onClick={() => setSelectedLid('Sip')}>Sip (Paper)</Button>
                     </div>
                   </div>
-                </div>
+                  
+                   {availablePacks && availablePacks.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-semibold mb-2">Quantity: <span className="font-normal">{selectedPack?.quantity.toLocaleString()} Pieces</span></h3>
+                      <div className="grid grid-cols-4 gap-2">
+                        {availablePacks.sort((a,b) => a.quantity - b.quantity).map((pack) => (
+                          <Button 
+                            key={pack.id} 
+                            variant={selectedPack?.id === pack.id ? 'default' : 'outline'} 
+                            onClick={() => setSelectedPack(pack)}
+                            className={cn(selectedPack?.id === pack.id && 'ring-2 ring-primary ring-offset-2')}
+                          >
+                            {pack.quantity.toLocaleString()}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-                <QuantityPricingTable onQuantityChange={setSelectedTier} />
+                </div>
 
                 <div className="mt-6 text-right">
                   <p className="text-sm text-muted-foreground">Total (excl. VAT)</p>
-                  {selectedTier ? (
+                  {selectedPack ? (
                     <>
-                      <p className="font-headline text-3xl font-bold">DH{selectedTier.total.toFixed(2)}</p>
-                      <p className="text-xs text-muted-foreground">or financing from DH{(selectedTier.total / 4).toFixed(2)}/Mo.</p>
+                      <p className="font-headline text-3xl font-bold">DH{totalPrice.toFixed(2)}</p>
+                      <p className="text-xs text-muted-foreground">or financing from DH{(totalPrice / 4).toFixed(2)}/Mo.</p>
                     </>
                   ) : (
                     <div className="h-12 flex items-center justify-end"><Loader2 className="h-6 w-6 animate-spin" /></div>
@@ -269,7 +300,7 @@ export default function ProductDetailPage() {
 
                 <div className="mt-6 space-y-3">
                   <Button size="lg" className="w-full bg-pink-500 hover:bg-pink-600 text-white">Upload design</Button>
-                  <Button size="lg" variant="outline" className="w-full" onClick={handleDesignLater} disabled={!selectedTier}>
+                  <Button size="lg" variant="outline" className="w-full" onClick={handleDesignLater} disabled={!selectedPack}>
                     Design later — Add to cart
                   </Button>
                 </div>
@@ -281,7 +312,3 @@ export default function ProductDetailPage() {
     </>
   );
 }
-
-    
-
-    

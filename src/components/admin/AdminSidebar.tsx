@@ -47,7 +47,7 @@ export function AdminSidebar() {
 
   const isProductRouteActive = pathname.startsWith('/admin/products');
   const isCmsRouteActive = pathname.startsWith('/admin/content');
-  const isStockRouteActive = pathname.startsWith('/admin/quantity-tiers');
+  const isStockRouteActive = pathname.startsWith('/admin/pack-sizes');
 
   const [isProductsOpen, setIsProductsOpen] = useState(isProductRouteActive);
   const [isCmsOpen, setIsCmsOpen] = useState(isCmsRouteActive);
@@ -222,9 +222,9 @@ export function AdminSidebar() {
               <CollapsibleContent>
                 <SidebarMenuSub>
                   <SidebarMenuSubItem>
-                    <Link href="/admin/quantity-tiers">
-                      <SidebarMenuSubButton isActive={pathname === '/admin/quantity-tiers'}>
-                        Quantity Tiers
+                    <Link href="/admin/pack-sizes">
+                      <SidebarMenuSubButton isActive={pathname === '/admin/pack-sizes'}>
+                        Pack Sizes & Tiers
                       </SidebarMenuSubButton>
                     </Link>
                   </SidebarMenuSubItem>

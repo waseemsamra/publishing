@@ -110,16 +110,21 @@ export default function ProductDetailPage() {
   
   const handleDesignLater = () => {
     if (product && selectedPack && product.packPrices) {
-        const packPrice = product.packPrices.find(p => p.packSizeId === selectedPack.id);
-        if (packPrice) {
-            const productWithPrice = { ...product, price: packPrice.price };
-            addToCart(productWithPrice, selectedPack.quantity);
-        }
+      const packPriceData = product.packPrices.find(p => p.packSizeId === selectedPack.id);
+      if (packPriceData) {
+        const productForCart: Product = {
+          ...product,
+          id: `${product.id}-${selectedPack.id}`,
+          name: `${product.name} (Pack of ${selectedPack.quantity})`,
+          price: packPriceData.price,
+        };
+        addToCart(productForCart, 1);
+      }
     }
   };
 
   const selectedPackPrice = product.packPrices?.find(p => p.packSizeId === selectedPack?.id)?.price;
-  const totalPrice = selectedPack && selectedPackPrice ? selectedPack.quantity * selectedPackPrice : 0;
+  const totalPrice = selectedPackPrice ?? 0;
 
   return (
     <>

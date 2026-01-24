@@ -190,6 +190,7 @@ export interface HeroBox {
   imageHint?: string;
   order: number;
   isFeatured?: boolean;
+  categoryId?: string;
   createdAt?: any;
   updatedAt?: any;
 }
@@ -206,5 +207,8 @@ export interface TrendingItem {
     
 
     
+
+    
+
 
     

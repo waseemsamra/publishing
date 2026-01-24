@@ -8,7 +8,7 @@ import * as z from 'zod';
 import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy, writeBatch, where, getDocs } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirestore } from '@/firebase/provider';
-import type { HeroBox } from '@/lib/types';
+import type { HeroBox, Category } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
@@ -19,8 +19,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MoreHorizontal, Edit, Trash2, PlusCircle, Loader2, UploadCloud, Copy, ArrowUp, ArrowDown } from 'lucide-react';
-import { format } from 'date-fns';
 
 const s3BaseUrl = 'https://printinweb.s3.us-east-1.amazonaws.com';
 
@@ -31,6 +31,7 @@ const boxSchema = z.object({
   imageHint: z.string().optional(),
   order: z.coerce.number().default(0),
   isFeatured: z.boolean().default(false),
+  categoryId: z.string().optional(),
 });
 
 type BoxFormValues = z.infer<typeof boxSchema>;
@@ -44,10 +45,11 @@ export default function AdminHeroBoxesPage() {
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
+    const [filterCategory, setFilterCategory] = useState<string>('all');
     
     const form = useForm<BoxFormValues>({
         resolver: zodResolver(boxSchema),
-        defaultValues: { title: '', link: '', imageUrl: '', imageHint: '', order: 0, isFeatured: false }
+        defaultValues: { title: '', link: '', imageUrl: '', imageHint: '', order: 0, isFeatured: false, categoryId: '' }
     });
 
     const boxesQuery = useMemo(() => {
@@ -56,8 +58,29 @@ export default function AdminHeroBoxesPage() {
         (q as any).__memo = true;
         return q;
     }, [db]);
+    
+    const categoriesQuery = useMemo(() => {
+        if (!db) return null;
+        const q = query(collection(db, 'categories'), orderBy('name', 'asc'));
+        (q as any).__memo = true;
+        return q;
+    }, [db]);
 
     const { data: boxes, isLoading: isLoadingData, error } = useCollection<HeroBox>(boxesQuery);
+    const { data: categories } = useCollection<Category>(categoriesQuery);
+    
+    const categoryMap = useMemo(() => {
+        if (!categories) return new Map();
+        return new Map(categories.map(c => [c.id, c.name]));
+    }, [categories]);
+
+    const filteredBoxes = useMemo(() => {
+        if (!boxes) return [];
+        if (filterCategory === 'all') return boxes;
+        if (filterCategory === 'none') return boxes.filter(box => !box.categoryId);
+        return boxes.filter(box => box.categoryId === filterCategory);
+    }, [boxes, filterCategory]);
+    
     const isLoading = authLoading || isLoadingData;
     
     const imageUrlPath = form.watch('imageUrl');
@@ -81,11 +104,12 @@ export default function AdminHeroBoxesPage() {
                 imageHint: dialogState.box.imageHint || '',
                 order: dialogState.box.order || 0,
                 isFeatured: dialogState.box.isFeatured || false,
+                categoryId: dialogState.box.categoryId || '',
             });
             setImagePreview(dialogState.box.imageUrl || null);
             setImageFile(null);
         } else {
-            form.reset({ title: '', link: '', imageUrl: '', imageHint: '', order: boxes?.length || 0, isFeatured: false });
+            form.reset({ title: '', link: '', imageUrl: '', imageHint: '', order: boxes?.length || 0, isFeatured: false, categoryId: '' });
             setImagePreview(null);
             setImageFile(null);
         }
@@ -124,9 +148,8 @@ export default function AdminHeroBoxesPage() {
                 finalImageUrl = data.imageUrl ? (data.imageUrl.startsWith('http') ? data.imageUrl : `${s3BaseUrl}${data.imageUrl}`) : '';
             }
 
-            const dataToSave = { ...data, imageUrl: finalImageUrl, updatedAt: serverTimestamp() };
+            const dataToSave = { ...data, categoryId: data.categoryId || null, imageUrl: finalImageUrl, updatedAt: serverTimestamp() };
             
-            // If this box is being set as featured, un-feature all other boxes
             if (data.isFeatured) {
                 const featuredQuery = query(collection(db, 'heroBoxes'), where('isFeatured', '==', true));
                 const featuredSnapshot = await getDocs(featuredQuery);
@@ -168,14 +191,14 @@ export default function AdminHeroBoxesPage() {
     };
     
     const handleReorder = async (currentIndex: number, direction: 'up' | 'down') => {
-        if (!db || !boxes) return;
-        if ((direction === 'up' && currentIndex === 0) || (direction === 'down' && currentIndex === boxes.length - 1)) {
+        if (!db || !filteredBoxes) return;
+        if ((direction === 'up' && currentIndex === 0) || (direction === 'down' && currentIndex === filteredBoxes.length - 1)) {
             return;
         }
 
-        const itemToMove = boxes[currentIndex];
+        const itemToMove = filteredBoxes[currentIndex];
         const otherIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-        const itemToSwapWith = boxes[otherIndex];
+        const itemToSwapWith = filteredBoxes[otherIndex];
 
         try {
             const batch = writeBatch(db);
@@ -204,8 +227,26 @@ export default function AdminHeroBoxesPage() {
             </div>
             <Card>
                 <CardHeader>
-                    <CardTitle>All Hero Boxes</CardTitle>
-                    <CardDescription>A list of all hero boxes, ordered by display order.</CardDescription>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <CardTitle>All Hero Boxes</CardTitle>
+                            <CardDescription>A list of all hero boxes, ordered by display order.</CardDescription>
+                        </div>
+                        <div className="w-64">
+                            <Select value={filterCategory} onValueChange={setFilterCategory}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Filter by category..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Categories</SelectItem>
+                                    <SelectItem value="none">Homepage (No Category)</SelectItem>
+                                    {categories?.map(cat => (
+                                        <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -215,15 +256,16 @@ export default function AdminHeroBoxesPage() {
                                 <TableHead>Title</TableHead>
                                 <TableHead>Order</TableHead>
                                 <TableHead>Link</TableHead>
+                                <TableHead>Category</TableHead>
                                 <TableHead>Featured</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {isLoading ? <TableRow><TableCell colSpan={6} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell></TableRow>
-                            : error ? <TableRow><TableCell colSpan={6} className="text-center text-red-500">{error.message}</TableCell></TableRow>
-                            : boxes?.length === 0 ? <TableRow><TableCell colSpan={6} className="h-24 text-center">No boxes found. Add one to get started.</TableCell></TableRow>
-                            : boxes?.map((box, index) => (
+                            {isLoading ? <TableRow><TableCell colSpan={7} className="h-24 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell></TableRow>
+                            : error ? <TableRow><TableCell colSpan={7} className="text-center text-red-500">{error.message}</TableCell></TableRow>
+                            : filteredBoxes?.length === 0 ? <TableRow><TableCell colSpan={7} className="h-24 text-center">No boxes found. Add one to get started.</TableCell></TableRow>
+                            : filteredBoxes?.map((box, index) => (
                                 <TableRow key={box.id}>
                                     <TableCell className="hidden sm:table-cell">
                                         {box.imageUrl && <Image alt={box.title} className="aspect-square rounded-md object-cover" height="64" src={box.imageUrl} width="64" unoptimized />}
@@ -231,6 +273,7 @@ export default function AdminHeroBoxesPage() {
                                     <TableCell className="font-medium">{box.title}</TableCell>
                                     <TableCell>{box.order}</TableCell>
                                     <TableCell>{box.link}</TableCell>
+                                    <TableCell>{box.categoryId ? categoryMap.get(box.categoryId) || 'N/A' : 'Homepage'}</TableCell>
                                     <TableCell>{box.isFeatured ? 'Yes' : 'No'}</TableCell>
                                     <TableCell className="text-right">
                                         <DropdownMenu>
@@ -239,7 +282,7 @@ export default function AdminHeroBoxesPage() {
                                                 <DropdownMenuItem onSelect={() => handleReorder(index, 'up')} disabled={index === 0}>
                                                     <ArrowUp className="mr-2 h-4 w-4" /><span>Move Up</span>
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem onSelect={() => handleReorder(index, 'down')} disabled={index === boxes.length - 1}>
+                                                <DropdownMenuItem onSelect={() => handleReorder(index, 'down')} disabled={index === filteredBoxes.length - 1}>
                                                     <ArrowDown className="mr-2 h-4 w-4" /><span>Move Down</span>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
@@ -272,6 +315,31 @@ export default function AdminHeroBoxesPage() {
                             <FormField control={form.control} name="order" render={({ field }) => (
                                 <FormItem><FormLabel>Order</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
                             )} />
+                             <FormField
+                                control={form.control}
+                                name="categoryId"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Category (Optional)</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value || ''}>
+                                        <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Assign to a category" />
+                                        </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                        <SelectItem value="">None (Homepage)</SelectItem>
+                                        {categories?.map((category) => (
+                                            <SelectItem key={category.id} value={category.id}>
+                                            {category.name}
+                                            </SelectItem>
+                                        ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                             <FormField control={form.control} name="isFeatured" render={({ field }) => (
                                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                                     <div className="space-y-0.5">
@@ -322,3 +390,5 @@ export default function AdminHeroBoxesPage() {
         </div>
     );
 }
+
+    
